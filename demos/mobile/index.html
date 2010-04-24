@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:m="http://sage.com/gobi/mobile">
+<head>
+    <title></title>
+    <meta name="viewport" content="width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <link type="text/css" rel="stylesheet" href="Content/javascript/iui/iui.css" />
+    <link type="text/css" rel="stylesheet" href="Content/javascript/iui/default/default-theme.css" />
+    <link type="text/css" rel="stylesheet" href="Content/css/app.css" />        
+    <script type="text/javascript" src="content/javascript/ext/ext-core.js"></script>   
+    <script type="text/javascript" src="content/javascript/iui/iui-sage.js"></script>
+    <script type="text/javascript">iui.delayInit = true;</script> 
+</head>
+<body>
+<div class="toolbar">
+    <h1 id="pageTitle">Mobile Demo</h1>
+    <a id="backButton" class="button" href="#"></a>
+    <a class="button" href="#searchForm" style="display: none;">Search</a>
+</div>
+
+<!-- 
+note: without some re-work to iUI, there must always be an initial page, otherwise behavior
+is inconsistant.  root views can boot into this root page, instead of dynamically generating
+their root view.
+-->
+<!--
+<ul id="root" selected="true">
+</ul>
+-->
+<!--
+<div id="root" selected="true" class="panel">
+
+</div>
+-->
+<script type="text/javascript">
+Ext.onReady(function() {    
+    App.init(); 
+    iui.init();
+});
+</script>
+<script type="text/javascript" src="content/javascript/ObjTree.js" type="text/javascript"></script>     
+<script type="text/javascript" src="content/javascript/Base64.js" type="text/javascript"></script>   
+<script type="text/javascript" src="content/javascript/Simplate.js" type="text/javascript"></script>
+<script type="text/javascript" src="content/javascript/sdata/SDataService.js"></script>
+<script type="text/javascript" src="content/javascript/sdata/SDataBaseRequest.js"></script>
+<script type="text/javascript" src="content/javascript/sdata/SDataApplicationRequest.js"></script>
+<script type="text/javascript" src="content/javascript/sdata/SDataResourceCollectionRequest.js"></script>
+<script type="text/javascript" src="content/javascript/sdata/SDataSingleResourceRequest.js"></script>
+<script type="text/javascript" src="content/javascript/sdata/SDataUri.js"></script>
+
+<script type="text/javascript" src="content/javascript/platform/Application.js"></script>
+<script type="text/javascript" src="content/javascript/platform/View.js"></script>
+<script type="text/javascript" src="content/javascript/platform/List.js"></script>    
+<script type="text/javascript" src="content/javascript/platform/Detail.js"></script>
+
+<script type="text/javascript" src="content/javascript/app/aw/Application.js"></script>
+<script type="text/javascript" src="content/javascript/app/aw/views/Login.js"></script>
+<script type="text/javascript" src="content/javascript/app/aw/views/LoginDialog.js"></script>
+<script type="text/javascript" src="content/javascript/app/aw/views/Home.js"></script>
+<script type="text/javascript" src="content/javascript/app/aw/views/contact/List.js"></script>
+<script type="text/javascript" src="content/javascript/app/aw/views/contact/Detail.js"></script>
+<script type="text/javascript" src="content/javascript/app/aw/views/salesorder/List.js"></script>
+</body>
+</html>

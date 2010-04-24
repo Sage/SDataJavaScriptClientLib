@@ -1,0 +1,60 @@
+﻿body[orient="landscape"] > form.dialog,
+body > form.dialog
+{
+	height: 100%;
+}
+
+h3 
+{
+	font-size: .75em;
+	margin: 0;
+	padding: 0;
+}
+
+h4 
+{
+	font-size: .5em;
+	margin: 0;
+	padding: 0;
+	color: #999999;
+}
+
+li.more
+{
+	padding: 1em;
+}
+
+li.more-loading a.whiteButton span
+{
+	background: url('../images/loading-arrows.gif') no-repeat scroll 0 50%;
+	padding: 0 0 0 20px;
+	color: #999999;
+}
+
+li.loading
+{
+	text-align: center;
+}
+
+li.loading .loading-indicator
+{	
+	display: inline-block;
+}
+
+.loading-indicator
+{
+	background: url('../images/loading-arrows.gif') no-repeat scroll 0 50%;
+	padding: 0 0 0 20px;
+}
+
+fieldset.loading .row
+{
+	text-align: center !important;
+	padding: 1em !important;
+	min-height: 1em !important;
+}
+
+fieldset.loading .loading-indicator
+{
+	display: inline-block;
+}
