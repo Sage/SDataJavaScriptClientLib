@@ -37,20 +37,30 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
                     this.loaded = true;
                 }   
             }, this)
-            .on('focus', function(evt, el, o) {                                            
-                this.focus();
+            .on('beforetransition', function(evt, el, o) {
+                if (evt.browserEvent.out)
+                    this.beforeTransitionAway();
+                else
+                    this.beforeTransitionTo();                
             }, this)
-            .on('blur', function(evt, el, o) {
-                this.blur();
+            .on('aftertransition', function(evt, el, o) {
+                if (evt.browserEvent.out)
+                    this.transitionAway();
+                else
+                    this.transitionTo();
             }, this);              
     },
     load: function() {
     },
-    focus: function() {
-    },
-    blur: function() {
-    },
     show: function() {
         iui.showPage(this.el.dom);
-    }
+    },
+    beforeTransitionTo: function() {
+    },
+    beforeTransitionAway: function() {
+    },
+    transitionTo: function() {        
+    },
+    transitionAway: function() {        
+    }   
 });

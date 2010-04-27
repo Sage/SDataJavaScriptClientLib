@@ -16,21 +16,6 @@
     <a id="backButton" class="button" href="#"></a>
     <a class="button" href="#searchForm" style="display: none;">Search</a>
 </div>
-
-<!-- 
-note: without some re-work to iUI, there must always be an initial page, otherwise behavior
-is inconsistant.  root views can boot into this root page, instead of dynamically generating
-their root view.
--->
-<!--
-<ul id="root" selected="true">
-</ul>
--->
-<!--
-<div id="root" selected="true" class="panel">
-
-</div>
--->
 <script type="text/javascript">
 Ext.onReady(function() {    
     App.init(); 
@@ -52,21 +37,14 @@ Ext.onReady(function() {
 <script type="text/javascript" src="content/javascript/platform/List.js"></script>    
 <script type="text/javascript" src="content/javascript/platform/Detail.js"></script>
 
-<!--
-<script type="text/javascript" src="content/javascript/app/aw/Application.js"></script>
-<script type="text/javascript" src="content/javascript/app/aw/views/Login.js"></script>
-<script type="text/javascript" src="content/javascript/app/aw/views/LoginDialog.js"></script>
-<script type="text/javascript" src="content/javascript/app/aw/views/Home.js"></script>
-<script type="text/javascript" src="content/javascript/app/aw/views/contact/List.js"></script>
-<script type="text/javascript" src="content/javascript/app/aw/views/contact/Detail.js"></script>
-<script type="text/javascript" src="content/javascript/app/aw/views/salesorder/List.js"></script>
--->
 <script type="text/javascript" src="content/javascript/app/slx/Application.js"></script>
+<script type="text/javascript" src="content/javascript/app/slx/Format.js"></script>
+<script type="text/javascript" src="content/javascript/app/slx/Template.js"></script>
 <script type="text/javascript" src="content/javascript/app/slx/views/LoginDialog.js"></script>
 <script type="text/javascript" src="content/javascript/app/slx/views/Home.js"></script>
 <script type="text/javascript" src="content/javascript/app/slx/views/account/List.js"></script>
 <script type="text/javascript" src="content/javascript/app/slx/views/account/Detail.js"></script>
 <script type="text/javascript" src="content/javascript/app/slx/views/contact/List.js"></script>
-
+<script type="text/javascript" src="content/javascript/app/slx/views/contact/Detail.js"></script>
 </body>
 </html>

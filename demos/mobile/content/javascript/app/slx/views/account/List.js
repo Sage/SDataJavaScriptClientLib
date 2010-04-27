@@ -22,7 +22,7 @@ Mobile.SalesLogix.Account.List = Ext.extend(Sage.Platform.Mobile.List, {
         Ext.apply(this, o, {
             id: 'account_list',
             title: 'Accounts',
-            pageSize: 20,
+            pageSize: 10,
             icon: 'content/images/app/slx/Accounts_24x24.gif'
         });
     },   
@@ -36,6 +36,7 @@ Mobile.SalesLogix.Account.List = Ext.extend(Sage.Platform.Mobile.List, {
             .setResourceKind('accounts')
             .setQueryArgs({
                 'include': 'Address',
+                'orderby': 'AccountName',
                 'select': 'AccountName,Address/City'                
             })                    
             .setCount(pageSize)

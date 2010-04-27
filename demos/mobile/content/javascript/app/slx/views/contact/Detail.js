@@ -5,55 +5,57 @@
 /// <reference path="../../../../platform/View.js"/>
 /// <reference path="../../../../platform/Detail.js"/>
 /// <reference path="../../Format.js"/>
+/// <reference path="../../Template.js"/>
 
-Ext.namespace("Mobile.SalesLogix.Account");
+Ext.namespace("Mobile.SalesLogix.Contact");
 
-Mobile.SalesLogix.Account.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {       
+Mobile.SalesLogix.Contact.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {       
     constructor: function(o) {
-        Mobile.SalesLogix.Account.Detail.superclass.constructor.call(this);        
+        Mobile.SalesLogix.Contact.Detail.superclass.constructor.call(this);        
         
         Ext.apply(this, o, {
-            id: 'account_detail',
-            title: 'Account',
+            id: 'contact_detail',
+            title: 'Contact',
             expose: false
         });
 
         this.layout = [
-            {name: 'AccountName', label: 'name'},
-            {name: 'MainPhone', label: 'phone', renderer: Mobile.SalesLogix.Format.phone},
+            {label: 'name', tpl: Mobile.SalesLogix.Template.nameLF},
+            {name: 'AccountName', label: 'account'},
+            {name: 'WorkPhone', label: 'work', renderer: Mobile.SalesLogix.Format.phone},
+            {name: 'MobilePhone', label: 'mobile', renderer: Mobile.SalesLogix.Format.phone},
+            {name: 'Email', label: 'email', renderer: Mobile.SalesLogix.Format.mail},
             {name: 'Address', label: 'address', renderer: Mobile.SalesLogix.Format.address},
             {name: 'WebAddress', label: 'web', renderer: Mobile.SalesLogix.Format.link},
-            {name: 'Type', label: 'type'},
-            {name: 'SubType', label: 'sub-type'}, 
             {name: 'AccountManager.UserInfo', label: 'acct mgr', tpl: Mobile.SalesLogix.Template.nameLF},
             {name: 'Owner.OwnerDescription', label: 'owner'},
-            {name: 'Status', label: 'status'},
             {name: 'CreateDate', label: 'create date'},
             {name: 'CreateUser', label: 'create user'}
         ];
     },
     init: function() {     
-        Mobile.SalesLogix.Account.Detail.superclass.init.call(this);   
+        Mobile.SalesLogix.Contact.Detail.superclass.init.call(this);   
     },
     createRequest: function() {
         return new Sage.SData.Client.SDataSingleResourceRequest(this.getService())            
-            .setResourceKind('accounts')
+            .setResourceKind('contacts')
             .setQueryArgs({
-                'include': 'Address,AccountManager,AccountManager/UserInfo,Owner',
+                'include': 'Address,AccountManager,AccountManager/UserInfo',                
                 'select': [
+                    'FirstName',
+                    'LastName',
                     'AccountName',
-                    'MainPhone',
+                    'WorkPhone',
+                    'Mobile',
+                    'Email',
                     'Address/*',
                     'WebAddress',
-                    'Type',
-                    'SubType',
                     'AccountManager/UserInfo/FirstName',
                     'AccountManager/UserInfo/LastName',
                     'Owner/OwnerDescription',
-                    'Status',
                     'CreateDate',
                     'CreateUser'
-                ].join(',')                  
+                ].join(',')             
             })
             .setResourceSelector("'" + this.context.key + "'");
     } 

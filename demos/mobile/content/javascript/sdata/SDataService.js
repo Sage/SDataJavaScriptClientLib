@@ -105,7 +105,7 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
     },
     createHeadersForRequest: function(request) {
         var headers = {
-            'User-Agent': this.userAgent /* 'User-Agent' cannot be set on XmlHttpRequest */
+            /* 'User-Agent': this.userAgent */ /* 'User-Agent' cannot be set on XmlHttpRequest */
         };
         
         if (this.username !== false)
@@ -125,7 +125,8 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
         }     
         
         /* temporary fix for iphone authentication issue */
-        if (/(iphone|ipad)/.test(navigator.userAgent.toLowerCase()))           
+        /*
+        if (/(iphone|ipad)/i.test(navigator.userAgent))           
         if (true)
         {
             var old = request.getUri();
@@ -138,7 +139,8 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
                 );
                 
             request.setUri(uri);   
-        }        
+        }   
+        */     
 
         Ext.Ajax.request({
             url: request.toString(),

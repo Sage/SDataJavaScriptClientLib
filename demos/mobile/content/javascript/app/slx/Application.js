@@ -25,6 +25,7 @@ Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {
         this.registerView(new Mobile.SalesLogix.Account.List());  
         this.registerView(new Mobile.SalesLogix.Account.Detail());      
         this.registerView(new Mobile.SalesLogix.Contact.List());       
+        this.registerView(new Mobile.SalesLogix.Contact.Detail());  
     }    
 });
 

@@ -22,7 +22,7 @@ Mobile.SalesLogix.Contact.List = Ext.extend(Sage.Platform.Mobile.List, {
         Ext.apply(this, o, {
             id: 'contact_list',
             title: 'Contacts',
-            pageSize: 20,
+            pageSize: 10,
             icon: 'content/images/app/slx/Contacts_24x24.gif'
         });
     },   
@@ -35,7 +35,8 @@ Mobile.SalesLogix.Contact.List = Ext.extend(Sage.Platform.Mobile.List, {
         return new Sage.SData.Client.SDataResourceCollectionRequest(this.getService())            
             .setResourceKind('contacts')
             .setQueryArgs({
-                'select': 'LastName,FirstName,AccountName'                
+                'orderby': 'LastName,FirstName',
+                'select': 'LastName,FirstName,AccountName'                             
             })                    
             .setCount(pageSize)
             .setStartIndex(startIndex); 

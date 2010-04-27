@@ -10,6 +10,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     dotValueProvider: (function() { 
         var cache = {};
         var nameToPath = function(name) {
+            if (typeof name !== 'string') return [];
             if (cache[name]) return cache[name];
             var parts = name.split(".");
             var path = [];
@@ -165,21 +166,28 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         this.context = o; 
 
         Sage.Platform.Mobile.Detail.superclass.show.call(this);                     
+    },  
+    isNewContext: function() {
+        return (!this.current || (this.current && this.current.key != this.context.key));
+    }, 
+    beforeTransitionTo: function() {
+        Sage.Platform.Mobile.Detail.superclass.beforeTransitionTo.call(this);
+
+        if (this.isNewContext())
+        {
+            this.clear();
+        } 
     },
-    focus: function() {        
-        Sage.Platform.Mobile.Detail.superclass.focus.call(this);
+    transitionTo: function() {
+        Sage.Platform.Mobile.Detail.superclass.transitionTo.call(this);
 
         // if the current context has changed, re-render the view
-        if (!this.current || (this.current && this.current.key != this.context.key)) 
+        if (this.isNewContext()) 
         {
             this.current = this.context;
-
-            this.clear();        
-            
-            // allow iUI transition to begin
-            // todo: find a way to detect when the iUI transition has ended before calling load      
-            this.requestData.defer(100, this);    
-        }        
+                    
+            this.requestData();  
+        }   
     },
     clear: function() {
         this.el.update(this.contentTemplate.apply(this));

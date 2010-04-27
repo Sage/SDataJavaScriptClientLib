@@ -24,7 +24,8 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         Ext.apply(this, o, {
             id: 'generic_list',
             title: 'List',
-            pageSize: 20
+            pageSize: 20,
+            requestedFirstPage: false
         });
     },    
     init: function() {     
@@ -101,11 +102,13 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         this.moreEl.addClass('more-loading');
         this.requestData();
     },
-    load: function() {        
-        Sage.Platform.Mobile.List.superclass.load.call(this);
+    transitionTo: function() {
+         Sage.Platform.Mobile.List.superclass.transitionTo.call(this);
 
-        // allow iUI transition to begin
-        // todo: find a way to detect when the iUI transition has ended before calling load      
-        this.requestData.defer(100, this);
+        if (this.requestedFirstPage == false) 
+        {
+            this.requestedFirstPage = true;
+            this.requestData();
+        }
     }
 });
