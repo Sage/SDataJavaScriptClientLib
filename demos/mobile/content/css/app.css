@@ -58,3 +58,51 @@ fieldset.loading .loading-indicator
 {
 	display: inline-block;
 }
+
+img
+{
+	border: none 0px black;
+}
+
+img.icon
+{
+	margin: 0 .5em 0 0;
+}
+
+div.row > label 
+{
+	margin: 0px;
+	padding: 0;
+	position: relative;
+	float: left;
+	line-height: 40px;
+	width: 100px;
+	text-align: right;
+	color: #556382;
+	font-size: 0.9em;
+}
+
+div.panel > ul li, 
+div.row
+{
+	text-align: left;
+	clear: both;
+	min-height: 40px;
+}
+
+div.panel > ul, 
+div.panel > fieldset
+{
+	text-align: left;
+	font-size: 14px;
+}
+
+div.row > span
+{
+	display: block;
+	margin: 0 0 0 0px;
+	padding: 12px 12px 12px 12px;
+	position: relative;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}

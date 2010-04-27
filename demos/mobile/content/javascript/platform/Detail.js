@@ -7,6 +7,42 @@
 Ext.namespace('Sage.Platform.Mobile');
 
 Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
+    dotValueProvider: (function() { 
+        var cache = {};
+        var nameToPath = function(name) {
+            if (cache[name]) return cache[name];
+            var parts = name.split(".");
+            var path = [];
+            for (var i = 0; i < parts.length; i++)
+            {
+                var match = parts[i].match(/([a-zA-Z0-9_]+)\[([^\]]+)\]/);
+                if (match)
+                {
+                    path.push(match[1]);
+                    if (/^\d+$/.test(match[2]))
+                        path.push(parseInt(match[2]));
+                    else
+                        path.push(match[2]);                    
+                }
+                else
+                {
+                    path.push(parts[i]);
+                }                    
+            } 
+            return (cache[name] = path.reverse());
+        };
+
+        return function(o, name) {
+            var path = nameToPath(name).slice(0);
+            var current = o;
+            while (current && path.length > 0)
+            {
+                var key = path.pop();
+                if (current[key]) current = current[key]; else return null;
+            }                                
+            return current;
+        }
+    })(),
     viewTemplate: new Simplate([            
         '<div id="{%= id %}" title="{%= title %}" class="panel">',             
         '</div>'
@@ -16,17 +52,17 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         '<div class="row"><div class="loading-indicator">loading...</div></div>',
         '</fieldset>',
     ]),
-    entryBeginTemplate: new Simplate([
-        '<h2>{%= title || "Details" %}</h2>',
+    sectionBeginTemplate: new Simplate([
+        '<h2>{%= values["title"] || "Details" %}</h2>',
         '<fieldset>'
     ]),
-    entryEndTemplate: new Simplate([
+    sectionEndTemplate: new Simplate([
         '</fieldset>'
     ]),
     propertyTemplate: new Simplate([
         '<div class="row">',
-        '<label>{%= label %}</label>',
-        '<span>{%= entry[name] %}</span>',
+        '<label>{%= label %}</label>',       
+        '<span>{%= value %}</span>',
         '</div>'
     ]),    
     constructor: function(o) {
@@ -53,51 +89,58 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     createRequest: function() {
        
     },    
-    processEntry: function(layout, title, entry) {        
-        var children = [];
+    processLayout: function(layout, title, entry)
+    {
+        var sections = [];
+        var content = [];
+        
+        content.push(this.sectionBeginTemplate.apply({
+            title: title,
+            entry: entry
+        }));        
 
-        if (entry) 
+        for (var i = 0; i < layout.length; i++)
         {
-            var content = [];
+            var current = layout[i];
 
-            content.push(this.entryBeginTemplate.apply({
-                title: title,
-                entry: entry
-            }));
-
-            for (var i = 0; i < layout.length; i++)
+            if (current['as'])
             {
-                if (layout[i]['layout'])
-                {
-                    children.push(layout[i]);
-                }
-                else
-                {
-                    content.push(this.propertyTemplate.apply({
-                        label: layout[i]['label'],
-                        name: layout[i]['name'],
-                        format: layout[i]['format'],
-                        entry: entry
-                    }));
-                }
-            }
+                sections.push(current);
+                continue;
+            }         
+            
+            var provider = current['provider'] || this.dotValueProvider;
+            var value = provider(entry, current['name']);
+            var formatted = current['tpl']
+                ? current['tpl'].apply(value)
+                : current['renderer']
+                    ? current['renderer'](value)
+                    : value;
 
-            content.push(this.entryEndTemplate.apply({              
-                entry: entry
+            content.push(this.propertyTemplate.apply({
+                name: current['name'],
+                label: current['label'],
+                renderer: current['renderer'],
+                provider: current['provider'],                
+                entry: entry,
+                raw: value,
+                value: formatted
             }));
-
-            Ext.DomHelper.append(this.el, content.join(''));
         }
 
-        for (var i = 0; i < children.length; i++)
+        content.push(this.sectionEndTemplate.apply({              
+            entry: entry
+        }));
+
+        Ext.DomHelper.append(this.el, content.join(''));
+
+        for (var i = 0; i < sections.length; i++)
         {
-            this.processEntry(
-                children[i]['layout'], 
-                children[i]['label'],
-                entry[children[i]['name']]
-            );
-        }
-    },
+            var current = sections[i];  
+            
+            this.processEntry(current['as'], current['title'], entry);  
+        }        
+    },    
     requestFailure: function(response, o) {
        
     },
@@ -110,7 +153,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
                     .remove();
 
                 if (entry)                  
-                    this.processEntry(this.layout, false, entry);
+                    this.processLayout(this.layout, false, entry);
             },
             failure: function(response, o) {
                 this.requestFailure(response, o);
@@ -135,7 +178,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
             
             // allow iUI transition to begin
             // todo: find a way to detect when the iUI transition has ended before calling load      
-            this.requestData.defer(75, this);    
+            this.requestData.defer(100, this);    
         }        
     },
     clear: function() {

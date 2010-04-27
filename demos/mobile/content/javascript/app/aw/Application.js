@@ -13,7 +13,7 @@ Mobile.AdventureWorks.Application = Ext.extend(Sage.Platform.Mobile.Application,
         this.service
             .setServerName('10.40.112.24')      
             .setPort(3333)                        
-            .setVirtualDirectory('sdata')
+            .setVirtualDirectory('sdata-aw')
             .setApplicationName('aw')
             .setContractName('dynamic')
             .setIncludeContent(false);

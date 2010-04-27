@@ -106,6 +106,6 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
         // allow iUI transition to begin
         // todo: find a way to detect when the iUI transition has ended before calling load      
-        this.requestData.defer(75, this);
+        this.requestData.defer(100, this);
     }
 });

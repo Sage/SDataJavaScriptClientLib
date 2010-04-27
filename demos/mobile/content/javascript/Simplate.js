@@ -58,22 +58,22 @@
             fragments[i] = "__p('" + fragments[i].replace(new RegExp("'"), "\\'") + "');";
            
         var source = [
-            'var r = [], __p = function() { r.push.apply(r, arguments); };',
-            'with (d) {',
+            'var __r = [], __v = values, __p = function() { __r.push.apply(__r, arguments); };',
+            'with (__v) {',
             fragments.join(''),
             '}',
-            'return r.join(\'\');'
+            'return __r.join(\'\');'
         ];            
         
         var fn;
 
         try
         {
-            fn = new Function("d", source.join(''));
+            fn = new Function("values", source.join(''));
         } 
         catch (e) 
         {
-            fn = function(d) { return e.message; };
+            fn = function(values) { return e.message; };
         }        
        
         return (cache[markup] = fn);        

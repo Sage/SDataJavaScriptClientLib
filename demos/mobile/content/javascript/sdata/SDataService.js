@@ -204,14 +204,17 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
                     {
                         var converted = null;
                     }
+                    /*
+                    // no longer an indicator of a pure-linked entry
                     else if (value.hasOwnProperty('@sdata:uri')) // linked
                     {
                         var converted = {
                             '$key': value['@sdata:key'],
                             '$url': value['@sdata:uri']
-                            /* should be a descriptor as well */
+                            // should be a descriptor as well 
                         };
                     }
+                    */
                     else if (value.hasOwnProperty('@sdata:key')) // included
                     {
                         var converted = this.convertEntity(ns, value);
