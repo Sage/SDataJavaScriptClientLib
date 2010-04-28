@@ -24,14 +24,21 @@ Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {
         this.registerView(new Mobile.SalesLogix.Home());
         
         this.registerView(new Mobile.SalesLogix.Account.List());  
-        this.registerView(new Mobile.SalesLogix.Account.Detail());      
+        this.registerView(new Mobile.SalesLogix.Account.Detail());
+              
         this.registerView(new Mobile.SalesLogix.Contact.List());                     
         this.registerView(new Mobile.SalesLogix.Contact.Detail());  
-
         this.registerView(new Mobile.SalesLogix.Contact.List({
             id: 'contact_related',
             expose: false
         }));  
+
+        this.registerView(new Mobile.SalesLogix.Opportunity.List());
+        this.registerView(new Mobile.SalesLogix.Opportunity.Detail());
+        this.registerView(new Mobile.SalesLogix.Opportunity.List({
+            id: 'opportunity_related',
+            expose: false
+        })); 
     }    
 });
 

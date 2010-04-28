@@ -36,6 +36,12 @@ Mobile.SalesLogix.Account.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
                     where: this.formatRelatedQuery.createDelegate(this, ['Account.id eq "{0}"'], true),
                     label: 'Contacts',
                     icon: 'content/images/app/slx/Contacts_24x24.gif'
+                },
+                {
+                    view: 'opportunity_related', 
+                    where: this.formatRelatedQuery.createDelegate(this, ['Account.id eq "{0}"'], true),
+                    label: 'Opportunities',
+                    icon: 'content/images/app/slx/Opportunity_List_24x24.gif'
                 }
             ]}
         ];

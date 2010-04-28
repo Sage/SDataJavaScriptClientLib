@@ -23,16 +23,27 @@ Mobile.SalesLogix.Contact.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
             {label: 'name', tpl: Mobile.SalesLogix.Template.nameLF},
             {name: 'AccountName', label: 'account'},
             {name: 'WorkPhone', label: 'work', renderer: Mobile.SalesLogix.Format.phone},
-            {name: 'MobilePhone', label: 'mobile', renderer: Mobile.SalesLogix.Format.phone},
+            {name: 'Mobile', label: 'mobile', renderer: Mobile.SalesLogix.Format.phone},
             {name: 'Email', label: 'email', renderer: Mobile.SalesLogix.Format.mail},
             {name: 'Address', label: 'address', renderer: Mobile.SalesLogix.Format.address},
             {name: 'WebAddress', label: 'web', renderer: Mobile.SalesLogix.Format.link},
             {name: 'AccountManager.UserInfo', label: 'acct mgr', tpl: Mobile.SalesLogix.Template.nameLF},
             {name: 'Owner.OwnerDescription', label: 'owner'},
             {name: 'CreateDate', label: 'create date'},
-            {name: 'CreateUser', label: 'create user'}            
+            {name: 'CreateUser', label: 'create user'},
+            {options: {title: 'Related', list: true}, as: [                
+                {
+                    view: 'opportunity_related', 
+                    where: this.formatAccountRelatedQuery.createDelegate(this, ['Account.id eq "{0}"'], true),
+                    label: 'Opportunities',
+                    icon: 'content/images/app/slx/Opportunity_List_24x24.gif'
+                }
+            ]}           
         ];
     },        
+    formatAccountRelatedQuery: function(entry, fmt) {
+        return String.format(fmt, entry['Account']['$key']);
+    },
     init: function() {     
         Mobile.SalesLogix.Contact.Detail.superclass.init.call(this);   
     },
@@ -40,8 +51,9 @@ Mobile.SalesLogix.Contact.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
         return new Sage.SData.Client.SDataSingleResourceRequest(this.getService())            
             .setResourceKind('contacts')
             .setQueryArgs({
-                'include': 'Address,AccountManager,AccountManager/UserInfo',                
+                'include': 'Account,Address,AccountManager,AccountManager/UserInfo',                
                 'select': [
+                    'Account/AccountName',
                     'FirstName',
                     'LastName',
                     'AccountName',
