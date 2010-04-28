@@ -30,9 +30,9 @@ Mobile.SalesLogix.Contact.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
             {name: 'AccountManager.UserInfo', label: 'acct mgr', tpl: Mobile.SalesLogix.Template.nameLF},
             {name: 'Owner.OwnerDescription', label: 'owner'},
             {name: 'CreateDate', label: 'create date'},
-            {name: 'CreateUser', label: 'create user'}
+            {name: 'CreateUser', label: 'create user'}            
         ];
-    },
+    },        
     init: function() {     
         Mobile.SalesLogix.Contact.Detail.superclass.init.call(this);   
     },

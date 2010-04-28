@@ -122,25 +122,7 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
             var options = {
                 success: options
             };
-        }     
-        
-        /* temporary fix for iphone authentication issue */
-        /*
-        if (/(iphone|ipad)/i.test(navigator.userAgent))           
-        if (true)
-        {
-            var old = request.getUri();
-            var uri = new Sage.SData.Client.SDataUri(old)
-                .setHost(
-                    String.format("{0}:{1}@{2}", 
-                        encodeURIComponent(this.getUserName()), 
-                        encodeURIComponent(this.getPassword()), 
-                        old.getHost())
-                );
-                
-            request.setUri(uri);   
-        }   
-        */     
+        }             
 
         Ext.Ajax.request({
             url: request.toString(),
@@ -282,7 +264,7 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
         if (Ext.isArray(feed['entry']))
             for (var i = 0; i < feed['entry'].length; i++)
                 result['$resources'].push(this.convertEntry(feed['entry'][i]));
-        else
+        else if (typeof feed['entry'] === 'object')
             result['$resources'].push(this.convertEntry(feed['entry']));
 
         return result;

@@ -6,14 +6,16 @@ Ext.namespace('Sage.Platform.Mobile');
 
 Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     viewTemplate: new Simplate([            
-        '<ul id="{%= id %}" title="{%= title %}">',        
-        '<li class="loading"><div class="loading-indicator">loading...</div></li>',
-        '<li class="more"><a href="#" target="_none" class="whiteButton"><span>More</span></a></li>',        
+        '<ul id="{%= id %}" title="{%= title %}">',                       
         '</ul>'
+    ]),
+    contentTemplate: new Simplate([
+        '<li class="loading"><div class="loading-indicator">loading...</div></li>',
+        '<li class="more" style="display: none;"><a href="#" target="_none" class="whiteButton moreButton"><span>More</span></a></li>'
     ]),
     itemTemplate: new Simplate([
         '<li>',
-        '<a href="#" target="_none" m:key="{%= $key %}" m:url="{%= $url %}" m:kind="">',
+        '<a href="#" target="_detail" m:key="{%= $key %}" m:url="{%= $url %}" m:kind="">',
         '<h3>{%= $descriptor %}</h3>',
         '</a>',
         '</li>'
@@ -27,22 +29,26 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             pageSize: 20,
             requestedFirstPage: false
         });
-    },    
+    },   
+    render: function() {
+        Sage.Platform.Mobile.List.superclass.render.call(this);
+
+        this.clear();
+    }, 
     init: function() {     
         Sage.Platform.Mobile.List.superclass.init.call(this); 
 
         this.el
-            .on('click', function(evt, el, o) {
-                this.navigateToDetail(Ext.fly(el).up('a'));
-            }, this, { preventDefault: true, stopPropagation: true });
+            .on('click', function(evt, el, o) {                
+                var source = Ext.get(el);
+                var target;
 
-        this.moreEl = this.el.select(".more").item(0);
-        this.moreEl
-            .hide()
-            .select(".whiteButton")            
-                .on('click', function(evt, el, o) {    
-                    this.more();          
-                }, this, { preventDefault: true, stopPropagation: true });
+                if (source.is('.more') || (source.up('.more')))                
+                    this.more(evt);
+                else if (source.is('a[target="_detail"]') || (target = source.up('a[target="_detail"]')))
+                    this.navigateToDetail(target || source, evt);
+
+            }, this, { preventDefault: true, stopPropagation: true });                
     },
     getService: function() {
         /// <returns type="Sage.SData.Client.SDataService" />
@@ -65,11 +71,13 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         }
     },
     processFeed: function(feed) {
-        var isFirstFetch = typeof this.feed === 'undefined';
-        if (isFirstFetch) 
+        if (this.requestedFirstPage == false) 
+        {
+            this.requestedFirstPage = true;
             this.el
                 .select('.loading')
-                .remove();
+                .remove();           
+        }
                        
         this.feed = feed;
                 
@@ -101,14 +109,43 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     more: function() {
         this.moreEl.addClass('more-loading');
         this.requestData();
+    },  
+    hasContext: function() {
+        return (this.current || this.context);
+    },  
+    isNewContext: function() {        
+        return (!this.current || (this.current && this.current.where != this.context.where));
+    },
+    beforeTransitionTo: function() {
+        Sage.Platform.Mobile.List.superclass.beforeTransitionTo.call(this);
+
+        if (this.hasContext() && this.isNewContext())
+        {
+            this.clear();
+        } 
     },
     transitionTo: function() {
-         Sage.Platform.Mobile.List.superclass.transitionTo.call(this);
+        Sage.Platform.Mobile.List.superclass.transitionTo.call(this);
 
-        if (this.requestedFirstPage == false) 
+        if (this.hasContext() && this.isNewContext())
         {
-            this.requestedFirstPage = true;
-            this.requestData();
+            this.current = this.context;
         }
-    }
+        
+        if (this.requestedFirstPage == false)         
+            this.requestData();                
+    },    
+    show: function(o) {
+        this.context = o; 
+
+        Sage.Platform.Mobile.List.superclass.show.call(this);                     
+    },  
+    clear: function() {
+        this.el.update(this.contentTemplate.apply(this));
+
+        this.moreEl = this.el.down(".more"); 
+
+        this.requestedFirstPage = false;
+        this.feed = false;
+    }  
 });

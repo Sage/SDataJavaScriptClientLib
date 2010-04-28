@@ -1,4 +1,5 @@
 ﻿/// <reference path="../ext/ext-core-debug.js"/>
+/// <reference path="Format.js"/>
 
 Ext.namespace('Sage.Platform.Mobile');
 
