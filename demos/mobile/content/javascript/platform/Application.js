@@ -8,10 +8,12 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         Sage.Platform.Mobile.Application.superclass.constructor.call(this);
 
         this.initialized = false;
-        this.views = [];
+        this.views = [];        
         this.viewsById = {};
         this.addEvents(
-            'registered'
+            'registered',
+            'search',
+            'edit'
         );
     },
     setup: function() {
@@ -19,6 +21,9 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     },
     init: function() {        
         this.setup();
+
+        if (this.tbar)
+            this.tbar.init();
 
         for (var i = 0; i < this.views.length; i++) 
             this.views[i].init();
@@ -37,10 +42,22 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         return this.views;
     },
     getView: function(id) {
-        return this.viewsById[id];
+        if (typeof id === 'string') 
+            return this.viewsById[id];
+        else if (typeof id.id !== 'undefined')
+            return this.viewsById[id.id];
+        else return null;
     },
     getService: function() {
         return this.service;
+    },
+    allowSearch: function(val) {
+        if (this.tbar && this.tbar.allowSearch)
+            this.tbar.allowSearch(val);
+    },
+    allowEdit: function(val) {
+        if (this.tbar && this.tbar.allowEdit)
+            this.tbar.allowEdit(val);
     }
 });
 

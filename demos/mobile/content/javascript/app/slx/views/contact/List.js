@@ -26,25 +26,18 @@ Mobile.SalesLogix.Contact.List = Ext.extend(Sage.Platform.Mobile.List, {
             icon: 'content/images/app/slx/Contacts_24x24.gif'
         });
     },   
+    formatSearchQuery: function(query) {
+        return String.format('(LastName like "%{0}%" or FirstName like "%{0}%")', query);
+    },
     createRequest: function() {
-        var pageSize = this.pageSize;
-        var startIndex = this.feed && this.feed['$startIndex'] && this.feed['$itemsPerPage'] 
-            ? this.feed['$startIndex'] + this.feed['$itemsPerPage']
-            : 1;
-
-        var request = new Sage.SData.Client.SDataResourceCollectionRequest(this.getService())            
+        var request = Mobile.SalesLogix.Contact.List.superclass.createRequest.call(this);
+       
+        request
             .setResourceKind('contacts')
             .setQueryArgs({
                 'orderby': 'LastName,FirstName',
                 'select': 'LastName,FirstName,AccountName'                             
-            })                    
-            .setCount(pageSize)
-            .setStartIndex(startIndex); 
-
-        if (this.current && this.current.where)
-            request.setQueryArgs({
-                'where': this.current.where
-            });        
+            });                       
 
         return request;
     }

@@ -27,7 +27,8 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             id: 'generic_list',
             title: 'List',
             pageSize: 20,
-            requestedFirstPage: false
+            requestedFirstPage: false,
+            canSearch: true
         });
     },   
     render: function() {
@@ -36,7 +37,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         this.clear();
     }, 
     init: function() {     
-        Sage.Platform.Mobile.List.superclass.init.call(this); 
+        Sage.Platform.Mobile.List.superclass.init.call(this);      
 
         this.el
             .on('click', function(evt, el, o) {                
@@ -49,6 +50,22 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
                     this.navigateToDetail(target || source, evt);
 
             }, this, { preventDefault: true, stopPropagation: true });                
+
+        if (this.canSearch) 
+            App.on('search', function(query) {
+                if (this.el.getAttribute('selected') == 'true')
+                    this.search(query);
+            }, this);
+    },
+    search: function(query) {
+        this.query = query && query.length > 0
+            ? this.formatSearchQuery(query)
+            : false;
+        this.clear();
+        this.requestData(); 
+    },
+    formatSearchQuery: function(query) {
+        return false;
     },
     getService: function() {
         /// <returns type="Sage.SData.Client.SDataService" />
@@ -56,6 +73,28 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     },    
     createRequest:function() {
         /// <returns type="Sage.SData.Client.SDataResourceCollectionRequest" />
+        var pageSize = this.pageSize;
+        var startIndex = this.feed && this.feed['$startIndex'] && this.feed['$itemsPerPage'] 
+            ? this.feed['$startIndex'] + this.feed['$itemsPerPage']
+            : 1;
+
+        var request = new Sage.SData.Client.SDataResourceCollectionRequest(this.getService())                         
+            .setCount(pageSize)
+            .setStartIndex(startIndex); 
+
+        var where = [];
+        if (this.current && this.current.where)
+            where.push(this.current.where);
+
+        if (this.query)
+            where.push(this.query);
+
+        if (where.length > 0)
+            request.setQueryArgs({
+                'where': where.join(' and ')
+            });  
+
+        return request;
     },
     navigateToDetail: function(el) {
         if (el) 

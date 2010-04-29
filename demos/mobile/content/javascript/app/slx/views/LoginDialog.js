@@ -13,9 +13,9 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
         '<fieldset>',
         '<h1>{%= title %}</h1>',
         '<a class="button blueButton" target="_none">Login</a>',
-        '<label>User:</label>',
+        '<label>user:</label>',
         '<input id="{%= id %}_user" type="text" name="user" /><br />',
-        '<label>Pass:</label>',
+        '<label>pass:</label>',
         '<input id="{%= id %}_pass" type="text" name="password" />',
         '</fieldset>',
         '</form>'
@@ -32,7 +32,7 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
     init: function() {                                            
         Mobile.SalesLogix.LoginDialog.superclass.init.call(this);
         
-        this.el.select(".blueButton")
+        this.el.select('.blueButton')
             .on('click', function(evt, el, o) {    
                     this.login();         
                 }, this, { preventDefault: true, stopPropagation: true });                        
@@ -44,6 +44,6 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
             .setUserName('lee')
             .setPassword('')    
      
-        this.el.dom.removeAttribute("selected");
+        this.el.dom.removeAttribute('selected');
     }
 });

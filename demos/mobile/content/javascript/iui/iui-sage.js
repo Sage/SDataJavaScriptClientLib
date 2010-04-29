@@ -452,24 +452,27 @@ function showDialog(page)
 
 function showForm(form)
 {
-	form.onsubmit = function(event)
-	{
-//  submitForm and preventDefault are called in the click handler
-//  when the user clicks the submit a.button
-// 
-		event.preventDefault();
-		submitForm(form);
-	};
+    
+    // sage: only bind to onsubmit when there is no onsubmit
+    if (typeof form.onsubmit === 'undefined')
+	    form.onsubmit = function(event)
+	    {
+            //  submitForm and preventDefault are called in the click handler
+            //  when the user clicks the submit a.button
+            // 
+		    event.preventDefault();
+		    submitForm(form);
+	    };
 	
-	form.onclick = function(event)
-	{
-// Why is this code needed?  cancelDialog is called from
-// the click hander.  When will this be called?
+	//form.onclick = function(event)
+	//{
+        // Why is this code needed?  cancelDialog is called from
+        // the click hander.  When will this be called?
 
         // removed: sage        
-//		if (event.target == form && hasClass(form, "dialog"))
-//			cancelDialog(form);
-	};
+		//if (event.target == form && hasClass(form, "dialog"))
+		//	cancelDialog(form);
+	//};
 }
 
 function cancelDialog(form)

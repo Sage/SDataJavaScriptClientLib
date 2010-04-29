@@ -1,0 +1,77 @@
+﻿/// <reference path="../../../ext/ext-core-debug.js"/>
+/// <reference path="../../../iui/iui.js"/>
+/// <reference path="../../../platform/Application.js"/>
+/// <reference path="../../../platform/View.js"/>
+/// <reference path="Application.js"/>
+
+Ext.namespace("Mobile.SalesLogix");
+
+/// this is a very simple home view.
+Mobile.SalesLogix.SearchDialog = Ext.extend(Sage.Platform.Mobile.View, {   
+    viewTemplate: new Simplate([
+        '<form id="{%= id %}" class="dialog">',
+        '<fieldset>',
+        '<h1>{%= title %}</h1>',
+        '<a type="cancel" class="button leftButton">Cancel</a>',
+        '<a class="button blueButton" target="_none">Search</a>',
+        '<label>query:</label>',
+        '<input id="{%= id %}_query" type="text" name="query" />',
+        '</fieldset>',
+        '</form>'
+    ]),    
+    constructor: function(o) {
+        Mobile.SalesLogix.SearchDialog.superclass.constructor.call(this);        
+        
+        Ext.apply(this, o, {
+            id: 'search_dialog',
+            title: 'Search',
+            expose: false
+        });        
+    },        
+    init: function() {                                            
+        Mobile.SalesLogix.SearchDialog.superclass.init.call(this);
+        
+        this.el
+            .on('submit', function(evt, el, o) {
+                return false;
+            }, this, { preventDefault: true, stopPropagation: true })
+            .dom.onsubmit = false; // fix for iui shenanigans
+
+        this.el.select('.blueButton')
+            .on('click', function(evt, el, o) {    
+                this.search();         
+            }, this, { preventDefault: true, stopPropagation: true });    
+        
+        this.el.select('input[name="query"]')
+            .on('keypress', function(evt, el, o) {
+                if (evt.getKey() == 13)  
+                {
+                    evt.stopEvent();
+
+                    this.search();                
+                }
+            }, this);            
+    },    
+    show: function() {
+        this.el
+            .child('input[name="query"]')
+            .dom.value = '';
+
+        Mobile.SalesLogix.SearchDialog.superclass.show.call(this);
+
+        this.el 
+            .child('input[name="query"]')
+            .focus();
+    },
+    search: function() {
+        // todo: get actual parameters and validate them by requesting a simple feed (i.e. $service)
+
+        var query = this.el
+            .child('input[name="query"]')
+            .getValue();
+
+        App.fireEvent('search', query);
+     
+        this.el.dom.removeAttribute('selected');
+    }
+});

@@ -18,9 +18,14 @@ Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {
             .setIncludeContent(false);
     },
     setup: function() {
-        Mobile.SalesLogix.Application.superclass.setup.apply(this, arguments);       
-
+        Mobile.SalesLogix.Application.superclass.setup.apply(this, arguments);    
+        
+        this.tbar = new Mobile.SalesLogix.MainToolbar({
+            title: 'Mobile Demo'
+        });   
+        
         this.registerView(new Mobile.SalesLogix.LoginDialog());
+        this.registerView(new Mobile.SalesLogix.SearchDialog());
         this.registerView(new Mobile.SalesLogix.Home());
         
         this.registerView(new Mobile.SalesLogix.Account.List());  

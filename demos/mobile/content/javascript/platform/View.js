@@ -15,7 +15,8 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
         
         Ext.apply(this, o, {
             id: 'view',
-            title: ''
+            title: '',
+            canSearch: false
         });        
 
         this.loaded = false;
@@ -58,9 +59,12 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
     beforeTransitionTo: function() {
     },
     beforeTransitionAway: function() {
+        App.allowSearch(false);
     },
-    transitionTo: function() {        
+    transitionTo: function() { 
+        App.allowSearch(this.canSearch);     
     },
-    transitionAway: function() {        
+    transitionAway: function() {    
+                
     }   
 });

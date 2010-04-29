@@ -26,26 +26,21 @@ Mobile.SalesLogix.Opportunity.List = Ext.extend(Sage.Platform.Mobile.List, {
             icon: 'content/images/app/slx/Opportunity_List_24x24.gif'
         });
     },   
+    formatSearchQuery: function(query) {
+        return String.format('(Description like "%{0}%")', query);
+        // todo: unable to currently work, NH is unable to resolve Account property.
+        //return String.format('(Description like "%{0}%" or Account.AccountName like "%{0}%")', query);
+    },
     createRequest: function() {
-        var pageSize = this.pageSize;
-        var startIndex = this.feed && this.feed['$startIndex'] && this.feed['$itemsPerPage'] 
-            ? this.feed['$startIndex'] + this.feed['$itemsPerPage']
-            : 1;
+        var request = Mobile.SalesLogix.Opportunity.List.superclass.createRequest.call(this);
 
-        var request = new Sage.SData.Client.SDataResourceCollectionRequest(this.getService())            
+        request           
             .setResourceKind('opportunities')
             .setQueryArgs({
                 'include': 'Account',
                 'orderby': 'Description',
                 'select': 'Description,Account/AccountName'                             
-            })                    
-            .setCount(pageSize)
-            .setStartIndex(startIndex); 
-
-        if (this.current && this.current.where)
-            request.setQueryArgs({
-                'where': this.current.where
-            });        
+            });
 
         return request;
     }

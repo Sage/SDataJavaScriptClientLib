@@ -25,21 +25,21 @@ Mobile.SalesLogix.Account.List = Ext.extend(Sage.Platform.Mobile.List, {
             pageSize: 10,
             icon: 'content/images/app/slx/Accounts_24x24.gif'
         });
-    },   
-    createRequest:function() {
-        var pageSize = this.pageSize;
-        var startIndex = this.feed && this.feed['$startIndex'] && this.feed['$itemsPerPage'] 
-            ? this.feed['$startIndex'] + this.feed['$itemsPerPage']
-            : 1;
+    },  
+    formatSearchQuery: function(query) {
+        return String.format('AccountName like "%{0}%"', query);
+    },
+    createRequest: function() {
+        var request = Mobile.SalesLogix.Account.List.superclass.createRequest.call(this);
 
-        return new Sage.SData.Client.SDataResourceCollectionRequest(this.getService())            
+        request
             .setResourceKind('accounts')
             .setQueryArgs({
                 'include': 'Address',
                 'orderby': 'AccountName',
                 'select': 'AccountName,Address/City'                
-            })                    
-            .setCount(pageSize)
-            .setStartIndex(startIndex); 
+            });
+
+        return request;
     }
 });

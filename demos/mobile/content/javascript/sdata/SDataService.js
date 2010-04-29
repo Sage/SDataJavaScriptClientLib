@@ -132,7 +132,6 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
                     options.success.call(options.scope || this, feed);
             },
             failure: function(response, o) {  
-                console.dir(response);
                 if (options.failure)
                     options.failure.call(options.scope || this, response, o);
             },
