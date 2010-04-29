@@ -20,6 +20,11 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         '</a>',
         '</li>'
     ]),    
+    noDataTemplate: new Simplate([
+        '<li class="no-data">',
+        '<h3>{%= noDataText %}</h3>',
+        '</li>'
+    ]),
     constructor: function(o) {
         Sage.Platform.Mobile.List.superclass.constructor.call(this);        
         
@@ -28,7 +33,8 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             title: 'List',
             pageSize: 20,
             requestedFirstPage: false,
-            canSearch: true
+            canSearch: true,
+            noDataText: 'no records'
         });
     },   
     render: function() {
@@ -74,7 +80,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     createRequest:function() {
         /// <returns type="Sage.SData.Client.SDataResourceCollectionRequest" />
         var pageSize = this.pageSize;
-        var startIndex = this.feed && this.feed['$startIndex'] && this.feed['$itemsPerPage'] 
+        var startIndex = this.feed && this.feed['$startIndex'] > 0 && this.feed['$itemsPerPage'] > 0 
             ? this.feed['$startIndex'] + this.feed['$itemsPerPage']
             : 1;
 
@@ -120,15 +126,41 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
                        
         this.feed = feed;
                 
-        var o = [];
-        for (var i = 0; i < feed.$resources.length; i++)                
-            o.push(this.itemTemplate.apply(feed.$resources[i]));
-                    
-        Ext.DomHelper.insertBefore(this.moreEl, o.join(''));
+        if (this.feed['$totalResults'] === 0)
+        {
+            Ext.DomHelper.insertBefore(this.moreEl, this.noDataTemplate.apply(this));
+        }
+        else
+        {
+            var o = [];
+            for (var i = 0; i < feed.$resources.length; i++)                
+                o.push(this.itemTemplate.apply(feed.$resources[i]));
+        
+            if (o.length > 0)                    
+                Ext.DomHelper.insertBefore(this.moreEl, o.join(''));
+        }
 
         this.moreEl            
-            .removeClass('more-loading')
-            .show();
+            .removeClass('more-loading');
+
+        if (this.hasMoreData())
+            this.moreEl.show();
+        else
+            this.moreEl.hide();
+    },
+    hasMoreData: function() {
+        if (this.feed['$startIndex'] > 0 && this.feed['$itemsPerPage'] > 0 && this.feed['$totalResults'] >= 0)
+        {
+            var start = this.feed['$startIndex'];
+            var count = this.feed['$itemsPerPage'];
+            var total = this.feed['$totalResults'];
+
+            return (start + count <= total);
+        }
+        else
+        {
+            return true; // no way to determine, always assume more data
+        }        
     },
     requestFailure: function(response, o) {
         

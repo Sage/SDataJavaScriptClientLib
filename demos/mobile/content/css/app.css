@@ -106,3 +106,8 @@ div.row > span
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
+
+.no-data
+{
+	text-align: center;
+}

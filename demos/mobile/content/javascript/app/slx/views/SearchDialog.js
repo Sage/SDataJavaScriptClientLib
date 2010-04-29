@@ -44,10 +44,14 @@ Mobile.SalesLogix.SearchDialog = Ext.extend(Sage.Platform.Mobile.View, {
         
         this.el.select('input[name="query"]')
             .on('keypress', function(evt, el, o) {
-                if (evt.getKey() == 13)  
+                if (evt.getKey() == 13 || evt.getKey() == 10)  
                 {
-                    evt.stopEvent();
+                    evt.stopEvent();                    
 
+                    /* fix to hide iphone keyboard when go is pressed */
+                    if (/(iphone|ipad)/i.test(navigator.userAgent))
+                        Ext.get('backButton').focus();
+                    
                     this.search();                
                 }
             }, this);            
