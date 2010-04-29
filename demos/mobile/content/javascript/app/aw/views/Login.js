@@ -39,9 +39,13 @@ Mobile.AdventureWorks.Login = Ext.extend(Sage.Platform.Mobile.View, {
     login: function() {
         // todo: get actual parameters and validate them by requesting a simple feed (i.e. $service)
 
+        var userName = document.getElementById('login_dialog_user').value;
+        var userPass = document.getElementById('login_dialog_pass').value;
         App.getService()
-            .setUserName('kim2@adventure-works.com')
-            .setPassword('')
+            //.setUserName('kim2@adventure-works.com')
+            //.setPassword('')
+            .setUserName(userName)
+            .setPassword(userPass)
 
         iui.showPageById("home");
 
