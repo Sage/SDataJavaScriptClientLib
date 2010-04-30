@@ -105,7 +105,7 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
     },
     createHeadersForRequest: function(request) {
         var headers = {
-            'User-Agent': this.userAgent /* 'User-Agent' cannot be set on XmlHttpRequest */
+            /* 'User-Agent': this.userAgent */ /* 'User-Agent' cannot be set on XmlHttpRequest */
         };
         
         if (this.username !== false)
@@ -122,23 +122,7 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
             var options = {
                 success: options
             };
-        }     
-        
-        /* temporary fix for iphone authentication issue */
-        if (/(iphone|ipad)/.test(navigator.userAgent.toLowerCase()))           
-        if (true)
-        {
-            var old = request.getUri();
-            var uri = new Sage.SData.Client.SDataUri(old)
-                .setHost(
-                    String.format("{0}:{1}@{2}", 
-                        encodeURIComponent(this.getUserName()), 
-                        encodeURIComponent(this.getPassword()), 
-                        old.getHost())
-                );
-                
-            request.setUri(uri);   
-        }        
+        }             
 
         Ext.Ajax.request({
             url: request.toString(),
@@ -148,7 +132,6 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
                     options.success.call(options.scope || this, feed);
             },
             failure: function(response, o) {  
-                console.dir(response);
                 if (options.failure)
                     options.failure.call(options.scope || this, response, o);
             },
@@ -204,14 +187,17 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
                     {
                         var converted = null;
                     }
+                    /*
+                    // no longer an indicator of a pure-linked entry
                     else if (value.hasOwnProperty('@sdata:uri')) // linked
                     {
                         var converted = {
                             '$key': value['@sdata:key'],
                             '$url': value['@sdata:uri']
-                            /* should be a descriptor as well */
+                            // should be a descriptor as well 
                         };
                     }
+                    */
                     else if (value.hasOwnProperty('@sdata:key')) // included
                     {
                         var converted = this.convertEntity(ns, value);
@@ -277,7 +263,7 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
         if (Ext.isArray(feed['entry']))
             for (var i = 0; i < feed['entry'].length; i++)
                 result['$resources'].push(this.convertEntry(feed['entry'][i]));
-        else
+        else if (typeof feed['entry'] === 'object')
             result['$resources'].push(this.convertEntry(feed['entry']));
 
         return result;
