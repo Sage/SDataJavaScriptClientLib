@@ -20,34 +20,48 @@ Mobile.SalesLogix.MainToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
     init: function() {
         Mobile.SalesLogix.MainToolbar.superclass.init.call(this);
 
-        this.el
+         this.el.select('a[target="_search"]')
             .on('click', function(evt, el, o) {
-                var source = Ext.get(el);
-                var target;
+                this.displaySearch(Ext.get(el));
+            }, this, { preventDefault: true, stopPropagation: true });
 
-                if (source.is('a[target="_search"]') || (target = source.up('a[target="_search"]')))
-                    this.displaySearch(target || source);
-                else if (source.is('a[target="_edit"]') || (target = source.up('a[target="_edit"]')))
-                    this.displayEdit(target || source);
-
+        this.el.select('a[target="_edit"]')
+            .on('click', function(evt, el, o) {
+                this.displayEdit(Ext.get(el));
             }, this, { preventDefault: true, stopPropagation: true });
     },
     displaySearch: function(el) {
         var id = el.dom.hash.substring(1);
         if (id)
-            App.getView(id).show();
+            App.getView(id).show(this.searchText);
     },
     displayEdit: function() {
     
     },
-    allowSearch: function(val) {
-        if (val)
-            this.el.down('a[target="_search"]').show();
-        else
-            this.el.down('a[target="_search"]').hide();         
+    allowSearch: function(allow, has) {
+        this.searchText = false;
+
+        if (allow)
+        {
+            var button = this.el
+                .down('a[target="_search"]')
+                .removeClass("greenButton");
+
+            if (has) 
+            {
+                button.addClass("greenButton");
+
+                if (typeof has === 'string') 
+                    this.searchText = has;
+            }               
+                
+            button.show();  
+        }
+        else        
+            this.el.down('a[target="_search"]').hide();                                     
     },
-    allowEdit: function(val) {
-        if (val)
+    allowEdit: function(allow) {
+        if (allow)
             this.el.down('a[target="_edit"]').show();
         else
             this.el.down('a[target="_edit"]').hide(); 

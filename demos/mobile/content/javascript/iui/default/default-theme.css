@@ -27,6 +27,11 @@ body > .toolbar {
     -moz-border-image: url(blueButton.png) 0 5 0 5;
 }
 
+.greenButton {
+    -webkit-border-image: url(greenButton.png) 0 5 0 5;
+    -moz-border-image: url(greenButton.png) 0 5 0 5;
+}
+
 #backButton {
     -webkit-border-image: url(backButtonBrdr.png) 0 8 0 14;
     -moz-border-image: url(backButtonBrdr.png) 0 8 0 14;

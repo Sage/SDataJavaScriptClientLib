@@ -111,3 +111,41 @@ div.row > span
 {
 	text-align: center;
 }
+
+input:not(input[type|=radio]):not(input[type|=checkbox])
+{
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+}
+
+input:focus
+{ 
+	outline: none;
+	background-color: #FDFFDD;	
+}
+
+/* removes focus outline */
+body > *
+{
+	-webkit-tap-highlight-color: rgba(255,255,255,0);
+}
+
+.dialog > fieldset
+{
+	-webkit-border-bottom-left-radius: 5px;
+	-webkit-border-bottom-right-radius: 5px;
+	-moz-border-bottom-left-radius: 5px;
+	-moz-border-bottom-right-radius: 5px;
+}
+
+.dialog > fieldset > label
+{
+	margin: 17px 0 0 6px;
+}
+
+/* adjust input positions for search dialog */
+#search_dialog input:not(input[type|=radio]):not(input[type|=checkbox])
+{
+	padding: 6px 6px 6px 50px;
+}
+

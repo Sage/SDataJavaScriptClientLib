@@ -35,6 +35,10 @@ window.iui =
 	    "X-Requested-With" : "XMLHttpRequest"
 	},
 
+    getCurrentPage: function() {
+        return currentDialog || currentPage;
+    }, 
+
 	showPage: function(page, backwards)
 	{
 		if (page)

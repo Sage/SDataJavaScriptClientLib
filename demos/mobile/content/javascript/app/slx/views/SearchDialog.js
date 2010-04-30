@@ -37,6 +37,11 @@ Mobile.SalesLogix.SearchDialog = Ext.extend(Sage.Platform.Mobile.View, {
             }, this, { preventDefault: true, stopPropagation: true })
             .dom.onsubmit = false; // fix for iui shenanigans
 
+        this.el.select('.leftButton')
+            .on('click', function(evt, el, o) {
+                this.el.dom.removeAttribute('selected');
+            }, this, { preventDefault: true, stopPropagation: true });    
+
         this.el.select('.blueButton')
             .on('click', function(evt, el, o) {    
                 this.search();         
@@ -56,10 +61,10 @@ Mobile.SalesLogix.SearchDialog = Ext.extend(Sage.Platform.Mobile.View, {
                 }
             }, this);            
     },    
-    show: function() {
+    show: function(query) {
         this.el
             .child('input[name="query"]')
-            .dom.value = '';
+            .dom.value = typeof query === 'string' ? query : '';
 
         Mobile.SalesLogix.SearchDialog.superclass.show.call(this);
 
