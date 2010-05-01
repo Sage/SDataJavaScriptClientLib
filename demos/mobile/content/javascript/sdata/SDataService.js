@@ -106,6 +106,7 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
     createHeadersForRequest: function(request) {
         var headers = {
             /* 'User-Agent': this.userAgent */ /* 'User-Agent' cannot be set on XmlHttpRequest */
+            'X-Authorization-Mode': 'no-challenge'
         };
         
         if (this.username !== false)
