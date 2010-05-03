@@ -63,10 +63,19 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
                     this.search(query);
             }, this);
     },
-    search: function(query) {
-        this.query = query && query.length > 0
-            ? this.formatSearchQuery(query)
+    search: function(searchText) {
+        this.queryText = searchText && searchText.length > 0
+            ? searchText
             : false;
+
+        this.query = this.queryText !== false
+            ? this.formatSearchQuery(this.queryText)
+            : false;      
+
+        // reset search button state
+        // todo: is this the best way to do this?
+        App.allowSearch(this.canSearch, this.queryText);  
+
         this.clear();
         this.requestData(); 
     },
@@ -196,7 +205,9 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         } 
     },
     transitionTo: function() {
-        Sage.Platform.Mobile.List.superclass.transitionTo.call(this);
+        // not calling base implementation, want different allowSearch behavior.
+
+        App.allowSearch(this.canSearch, this.queryText);  
 
         if (this.hasContext() && this.isNewContext())
         {

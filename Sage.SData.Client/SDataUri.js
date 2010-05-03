@@ -228,7 +228,7 @@ Ext.apply(Sage.SData.Client.SDataUri, {
         Exclude: 'exclude',
         Format: 'format',
         Include: 'include',
-        IncludeContent: 'includeContent',
+        IncludeContent: '_includeContent',
         IncludeSchema: 'includeSchema',
         Language: 'language',
         OrderBy: 'orderby',

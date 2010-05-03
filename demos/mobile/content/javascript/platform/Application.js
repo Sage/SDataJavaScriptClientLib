@@ -51,13 +51,13 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     getService: function() {
         return this.service;
     },
-    allowSearch: function(val) {
+    allowSearch: function(allow, has) {
         if (this.tbar && this.tbar.allowSearch)
-            this.tbar.allowSearch(val);
+            this.tbar.allowSearch(allow, has);
     },
-    allowEdit: function(val) {
+    allowEdit: function(allow) {
         if (this.tbar && this.tbar.allowEdit)
-            this.tbar.allowEdit(val);
+            this.tbar.allowEdit(allow);
     }
 });
 
