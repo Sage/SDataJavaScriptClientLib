@@ -27,7 +27,7 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
         Ext.apply(this, o, {
             id: 'login_dialog',
             title: 'Login',
-            expose: false
+            expose: false            
         });
 
         this.busy = false;
@@ -40,7 +40,7 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
                 this.login();
             }, this, { preventDefault: true, stopPropagation: true });
     },
-    login: function () {
+    login: function () {        
         if (this.busy) return;
 
         var username = this.el
@@ -49,7 +49,7 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
 
         var password = this.el
             .child('input[name="password"]')
-            .getValue();
+            .getValue();        
 
         this.validateCredentials(username, password);
     },     
