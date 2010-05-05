@@ -145,6 +145,8 @@ Sage.SData.Client.SDataUri = Ext.extend(Ext.util.Observable, {
                        
         for (var i = 0; i < segments.length; i++) 
         {
+            if (typeof segments[i] === 'undefined') continue;
+
             // need to check predicate for beginning and end parenthesis and strip them
             if (segments[i]['predicate'])
                 path.push(encodeURIComponent(segments[i]['text'] + '(' + segments[i]['predicate'] + ')'));

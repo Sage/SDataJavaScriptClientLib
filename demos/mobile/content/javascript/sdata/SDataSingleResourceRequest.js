@@ -10,10 +10,13 @@ Sage.SData.Client.SDataSingleResourceRequest = Ext.extend(Sage.SData.Client.SDat
     constructor: function() {        
         Sage.SData.Client.SDataSingleResourceRequest.superclass.constructor.apply(this, arguments);
         
-        this.resourceSelector = false;                                                      
-    },   
+        this.resourceSelector = false;                                                   
+    },       
     read: function(options) {
         return this.service.readEntry(this, options);
+    },
+    update: function(entry, options) {
+        return this.service.updateEntry(this, entry, options);
     },
     getResourceSelector: function() {
         return this.resourceSelector;
