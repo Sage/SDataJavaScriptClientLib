@@ -7,7 +7,7 @@
 Ext.namespace("Mobile.AdventureWorks");
 
 /// this is a very simple home view.
-Mobile.AdventureWorks.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {   
+Mobile.AdventureWorks.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
     viewTemplate: new Simplate([
         '<form id="{%= id %}" class="dialog">',
         '<fieldset>',
@@ -19,31 +19,39 @@ Mobile.AdventureWorks.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
         '<input id="{%= id %}_pass" type="text" name="password" />',
         '</fieldset>',
         '</form>'
-    ]),    
-    constructor: function(o) {
-        Mobile.AdventureWorks.LoginDialog.superclass.constructor.call(this);        
-        
+    ]),
+    constructor: function (o) {
+        Mobile.AdventureWorks.LoginDialog.superclass.constructor.call(this);
+
         Ext.apply(this, o, {
             id: 'login_dialog',
             title: 'Login',
             expose: false
-        });        
-    },        
-    init: function() {                                            
+        });
+    },
+    init: function () {
         Mobile.AdventureWorks.LoginDialog.superclass.init.call(this);
-        
+
         this.el.select(".blueButton")
-            .on('click', function(evt, el, o) {    
-                    this.login();         
-                }, this, { preventDefault: true, stopPropagation: true });                        
-    },    
-    login: function() {
+            .on('click', function (evt, el, o) {
+                this.login();
+            }, this, { preventDefault: true, stopPropagation: true });
+    },
+    login: function () {
         // todo: get actual parameters and validate them by requesting a simple feed (i.e. $service)
 
+        //var userName = document.getElementById('login_dialog_user').value;
+        //var userPass = document.getElementById('login_dialog_pass').value;
+        var userName = this.el
+            .child('input[name="user"]')
+            .getValue();
+        var userPass = this.el
+            .child('input[name="password"]')
+            .getValue();
         App.getService()
-            .setUserName('kim2@adventure-works.com')
-            .setPassword('')    
-     
+            .setUserName(userName)
+            .setPassword(userPass);
+
         this.el.dom.removeAttribute("selected");
     }
 });

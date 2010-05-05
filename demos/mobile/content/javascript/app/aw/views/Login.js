@@ -7,41 +7,49 @@
 Ext.namespace("Mobile.AdventureWorks");
 
 /// this is a very simple home view.
-Mobile.AdventureWorks.Login = Ext.extend(Sage.Platform.Mobile.View, {   
+Mobile.AdventureWorks.Login = Ext.extend(Sage.Platform.Mobile.View, {
     viewTemplate: new Simplate([
         '<fieldset class="loading">',
-        '<div class="row"><div class="loading-indicator">loading...</div></div>',        
-        '</fieldset>',  
+        '<div class="row"><div class="loading-indicator">loading...</div></div>',
+        '</fieldset>',
         '<a href="#" target="_none" class="whiteButton"><span>Login</span></a>'
-    ]),    
-    constructor: function(o) {
-        Mobile.AdventureWorks.Login.superclass.constructor.call(this);        
-        
+    ]),
+    constructor: function (o) {
+        Mobile.AdventureWorks.Login.superclass.constructor.call(this);
+
         Ext.apply(this, o, {
             id: 'login',
             expose: false,
             selected: true
-        });        
-    },    
-    render: function() {
+        });
+    },
+    render: function () {
         Mobile.AdventureWorks.Login.superclass.render.call(this);
 
         this.el.update(this.viewTemplate.apply(this));
     },
-    init: function() {                                            
+    init: function () {
         Mobile.AdventureWorks.Login.superclass.init.call(this);
-        
+
         this.el.select(".whiteButton")
-            .on('click', function(evt, el, o) {    
-                    this.login();         
-                }, this, { preventDefault: true, stopPropagation: true });                        
-    },    
-    login: function() {
+            .on('click', function (evt, el, o) {
+                this.login();
+            }, this, { preventDefault: true, stopPropagation: true });
+    },
+    login: function () {
         // todo: get actual parameters and validate them by requesting a simple feed (i.e. $service)
 
+        //var userName = document.getElementById('login_dialog_user').value;
+        //var userPass = document.getElementById('login_dialog_pass').value;
+        var userName = this.el
+            .child('input[name="user"]')
+            .getValue();
+        var userPass = this.el
+            .child('input[name="password"]')
+            .getValue();
         App.getService()
-            .setUserName('kim2@adventure-works.com')
-            .setPassword('')
+            .setUserName(userName)
+            .setPassword(userPass);
 
         iui.showPageById("home");
 
