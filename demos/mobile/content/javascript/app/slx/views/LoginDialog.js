@@ -63,20 +63,37 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
     createRequest: function (userName, userPass) {
         /// <returns type="Sage.SData.Client.SDataResourceCollectionRequest" />
         var request = new Sage.SData.Client.SDataResourceCollectionRequest(this.getService())
-            .setResourceKind('contacts')
+            .setResourceKind('Users')
+            //.setResourceKind('contacts')
             .setCount(10)
             .setStartIndex(1);
 
+        request.setQueryArgs({
+            'where': String.format(" UserName eq '{0}' ", userName)
+        });
+
         return request;
     },
-    credentialsSuccess: function (feed)
-    {
-//        if (this.requestedFirstPage == false) {
-//            this.requestedFirstPage = true;
-//            this.el
-//                .select('.loading')
-//                .remove();
-//        }
+    credentialsSuccess: function (feed) {
+        //        if (this.requestedFirstPage == false) {
+        //            this.requestedFirstPage = true;
+        //            this.el
+        //                .select('.loading')
+        //                .remove();
+        //        }
+
+        this.feed = feed;
+        if (this.feed['$totalResults'] > 0) {
+            var o = [];
+            for (var i = 0; i < feed.$resources.length; i++)
+                o.push(feed.$resources[i]);
+
+            if (o.length > 0)
+                App.context = o;
+            else
+                App.context = []
+            //alert('User login OK: ' + o.join(' '));
+        }
 
         // proceed to next page
         //this.loadingEl.hide();
@@ -85,7 +102,8 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
     credentialsFailure: function (response, o) {
         //this.loadingEl.hide();
         // todo: show bad credentials dialog
-        alert('User login failed');
+        alert('User login failed: ' + o.url);
+        //alert('User login failed');
     },
     checkCredentials: function (userName, userPass) {
         var request = this.createRequest(userName, userPass);
