@@ -26,7 +26,7 @@ li.more
 
 li.more-loading a.whiteButton span
 {
-	background: url('../images/loading-arrows.gif') no-repeat scroll 0 50%;
+	background: url('../images/loading-indicator-white-button.gif') no-repeat scroll 0 50%;	
 	padding: 0 0 0 20px;
 	color: #999999;
 }
@@ -43,7 +43,7 @@ li.loading .loading-indicator
 
 .loading-indicator
 {
-	background: url('../images/loading-arrows.gif') no-repeat scroll 0 50%;
+	background: url('../images/loading-indicator-white.gif') no-repeat scroll 0 50%;
 	padding: 0 0 0 20px;
 }
 
@@ -149,3 +149,9 @@ body > *
 	padding: 6px 6px 6px 50px;
 }
 
+.busyButton span
+{
+	background: url('../images/loading-indicator-tool-button.gif') no-repeat scroll 0 50%;
+	padding: 0 0 0 20px;
+	color: #CCCCCC;
+}
