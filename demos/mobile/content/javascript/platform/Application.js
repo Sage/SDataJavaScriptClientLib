@@ -8,6 +8,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         Sage.Platform.Mobile.Application.superclass.constructor.call(this);
 
         this.initialized = false;
+        this.context = {};
         this.views = [];        
         this.viewsById = {};
         this.addEvents(

@@ -13,9 +13,9 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
         '<form id="{%= id %}" class="dialog">',
         '<fieldset>',
         '<h1>{%= title %}</h1>',
-        '<a class="button blueButton" target="_none">Login</a>',
+        '<a class="button blueButton" target="_none"><span>Login</span></a>',
         '<label>user:</label>',
-        '<input id="{%= id %}_user" type="text" name="user" /><br />',
+        '<input id="{%= id %}_user" type="text" name="user" value="lee" /><br />',
         '<label>pass:</label>',
         '<input id="{%= id %}_pass" type="text" name="password" />',
         '</fieldset>',
@@ -29,6 +29,8 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
             title: 'Login',
             expose: false
         });
+
+        this.busy = false;
     },
     init: function () {
         Mobile.SalesLogix.LoginDialog.superclass.init.call(this);
@@ -39,84 +41,75 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
             }, this, { preventDefault: true, stopPropagation: true });
     },
     login: function () {
-        // todo: get actual parameters and validate them by requesting a simple feed (i.e. $service)
+        if (this.busy) return;
 
-        var userName = this.el
+        var username = this.el
             .child('input[name="user"]')
             .getValue();
-        var userPass = this.el
+
+        var password = this.el
             .child('input[name="password"]')
             .getValue();
 
-        this.getService()
-            .setUserName(userName)
-            .setPassword(userPass);
+        this.validateCredentials(username, password);
+    },     
+    validateCredentials: function (username, password) {
+        this.busy = true;
+        this.el
+            .select('a.button')
+            .removeClass('blueButton')
+            .addClass('busyButton');
 
-        this.checkCredentials(userName, userPass);
+        var service = App.getService()
+            .setUserName(username)
+            .setPassword(password);
 
-        //this.el.dom.removeAttribute('selected');
-    },
-    getService: function () {
-        /// <returns type="Sage.SData.Client.SDataService" />
-        return App.getService();
-    },
-    createRequest: function (userName, userPass) {
-        /// <returns type="Sage.SData.Client.SDataResourceCollectionRequest" />
-        var request = new Sage.SData.Client.SDataResourceCollectionRequest(this.getService())
-            .setResourceKind('Users')
-            //.setResourceKind('contacts')
-            .setCount(10)
+        var request = new Sage.SData.Client.SDataResourceCollectionRequest(service)
+            .setResourceKind('users')
+            .setQueryArgs({
+                'select': 'UserName',
+                'where': String.format('UserName eq "{0}"', username)
+            })
+            .setCount(1)
             .setStartIndex(1);
 
-        request.setQueryArgs({
-            'where': String.format(" UserName eq '{0}' ", userName)
-        });
-
-        return request;
-    },
-    credentialsSuccess: function (feed) {
-        //        if (this.requestedFirstPage == false) {
-        //            this.requestedFirstPage = true;
-        //            this.el
-        //                .select('.loading')
-        //                .remove();
-        //        }
-
-        this.feed = feed;
-        if (this.feed['$totalResults'] > 0) {
-            var o = [];
-            for (var i = 0; i < feed.$resources.length; i++)
-                o.push(feed.$resources[i]);
-
-            if (o.length > 0)
-                App.context = o;
-            else
-                App.context = []
-            //alert('User login OK: ' + o.join(' '));
-        }
-
-        // proceed to next page
-        //this.loadingEl.hide();
-        this.el.dom.removeAttribute('selected');
-    },
-    credentialsFailure: function (response, o) {
-        //this.loadingEl.hide();
-        // todo: show bad credentials dialog
-        alert('User login failed: ' + o.url);
-        //alert('User login failed');
-    },
-    checkCredentials: function (userName, userPass) {
-        var request = this.createRequest(userName, userPass);
         request.read({
             success: function (feed) {
-                this.credentialsSuccess(feed);
+                this.busy = false;
+                this.el
+                    .select('a.button')
+                    .removeClass('busyButton')
+                    .addClass('blueButton');
+
+                if (feed['$resources'].length <= 0)
+                {   
+                    service
+                        .setUserName(false)
+                        .setPassword(false);
+
+                    alert('username or password is invalid');
+                }
+                else 
+                {
+                    App.context['user'] = feed['$resources'][0]['$key'];
+
+                    this.el.dom.removeAttribute('selected');
+                }
             },
             failure: function (response, o) {
-                this.credentialsFailure(response, o);
+                this.busy = false;
+                this.el
+                    .select('a.button')
+                    .removeClass('busyButton')
+                    .addClass('blueButton');
+
+                service
+                    .setUserName(false)
+                    .setPassword(false);
+
+                alert('username or password is invalid');
             },
             scope: this
         });
-        // todo: show busy icon
-        //this.loadingEl.show();
     }
 });
