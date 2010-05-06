@@ -27,7 +27,7 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
         Ext.apply(this, o, {
             id: 'login_dialog',
             title: 'Login',
-            expose: false            
+            expose: false
         });
 
         this.busy = false;
@@ -40,7 +40,7 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
                 this.login();
             }, this, { preventDefault: true, stopPropagation: true });
     },
-    login: function () {        
+    login: function () {
         if (this.busy) return;
 
         var username = this.el
@@ -49,10 +49,10 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
 
         var password = this.el
             .child('input[name="password"]')
-            .getValue();        
+            .getValue();
 
         this.validateCredentials(username, password);
-    },     
+    },
     validateCredentials: function (username, password) {
         this.busy = true;
         this.el
@@ -81,16 +81,14 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
                     .removeClass('busyButton')
                     .addClass('blueButton');
 
-                if (feed['$resources'].length <= 0)
-                {   
+                if (feed['$resources'].length <= 0) {
                     service
                         .setUserName(false)
                         .setPassword(false);
 
-                    alert('username or password is invalid');
+                    alert('User does not exist');
                 }
-                else 
-                {
+                else {
                     App.context['user'] = feed['$resources'][0]['$key'];
 
                     this.el.dom.removeAttribute('selected');
@@ -107,7 +105,12 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
                     .setUserName(false)
                     .setPassword(false);
 
-                alert('username or password is invalid');
+                if (response.status == 500)
+                    alert('Internal service error');
+                else if (response.status == 403)
+                    alert('Username or password is invalid');
+                else
+                    alert('Service error: ' + response.statusText);
             },
             scope: this
         });
