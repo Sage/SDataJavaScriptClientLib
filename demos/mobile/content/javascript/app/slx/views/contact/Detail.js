@@ -21,7 +21,7 @@ Mobile.SalesLogix.Contact.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
 
         this.layout = [
             {label: 'name', tpl: Mobile.SalesLogix.Template.nameLF},
-            {name: 'AccountName', label: 'account'},
+            {name: 'AccountName', label: 'account', view: 'account_detail', key: 'Account.$key', property: true},
             {name: 'WorkPhone', label: 'work', renderer: Mobile.SalesLogix.Format.phone},
             {name: 'Mobile', label: 'mobile', renderer: Mobile.SalesLogix.Format.phone},
             {name: 'Email', label: 'email', renderer: Mobile.SalesLogix.Format.mail},
@@ -29,7 +29,7 @@ Mobile.SalesLogix.Contact.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
             {name: 'WebAddress', label: 'web', renderer: Mobile.SalesLogix.Format.link},
             {name: 'AccountManager.UserInfo', label: 'acct mgr', tpl: Mobile.SalesLogix.Template.nameLF},
             {name: 'Owner.OwnerDescription', label: 'owner'},
-            {name: 'CreateDate', label: 'create date'},
+            {name: 'CreateDate', label: 'create date', renderer: Mobile.SalesLogix.Format.date},
             {name: 'CreateUser', label: 'create user'},
             {options: {title: 'Related Items', list: true}, as: [                
                 {
@@ -69,6 +69,6 @@ Mobile.SalesLogix.Contact.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
                     'CreateUser'
                 ].join(',')             
             })
-            .setResourceSelector("'" + this.context.key + "'");
+            .setResourceSelector(String.format("'{0}'", this.context.key));
     } 
 });

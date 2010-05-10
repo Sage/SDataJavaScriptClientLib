@@ -60,11 +60,17 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
     },
     beforeTransitionAway: function() {
         App.allowSearch(false);
+        App.allowEdit(false);
     },
     transitionTo: function() { 
         App.allowSearch(this.canSearch);     
+        App.allowEdit(this.canEdit);
     },
     transitionAway: function() {    
                 
-    }   
+    },
+    getService: function() {
+        /// <returns type="Sage.SData.Client.SDataService" />
+        return App.getService();
+    }  
 });

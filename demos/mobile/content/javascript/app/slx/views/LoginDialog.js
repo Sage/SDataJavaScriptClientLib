@@ -55,10 +55,7 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
     },     
     validateCredentials: function (username, password) {
         this.busy = true;
-        this.el
-            .select('a.button')
-            .removeClass('blueButton')
-            .addClass('busyButton');
+        this.el.addClass('dialog-busy');
 
         var service = App.getService()
             .setUserName(username)
@@ -76,10 +73,7 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
         request.read({
             success: function (feed) {
                 this.busy = false;
-                this.el
-                    .select('a.button')
-                    .removeClass('busyButton')
-                    .addClass('blueButton');
+                this.el.removeClass('dialog-busy');
 
                 if (feed['$resources'].length <= 0)
                 {   
@@ -98,10 +92,7 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
             },
             failure: function (response, o) {
                 this.busy = false;
-                this.el
-                    .select('a.button')
-                    .removeClass('busyButton')
-                    .addClass('blueButton');
+                this.el.removeClass('dialog-busy');
 
                 service
                     .setUserName(false)

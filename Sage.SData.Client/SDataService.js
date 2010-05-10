@@ -106,59 +106,85 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
     createHeadersForRequest: function(request) {
         var headers = {
             /* 'User-Agent': this.userAgent */ /* 'User-Agent' cannot be set on XmlHttpRequest */
+            'X-Authorization-Mode': 'no-challenge'
         };
         
         if (this.username !== false)
             headers['Authorization'] = headers['X-Authorization'] = this.createBasicAuthToken();
             
         return headers;        
-    },
-    executeRequest: function(request, options) {
-        /// <param name="request" type="Sage.SData.Client.SDataBaseRequest">request object</param>     
-        var self = this;
-
-        if (typeof options === 'function')
-        {
-            var options = {
-                success: options
-            };
-        }             
-
-        Ext.Ajax.request({
+    },        
+    executeRequest: function(request, options, ajax) {
+        var o = Ext.apply({
+            headers: {},
+            method: 'GET'
+        }, {
             url: request.toString(),
-            success: function(response, o) {
+            scope: this,
+            success: function(response, opt) {                
                 var feed = this.processFeed(response.responseText);
+
                 if (options.success)
                     options.success.call(options.scope || this, feed);
             },
-            failure: function(response, o) {  
+            failure: function(response, opt) {
                 if (options.failure)
-                    options.failure.call(options.scope || this, response, o);
-            },
-            headers: this.createHeadersForRequest(request),
-            scope: this           
-        });
-    },
+                    options.failure.call(options.scope || this, response, opt);
+            }                            
+        }, ajax);
+
+        Ext.apply(o.headers, this.createHeadersForRequest(request));
+
+        Ext.Ajax.request(o);
+    },    
     readFeed: function(request, options) {  
         /// <param name="request" type="Sage.SData.Client.SDataResourceCollectionRequest">request object</param>          
-        this.executeRequest(request, options);
+        this.executeRequest(request, options, {
+            headers: {
+                'Accept': 'application/atom+xml;type=feed'
+            }
+        });
     },   
     readEntry: function(request, options) {
-        /// <param name="request" type="Sage.SData.Client.SDataSingleResourceRequest">request object</param>
-
+        /// <param name="request" type="Sage.SData.Client.SDataSingleResourceRequest">request object</param>      
         var o = Ext.apply({}, {
             success: function(feed) {
-                if (options.success) 
-                {
-                    var entry = feed['$resources'][0] || false;
-                    
-                    options.success.call(options.scope || this, entry);
-                }                
-            },  
-            scope: this
+                var entry = feed['$resources'][0] || false;                 
+
+                if (options.success)                 
+                    options.success.call(options.scope || this, entry);                                
+            }
         }, options);
 
-        this.executeRequest(request, o);
+        this.executeRequest(request, o, {
+            headers: {
+                'Accept': 'application/atom+xml;type=entry'
+            }
+        });
+    },
+    updateEntry: function(request, entry, options) {
+        /// <param name="request" type="Sage.SData.Client.SDataSingleResourceRequest">request object</param>
+        var xml = new XML.ObjTree();
+        xml.attr_prefix = '@';
+
+        var body = xml.writeXML(this.formatEntry(entry));
+
+        this.executeRequest(request, Ext.apply({}, {
+            success: function(feed) {
+                var entry = feed['$resources'][0] || false;                 
+
+                if (options.success)                 
+                    options.success.call(options.scope || this, entry);                                
+            }
+        }, options), {
+            method: 'PUT',
+            xmlData: body,
+            headers: {
+                'Content-Type': 'application/atom+xml;type=entry',
+                'Accept': 'application/atom+xml;type=entry',
+                'If-Match': entry['$etag']
+            }
+        });
     },
     parseFeedXml: function(text) {
         var xml = new XML.ObjTree();
@@ -166,11 +192,12 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
 
         return xml.parseXML(text);
     }, 
-    convertEntity: function(ns, entity, applyTo) {
+    convertEntity: function(ns, name, entity, applyTo) {
         applyTo = applyTo || {};
 
+        applyTo['$name'] = name;
         applyTo['$key'] = entity['@sdata:key'];
-        applyTo['$url'] = entity['@sdata:uri'];
+        applyTo['$url'] = entity['@sdata:uri'];        
         
         var prefix = ns + ':'; 
 
@@ -186,21 +213,10 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
                     if (value.hasOwnProperty('@xsi:nil')) // null
                     {
                         var converted = null;
-                    }
-                    /*
-                    // no longer an indicator of a pure-linked entry
-                    else if (value.hasOwnProperty('@sdata:uri')) // linked
-                    {
-                        var converted = {
-                            '$key': value['@sdata:key'],
-                            '$url': value['@sdata:uri']
-                            // should be a descriptor as well 
-                        };
-                    }
-                    */
+                    }                    
                     else if (value.hasOwnProperty('@sdata:key')) // included
                     {
-                        var converted = this.convertEntity(ns, value);
+                        var converted = this.convertEntity(ns, propertyName, value);
                     }
 
                     value = converted;
@@ -208,6 +224,34 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
 
                 applyTo[propertyName] = value;                   
             }
+        }
+
+        return applyTo;
+    },
+    formatEntity: function(ns, entity, applyTo) {
+        applyTo = applyTo || {};
+
+        applyTo['@sdata:key'] = entity['$key'];
+        applyTo['@sdata:uri'] = entity['$url'];
+
+        // note: not using namespaces at this time
+
+        for (var propertyName in entity)
+        {
+            if (/^\$/.test(propertyName)) continue;
+
+            var value = entity[propertyName];
+
+            if (value == null)
+            {
+                value = {'@xsi:nil': 'true'};
+            }
+            else if (typeof value === 'object')
+            {
+                value = this.formatEntity(ns, value);
+            }
+
+            applyTo[propertyName] = value;
         }
 
         return applyTo;
@@ -228,13 +272,32 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
             var parts = key.split(':');
             if (parts.length < 2) continue;
 
-            var ns = parts[0];                     
+            var ns = parts[0];
+            var name = parts[1];                     
             var entity = payload[key];
 
-            this.convertEntity(ns, entity, result);
+            this.convertEntity(ns, name, entity, result);
         }
 
         return result;
+    },
+    formatEntry: function(entry) {
+        var result = {};
+        
+        result['@xmlns:sdata'] = 'http://schemas.sage.com/sdata/2008/1';
+        result['@xmlns:xsi'] = 'http://www.w3.org/2001/XMLSchema-instance';
+        result['@xmlns:http'] = 'http://schemas.sage.com/sdata/http/2008/1';
+        result['@xmlns'] = 'http://www.w3.org/2005/Atom';
+
+        result['http:etag'] = entry['$etag'];
+        result['sdata:payload'] = {};
+        result['sdata:payload'][entry['$name']] = {
+            '@xmlns': 'http://schemas.sage.com/dynamic/2007'
+        };
+  
+        this.formatEntity(false, entry, result['sdata:payload'][entry['$name']]);
+
+        return {'entry': result};
     },
     convertFeed: function(feed) {
         var result = {};

@@ -21,16 +21,16 @@ Mobile.SalesLogix.Opportunity.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
 
         this.layout = [
             {name: 'Description', label: 'name'},
-            {name: 'Account.AccountName', label: 'account'},
-            {name: 'EstimatedClose', label: 'est. close'},
-            {name: 'SalesPotential', label: 'potential'},
+            {name: 'Account.AccountName', label: 'account', view: 'account_detail', key: 'Account.$key', property: true},
+            {name: 'EstimatedClose', label: 'est. close', renderer: Mobile.SalesLogix.Format.date},
+            {name: 'SalesPotential', label: 'potential', renderer: Mobile.SalesLogix.Format.currency},
             {name: 'CloseProbability', label: 'probability'},
-            {name: 'Weighted', label: 'weighted'},
+            {name: 'Weighted', label: 'weighted', renderer: Mobile.SalesLogix.Format.currency},
             {name: 'Stage', label: 'stage'},
             {name: 'AccountManager.UserInfo', label: 'acct mgr', tpl: Mobile.SalesLogix.Template.nameLF},
             {name: 'Owner.OwnerDescription', label: 'owner'},
             {name: 'Status', label: 'status'},
-            {name: 'CreateDate', label: 'create date'},
+            {name: 'CreateDate', label: 'create date', renderer: Mobile.SalesLogix.Format.date},
             {name: 'CreateUser', label: 'create user'}            
         ];
     },        
@@ -58,6 +58,6 @@ Mobile.SalesLogix.Opportunity.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
                     'CreateUser'
                 ].join(',')             
             })
-            .setResourceSelector("'" + this.context.key + "'");
+            .setResourceSelector(String.format("'{0}'", this.context.key));
     } 
 });

@@ -10,8 +10,8 @@ Mobile.SalesLogix.Home = Ext.extend(Sage.Platform.Mobile.View, {
     itemTemplate: new Simplate([
         '<li>',
         '<a href="#{%= id %}">',
-        '{% if (values["icon"]) { %}',
-        '<img src="{%= values["icon"] %}" alt="icon" class="icon" />',
+        '{% if ($["icon"]) { %}',
+        '<img src="{%= $["icon"] %}" alt="icon" class="icon" />',
         '{% } %}',
         '{%= title %}',
         '</a>',
@@ -38,10 +38,29 @@ Mobile.SalesLogix.Home = Ext.extend(Sage.Platform.Mobile.View, {
         Ext.DomHelper.append(this.el, o.join(''));
     },
     init: function() {                                            
-        Mobile.SalesLogix.Home.superclass.init.call(this);                  
+        Mobile.SalesLogix.Home.superclass.init.call(this);
+        
+        this.el
+            .on('click', function(evt, el, o) {                                
+                var source = Ext.get(el);
+                var target;
+
+                if (source.is('a[target="_view"]') || (target = source.up('a[target="_view"]')))
+                    this.navigateToView(target || source, evt);
+
+            }, this, { preventDefault: true, stopPropagation: true });                  
 
         App.on('registered', this.viewRegistered, this);
     },    
+    navigateToView: function(el) {
+        if (el) 
+        {
+            var id = el.dom.hash.substring(1);                       
+            var view = App.getView(id);
+            if (view)
+                view.show();
+        }
+    },
     viewRegistered: function(view) {
         Ext.DomHelper.append(this.el, this.itemTemplate.apply(view));
     },

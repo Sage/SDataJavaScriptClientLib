@@ -36,7 +36,7 @@ Mobile.SalesLogix.MainToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
             App.getView(id).show(this.searchText);
     },
     displayEdit: function() {
-    
+        App.fireEvent('edit');
     },
     allowSearch: function(allow, has) {
         this.searchText = false;

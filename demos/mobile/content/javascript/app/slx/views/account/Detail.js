@@ -15,7 +15,8 @@ Mobile.SalesLogix.Account.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
         Ext.apply(this, o, {
             id: 'account_detail',
             title: 'Account',
-            expose: false
+            expose: false,
+            editor: 'account_edit'
         });
 
         this.layout = [
@@ -28,7 +29,7 @@ Mobile.SalesLogix.Account.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
             {name: 'AccountManager.UserInfo', label: 'acct mgr', tpl: Mobile.SalesLogix.Template.nameLF},
             {name: 'Owner.OwnerDescription', label: 'owner'},
             {name: 'Status', label: 'status'},
-            {name: 'CreateDate', label: 'create date'},
+            {name: 'CreateDate', label: 'create date', renderer: Mobile.SalesLogix.Format.date},
             {name: 'CreateUser', label: 'create user'},
             {options: {title: 'Related Items', list: true}, as: [
                 {
@@ -69,6 +70,6 @@ Mobile.SalesLogix.Account.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
                     'CreateUser'
                 ].join(',')                  
             })
-            .setResourceSelector("'" + this.context.key + "'");
+            .setResourceSelector(String.format("'{0}'", this.context.key));
     } 
 });

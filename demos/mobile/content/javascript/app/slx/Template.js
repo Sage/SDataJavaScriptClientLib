@@ -8,7 +8,7 @@ Ext.namespace("Mobile.SalesLogix");
 Mobile.SalesLogix.Template = (function() {
     return {
         nameLF: new Simplate([
-            '{%= __v["FirstName"] %}, {%= __v["LastName"] %}'
+            '{%= $["FirstName"] %}, {%= $["LastName"] %}'
         ])
     };
 })();

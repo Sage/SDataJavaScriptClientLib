@@ -47,6 +47,9 @@
                     case "$":
                         fragments[i] = "try {" + "__p(" + fragments[i].substr(1) + ");"  + "} catch (__e) {}";
                         break;
+                    case "!":
+                        fragments[i] = "__p(" + fragments[i].substr(1).replace(/^\s+|\s+$/g,'') + ".apply(__v));";
+                        break;
                     default:
                         /* as is */
                         break;
@@ -58,8 +61,8 @@
             fragments[i] = "__p('" + fragments[i].replace(new RegExp("'"), "\\'") + "');";
            
         var source = [
-            'var __r = [], __v = values, __p = function() { __r.push.apply(__r, arguments); };',
-            'with (__v) {',
+            'var __r = [], $ = __v, __p = function() { __r.push.apply(__r, arguments); };',
+            'with ($) {',
             fragments.join(''),
             '}',
             'return __r.join(\'\');'
@@ -69,7 +72,7 @@
 
         try
         {
-            fn = new Function("values", source.join(''));
+            fn = new Function("__v", source.join(''));
         } 
         catch (e) 
         {

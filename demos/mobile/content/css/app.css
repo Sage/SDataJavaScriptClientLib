@@ -9,6 +9,9 @@ h3
 	font-size: .75em;
 	margin: 0;
 	padding: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 h4 
@@ -17,6 +20,9 @@ h4
 	margin: 0;
 	padding: 0;
 	color: #999999;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 li.more
@@ -82,6 +88,11 @@ div.row > label
 	font-size: 0.9em;
 }
 
+div.row-edit > label
+{
+	position: absolute;
+}
+
 div.panel > ul li, 
 div.row
 {
@@ -97,7 +108,8 @@ div.panel > fieldset
 	font-size: 14px;
 }
 
-div.row > span
+div.row > span,
+div.row > a
 {
 	display: block;
 	margin: 0 0 0 0px;
@@ -105,6 +117,12 @@ div.row > span
 	position: relative;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+div.row a[target=_related]
+{
+	background:url(../javascript/iui/default/listArrow.png) center right no-repeat; 	
+	font-size: inherit;
 }
 
 .no-data
@@ -149,9 +167,61 @@ body > *
 	padding: 6px 6px 6px 50px;
 }
 
-.busyButton span
+/* same as above, but for chrome fix */
+#search_dialog input:not([type|=radio]):not([type|=checkbox]) 
+{
+	padding: 6px 6px 6px 50px;
+}
+
+.dialog-busy .blueButton
+{
+	-webkit-border-image: url(../javascript/iui/default/toolButton.png) 0 5 0 5;
+    -moz-border-image: url(../javascript/iui/default/toolButton.png) 0 5 0 5;
+}
+
+.dialog-busy .blueButton span
 {
 	background: url('../images/loading-indicator-tool-button.gif') no-repeat scroll 0 50%;
 	padding: 0 0 0 20px;
 	color: #CCCCCC;
+}
+
+.dialog-busy input
+{
+	background: #CCCCCC;
+}
+
+/* fix for chrome CSS3 issue - with latest chrome builds, input:not(input[...]) is not functioning */
+input:not([type|=radio]):not([type|=checkbox])  
+{
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    width: 100%;
+    margin: 8px 0 0 0;
+    padding: 6px 6px 6px 44px;
+    font-size: 16px;
+    font-weight: normal;
+    border: 1px inset gray;
+}
+
+.row > input:not([type|=radio]):not([type|=checkbox]) 
+{
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    margin: 0;
+    border: none;
+    padding: 12px 10px 0 110px;
+    height: 42px;
+    background: none;
+}
+
+.row > input[type|=radio], .row > input[type|=checkbox] 
+{
+  margin: 7px 7px 0 0;
+  height: 25px;
+  width: 25px;
 }

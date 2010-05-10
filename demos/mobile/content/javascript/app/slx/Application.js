@@ -30,6 +30,7 @@ Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {
         
         this.registerView(new Mobile.SalesLogix.Account.List());  
         this.registerView(new Mobile.SalesLogix.Account.Detail());
+        this.registerView(new Mobile.SalesLogix.Account.Edit());
               
         this.registerView(new Mobile.SalesLogix.Contact.List());                     
         this.registerView(new Mobile.SalesLogix.Contact.Detail());  
@@ -44,6 +45,15 @@ Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {
             id: 'opportunity_related',
             expose: false
         })); 
+
+        /*
+        this.registerView(new Mobile.SalesLogix.Activity.List({
+            title: 'My Activities',
+            context: {
+                where: function() { return String.format('UserId eq "{0}"', App.context['user']); }     
+            }
+        }));
+        */
     }    
 });
 

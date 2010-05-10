@@ -64,6 +64,8 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             }, this);
     },
     search: function(searchText) {
+        this.clear();
+
         this.queryText = searchText && searchText.length > 0
             ? searchText
             : false;
@@ -75,17 +77,12 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         // reset search button state
         // todo: is this the best way to do this?
         App.allowSearch(this.canSearch, this.queryText);  
-
-        this.clear();
+        
         this.requestData(); 
     },
     formatSearchQuery: function(query) {
         return false;
-    },
-    getService: function() {
-        /// <returns type="Sage.SData.Client.SDataService" />
-        return App.getService();
-    },    
+    },        
     createRequest:function() {
         /// <returns type="Sage.SData.Client.SDataResourceCollectionRequest" />
         var pageSize = this.pageSize;
@@ -98,8 +95,9 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             .setStartIndex(startIndex); 
 
         var where = [];
-        if (this.current && this.current.where)
-            where.push(this.current.where);
+        var expr;
+        if (this.current && (expr = this.expandExpression(this.current.where)))
+            where.push(expr);
 
         if (this.query)
             where.push(this.query);
@@ -190,18 +188,26 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         this.moreEl.addClass('more-loading');
         this.requestData();
     },  
+    expandExpression: function(expression) {
+        if (typeof expression === 'function') 
+            return expression.call(this);
+        else
+            return expression;
+    },
     hasContext: function() {
         return (this.current || this.context);
-    },  
-    isNewContext: function() {        
-        return (!this.current || (this.current && this.current.where != this.context.where));
+    },         
+    isNewContext: function() {   
+        if (!this.current) return true;
+         
+        return (this.expandExpression(this.current.where) != this.expandExpression(this.context.where))
     },
     beforeTransitionTo: function() {
         Sage.Platform.Mobile.List.superclass.beforeTransitionTo.call(this);
 
         if (this.hasContext() && this.isNewContext())
         {
-            this.clear();
+            this.clear();            
         } 
     },
     transitionTo: function() {
@@ -229,5 +235,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
         this.requestedFirstPage = false;
         this.feed = false;
+        this.query = false;
+        this.queryText = false;
     }  
 });

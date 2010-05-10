@@ -11,11 +11,11 @@ Mobile.SalesLogix.Opportunity.List = Ext.extend(Sage.Platform.Mobile.List, {
     itemTemplate: new Simplate([
         '<li>',
         '<a href="#opportunity_detail" target="_detail" m:key="{%= $key %}" m:url="{%= $url %}">',
-        '<h3>{%= __v["Description"] %}</h3>',
-        '<h4>{%= __v["Account"]["AccountName"] %}</h4>',
+        '<h3>{%= $["Description"] %}</h3>',
+        '<h4>{%= $["Account"]["AccountName"] %}</h4>',
         '</a>',
         '</li>'
-    ]),    
+    ]),       
     constructor: function(o) {
         Mobile.SalesLogix.Opportunity.List.superclass.constructor.call(this);        
         

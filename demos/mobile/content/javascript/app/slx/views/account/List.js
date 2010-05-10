@@ -11,8 +11,8 @@ Mobile.SalesLogix.Account.List = Ext.extend(Sage.Platform.Mobile.List, {
     itemTemplate: new Simplate([
         '<li>',
         '<a href="#account_detail" target="_detail" m:key="{%= $key %}" m:url="{%= $url %}">',
-        '<h3>{%= values["AccountName"] %}</h3>',
-        '<h4>{%= values["Address"] ? values["Address"]["City"] : "" %}</h4>',
+        '<h3>{%= $["AccountName"] %}</h3>',
+        '<h4>{%= $["Address"] ? $["Address"]["City"] : "" %}</h4>',
         '</a>',
         '</li>'
     ]),    
