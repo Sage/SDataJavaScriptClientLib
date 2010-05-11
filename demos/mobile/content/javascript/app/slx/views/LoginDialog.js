@@ -80,7 +80,7 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
                         .setUserName(false)
                         .setPassword(false);
 
-                    alert('User does not exist');
+                    alert('User does not exist.');
                 }
                 else {
                     App.context['user'] = feed['$resources'][0]['$key'];
@@ -96,12 +96,10 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
                     .setUserName(false)
                     .setPassword(false);
 
-                if (response.status == 500)
-                    alert('Internal service error');
-                else if (response.status == 403)
-                    alert('Username or password is invalid');
+                if (response.status = 403)
+                    alert('Username or password is invalid.');                
                 else
-                    alert('Service error: ' + response.statusText);
+                    alert('A problem occured on the server.');                                   
             },
             scope: this
         });
