@@ -84,10 +84,10 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         }, this);  
         
         App.on('refresh', function(o) {
-            if (this.current && o.key === this.current.key)
+            if (this.context && o.key === this.context.key)
             {
-                if (o.descriptor) 
-                    this.setTitle(o.descriptor);
+                if (o.data && o.data['$descriptor']) 
+                    this.setTitle(o.data['$descriptor']);
 
                 this.clear();                
             }
@@ -125,7 +125,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     },    
     createRequest: function() {
         var request = new Sage.SData.Client.SDataSingleResourceRequest(this.getService())
-            .setResourceSelector(String.format("'{0}'", this.current.key)); 
+            .setResourceSelector(String.format("'{0}'", this.context.key)); 
 
         if (this.resourceKind) 
             request.setResourceKind(this.resourceKind);
@@ -236,7 +236,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         if (o)
         {
             if (o.key) 
-                this.context = o;
+                this.newContext = o;
 
             if (o.descriptor)
                 this.setTitle(o.descriptor);
@@ -245,7 +245,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         Sage.Platform.Mobile.Detail.superclass.show.call(this);                     
     },  
     isNewContext: function() {
-        return (!this.current || (this.current && this.current.key != this.context.key));
+        return (!this.context || (this.context && this.context.key != this.newContext.key));
     }, 
     beforeTransitionTo: function() {
         Sage.Platform.Mobile.Detail.superclass.beforeTransitionTo.call(this);
@@ -263,7 +263,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         // if the current context has changed, re-render the view
         if (this.isNewContext()) 
         {
-            this.current = this.context;
+            this.context = this.newContext;
                     
             this.requestData();  
         }   
@@ -271,6 +271,6 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     clear: function() {
         this.el.update(this.contentTemplate.apply(this));
 
-        this.current = false;
+        this.context = false;
     }      
 });

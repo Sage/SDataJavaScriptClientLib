@@ -222,8 +222,6 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         {           
             var entry = this.createEntryForUpdate(values);
 
-            console.dir(entry);
-
             var request = this.createRequest();            
             if (request)
                 request.update(entry, {
@@ -231,7 +229,9 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
                         App.fireEvent('refresh', {
                             resourceKind: this.resourceKind,
                             key: modified['$key'],
-                            descriptor: modified['$descriptor']
+                            data: {
+                                '$descriptor': modified['$descriptor']
+                            }
                         });
                             
                         /* ensures that the browsers back button and the iUI history are in sync */                        

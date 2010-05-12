@@ -105,7 +105,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
         var where = [];
         var expr;
-        if (this.current && (expr = this.expandExpression(this.current.where)))
+        if (this.context && (expr = this.expandExpression(this.context.where)))
             where.push(expr);
 
         if (this.query)
@@ -204,12 +204,12 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             return expression;
     },
     hasContext: function() {
-        return (this.current || this.context);
+        return (this.context || this.newContext);
     },         
     isNewContext: function() {   
-        if (!this.current) return true;
+        if (!this.context) return true;
          
-        return (this.expandExpression(this.current.where) != this.expandExpression(this.context.where))
+        return (this.expandExpression(this.context.where) != this.expandExpression(this.newContext.where))
     },
     beforeTransitionTo: function() {
         Sage.Platform.Mobile.List.superclass.beforeTransitionTo.call(this);
@@ -224,14 +224,14 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
         if (this.hasContext() && this.isNewContext())
         {
-            this.current = this.context;
+            this.context = this.newContext;
         }
         
         if (this.requestedFirstPage == false)         
             this.requestData();                
     },    
     show: function(o) {
-        this.context = o; 
+        this.newContext = o; 
 
         Sage.Platform.Mobile.List.superclass.show.call(this);                     
     },  
