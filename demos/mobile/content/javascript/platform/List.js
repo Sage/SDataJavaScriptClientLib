@@ -15,7 +15,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     ]),
     itemTemplate: new Simplate([
         '<li>',
-        '<a href="#" target="_detail" m:key="{%= $key %}" m:url="{%= $url %}" m:kind="">',
+        '<a href="#" target="_detail" m:key="{%= $key %}">',
         '<h3>{%= $descriptor %}</h3>',
         '</a>',
         '</li>'
@@ -113,11 +113,11 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         if (el) 
         {
             var id = el.dom.hash.substring(1);
-            var url = el.getAttribute("url", "m");
-            var key = el.getAttribute("key", "m");            
+            var key = el.getAttribute("key", "m");  
+            var descriptor = el.getAttribute("descriptor", "m");         
 
             App.getView(id).show({
-                url: url,
+                descriptor: descriptor,
                 key: key
             });
         }
@@ -211,9 +211,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         } 
     },
     transitionTo: function() {
-        // not calling base implementation, want different allowSearch behavior.
-
-        App.allowSearch(this.canSearch, this.queryText);  
+        Sage.Platform.Mobile.List.superclass.transitionTo.call(this);
 
         if (this.hasContext() && this.isNewContext())
         {

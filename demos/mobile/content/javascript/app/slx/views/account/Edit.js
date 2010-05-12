@@ -15,7 +15,8 @@ Mobile.SalesLogix.Account.Edit = Ext.extend(Sage.Platform.Mobile.Edit, {
         Ext.apply(this, o, {
             id: 'account_edit',
             title: 'Account',
-            expose: false
+            expose: false,
+            canSave: true,
         });
 
         this.layout = [
@@ -25,5 +26,27 @@ Mobile.SalesLogix.Account.Edit = Ext.extend(Sage.Platform.Mobile.Edit, {
     },
     init: function() {     
         Mobile.SalesLogix.Account.Edit.superclass.init.call(this);   
-    }   
+    },
+    createRequest: function() {
+        return new Sage.SData.Client.SDataSingleResourceRequest(this.getService())            
+            .setResourceKind('accounts')
+            .setQueryArgs({
+                'include': 'Address,AccountManager,AccountManager/UserInfo,Owner',
+                'select': [
+                    'AccountName',
+                    'MainPhone',
+                    'Address/*',
+                    'WebAddress',
+                    'Type',
+                    'SubType',
+                    'AccountManager/UserInfo/FirstName',
+                    'AccountManager/UserInfo/LastName',
+                    'Owner/OwnerDescription',
+                    'Status',
+                    'CreateDate',
+                    'CreateUser'
+                ].join(',')                  
+            })
+            .setResourceSelector(String.format("'{0}'", this.entry['$key']));
+    }
 });

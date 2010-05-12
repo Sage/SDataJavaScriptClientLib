@@ -10,7 +10,7 @@ Ext.namespace("Mobile.SalesLogix.Activity");
 Mobile.SalesLogix.Activity.List = Ext.extend(Sage.Platform.Mobile.List, {   
     itemTemplate: new Simplate([
         '<li>',
-        '<a href="#activity_detail" target="_detail" m:key="{%= $key %}" m:url="{%= $url %}">',
+        '<a href="#activity_detail" target="_detail" m:key="{%= $key %}">',
         '<h3>{%= $["Description"] %}</h3>',
         '<h4>{%= $["Category"] %}</h4>',
         '</a>',

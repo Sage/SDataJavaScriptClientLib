@@ -10,7 +10,7 @@ Ext.namespace("Mobile.SalesLogix.Contact");
 Mobile.SalesLogix.Contact.List = Ext.extend(Sage.Platform.Mobile.List, {   
     itemTemplate: new Simplate([
         '<li>',
-        '<a href="#contact_detail" target="_detail" m:key="{%= $key %}" m:url="{%= $url %}">',
+        '<a href="#contact_detail" target="_detail" m:key="{%= $key %}" m:descriptor="{%: $descriptor %}">',
         '<h3>{%= LastName %}, {%= FirstName %}</h3>',
         '<h4>{%= AccountName %}</h4>',
         '</a>',

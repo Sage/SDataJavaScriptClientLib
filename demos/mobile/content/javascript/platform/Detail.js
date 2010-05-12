@@ -146,7 +146,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
             }
             else
             {            
-                var provider = current['provider'] || Sage.Platform.Mobile.Format.dotValueProvider;
+                var provider = current['provider'] || Sage.Platform.Mobile.Utility.getValue;
                 var value = provider(entry, current['name']);
                 var formatted = current['tpl']
                     ? current['tpl'].apply(value)
@@ -219,6 +219,12 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     show: function(o) {
         this.context = o; 
 
+        if (this.isNewContext())
+        {
+            if (this.context && this.context.descriptor) 
+                this.setTitle(this.context.descriptor);
+        }
+
         Sage.Platform.Mobile.Detail.superclass.show.call(this);                     
     },  
     isNewContext: function() {
@@ -247,5 +253,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     },
     clear: function() {
         this.el.update(this.contentTemplate.apply(this));
+
+        this.current = false;
     }      
 });

@@ -7,6 +7,7 @@
 Ext.namespace('Sage.Platform.Mobile');
 Ext.namespace('Sage.Platform.Mobile.Controls');
 
+// todo: move to separate files
 Sage.Platform.Mobile.Controls.Field = function(name) {
     this.name = name;    
 };
@@ -64,7 +65,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
     propertyTemplate: new Simplate([
         '<div class="row row-edit">',
         '<label>{%= label %}</label>',       
-        '{%! field %}', /* execute sub template */
+        '{%! field %}', /* apply sub-template */
         '</div>'
     ]),    
     textFieldTemplate: new Simplate([
@@ -77,6 +78,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
             id: 'generic_edit',
             title: 'Edit',
             expose: false,
+            canSave: true,
             fields: {}          
         });
     },
@@ -95,10 +97,19 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
 
         this.loadEl.hide();
         this.bodyEl.show();
+
+        // todo: find a better way to handle these notifications
+        App.on('save', function() {
+            if (this.el.getAttribute('selected') == 'true')
+                this.save();
+        }, this);  
     },      
     createRequest: function() {
        
     },    
+    createTemplateRequest: function() {
+
+    },
     processLayout: function(layout, options)
     {
         var sections = [];
@@ -156,8 +167,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
     show: function(o) {
         if (typeof o !== 'undefined') 
         {
-            this.original = o;
-            this.dirty = {};
+            this.entry = o;
             this.newContext = true;
         }        
         else
@@ -172,41 +182,75 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
     }, 
     beforeTransitionTo: function() {
         Sage.Platform.Mobile.Edit.superclass.beforeTransitionTo.call(this);
-
-        /*
-        if (this.isNewContext())
-        {
-            this.clear();
-        } 
-        */
     },
     setValues: function(o) {
         for (var name in this.fields)
         {
-            var value = Sage.Platform.Mobile.Format.dotValueProvider(o, name);
+            var value = Sage.Platform.Mobile.Utility.getValue(o, name);
 
             this.fields[name].setValue(value);
         }
     },
     getValues: function() {
+        var o = {};
+        var empty = true;
 
+        for (var name in this.fields)
+        {                        
+            if (this.fields[name].isDirty())
+            {
+                var value = this.fields[name].getValue();
+                
+                Sage.Platform.Mobile.Utility.setValue(o, name, value);
+
+                empty = false;
+            }
+        }
+        return empty ? false : o;
+    },
+    createEntryForUpdate: function(values) {
+        return Ext.apply(values, {
+            '$key': this.entry['$key'],
+            '$etag': this.entry['$etag'],
+            '$name': this.entry['$name']           
+        });
+    },
+    save: function() {
+        var values = this.getValues();        
+        if (values) 
+        {           
+            var entry = this.createEntryForUpdate(values);
+
+            console.dir(entry);
+
+            var request = this.createRequest();            
+            if (request)
+                request.update(entry, {
+                    success: function(modified) {   
+                        // todo: evaluate whether or not to use the modified data, or just refresh the previous view?
+                        var previous = App.getPreviousView();
+                        if (previous && typeof previous.clear === 'function')
+                            previous.clear();
+                            
+                        iui.goBack();                        
+                    },
+                    failure: function(response, o) {
+                        
+                    },
+                    scope: this
+                });
+        }
     },
     transitionTo: function() {
         Sage.Platform.Mobile.Edit.superclass.transitionTo.call(this); 
         
         if (this.isNewContext())
         {
-            this.setValues(this.original);
+            this.setValues(this.entry);
         }       
 
         // todo: check to see if we are creating instead of editing and, if so, request the 'template'
         //       from SData.
-        /*
-        if (this.isNewContext()) 
-        {
-            this.processLayout(this.layout, {}, this.original);
-        }
-        */
     },
     clear: function() {
         // todo: add back if we are creating instead of editing.

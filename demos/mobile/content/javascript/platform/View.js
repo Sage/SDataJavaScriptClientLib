@@ -37,19 +37,10 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
                     this.load(); 
                     this.loaded = true;
                 }   
-            }, this)
-            .on('beforetransition', function(evt, el, o) {
-                if (evt.browserEvent.out)
-                    this.beforeTransitionAway();
-                else
-                    this.beforeTransitionTo();                
-            }, this)
-            .on('aftertransition', function(evt, el, o) {
-                if (evt.browserEvent.out)
-                    this.transitionAway();
-                else
-                    this.transitionTo();
-            }, this);              
+            }, this);        
+    },
+    setTitle: function(title) {
+        this.el.dom.setAttribute('title', title);
     },
     load: function() {
     },
@@ -58,16 +49,11 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
     },
     beforeTransitionTo: function() {
     },
-    beforeTransitionAway: function() {
-        App.allowSearch(false);
-        App.allowEdit(false);
+    beforeTransitionAway: function() {        
     },
-    transitionTo: function() { 
-        App.allowSearch(this.canSearch);     
-        App.allowEdit(this.canEdit);
+    transitionTo: function() {                
     },
-    transitionAway: function() {    
-                
+    transitionAway: function() {                    
     },
     getService: function() {
         /// <returns type="Sage.SData.Client.SDataService" />

@@ -70,6 +70,6 @@ Mobile.SalesLogix.Account.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
                     'CreateUser'
                 ].join(',')                  
             })
-            .setResourceSelector(String.format("'{0}'", this.context.key));
+            .setResourceSelector(String.format("'{0}'", this.context.key));            
     } 
 });

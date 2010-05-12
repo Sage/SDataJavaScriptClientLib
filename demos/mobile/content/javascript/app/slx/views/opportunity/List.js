@@ -10,7 +10,7 @@ Ext.namespace("Mobile.SalesLogix.Opportunity");
 Mobile.SalesLogix.Opportunity.List = Ext.extend(Sage.Platform.Mobile.List, {   
     itemTemplate: new Simplate([
         '<li>',
-        '<a href="#opportunity_detail" target="_detail" m:key="{%= $key %}" m:url="{%= $url %}">',
+        '<a href="#opportunity_detail" target="_detail" m:key="{%= $key %}" m:descriptor="{%: $descriptor %}">',
         '<h3>{%= $["Description"] %}</h3>',
         '<h4>{%= $["Account"]["AccountName"] %}</h4>',
         '</a>',
@@ -28,7 +28,9 @@ Mobile.SalesLogix.Opportunity.List = Ext.extend(Sage.Platform.Mobile.List, {
     },   
     formatSearchQuery: function(query) {
         return String.format('(Description like "%{0}%")', query);
-        // todo: unable to currently work, NH is unable to resolve Account property.
+
+        // todo: The below does not currently work as the dynamic SData adapter does not support dotted notation for queries
+        //       except in certain situations.  Support for general dotted notation is being worked on.
         //return String.format('(Description like "%{0}%" or Account.AccountName like "%{0}%")', query);
     },
     createRequest: function() {

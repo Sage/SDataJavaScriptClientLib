@@ -1,20 +1,38 @@
-﻿(function() {
+﻿/*!
+ * simplate-js v1.1 
+ * Copyright 2010, Michael Morton 
+ * 
+ * MIT Licensed - See LICENSE.txt
+ */
+(function() {
     var options = {
         tags: {
             begin: "{%",
             end: "%}"
         }
-    };   
+    };
     var cache = {};
-    var merge = function(a, b) {
-        for (var n in b) a[n] = b[n];
+    var merge = function(a, b, c) {
+        if (c)
+            for (var n in c) a[n] = c[n];
+        if (b)
+            for (var n in b) a[n] = b[n];
         return a;
-    };       
+    };
+    function encode(val) {
+        if (typeof val !== 'string') return val;
+
+        return val
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    };
     var make = function(markup, o) {
         if (markup.join) markup = markup.join("");
-        if (cache[markup]) return cache[markup];  
+        if (cache[markup]) return cache[markup];
 
-        var o = merge(o || {}, options);
+        var o = merge({}, o, options);
        
         if ('is,ie'.split(/(,)/).length !== 3)
         {
@@ -24,7 +42,7 @@
                 fragments.push.apply(fragments, a[i].split(o.tags.end));
         }
         else
-        {           
+        {
             var regex = new RegExp(o.tags.begin + "(.*?)" + o.tags.end);
             var fragments = markup.split(regex);
         }
@@ -44,8 +62,11 @@
                     case "=":
                         fragments[i] = "__p(" + fragments[i].substr(1) + ");";
                         break;
+                    case ":":
+                        fragments[i] = "__p(__s.encode(" + fragments[i].substr(1) + "));";
+                        break;
                     case "$":
-                        fragments[i] = "try {" + "__p(" + fragments[i].substr(1) + ");"  + "} catch (__e) {}";
+                        fragments[i] = "try {" + "__p(" + fragments[i].substr(1) + ");" + "} catch (__e) {}";
                         break;
                     case "!":
                         fragments[i] = "__p(" + fragments[i].substr(1).replace(/^\s+|\s+$/g,'') + ".apply(__v));";
@@ -58,28 +79,28 @@
         }
        
         for (var i = 0; i < fragments.length; i += 2)
-            fragments[i] = "__p('" + fragments[i].replace(new RegExp("'"), "\\'") + "');";
+            fragments[i] = "__p('" + fragments[i].replace(/'/g, "\\'").replace(/\n/g, "\\n") + "');";
            
         var source = [
-            'var __r = [], $ = __v, __p = function() { __r.push.apply(__r, arguments); };',
+            'var __r = [], $ = __v || {}, __s = Simplate; __p = function() { __r.push.apply(__r, arguments); };',
             'with ($) {',
             fragments.join(''),
             '}',
             'return __r.join(\'\');'
-        ];            
+        ];
         
         var fn;
 
         try
         {
             fn = new Function("__v", source.join(''));
-        } 
-        catch (e) 
+        }
+        catch (e)
         {
             fn = function(values) { return e.message; };
-        }        
+        }
        
-        return (cache[markup] = fn);        
+        return (cache[markup] = fn);
     };
 
     Simplate = window.Simplate = function(markup, o) {
@@ -90,7 +111,8 @@
         apply: function(data, scope) {
             return this.fn.call(scope || this, data);
         }
-    };       
+    };
     
-    Simplate.options = options;         
+    Simplate.options = options;
+    Simplate.encode = encode;
 })();

@@ -1,5 +1,7 @@
 ﻿/// <reference path="../ext/ext-core-debug.js"/>
+/// <reference path="../iui/iui-sage.js"/>
 /// <reference path="Format.js"/>
+/// <reference path="Utility.js"/>
 
 Ext.namespace('Sage.Platform.Mobile');
 
@@ -14,11 +16,31 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         this.addEvents(
             'registered',
             'search',
-            'edit'
+            'edit',
+            'save'
         );
     },
     setup: function() {
-        
+        Ext.getBody().on('beforetransition', function(evt, el, o) {
+            var view = this.getView(el);
+            if (view)
+            {
+                if (evt.browserEvent.out)
+                    this.beforeViewTransitionAway(view);
+                else
+                    this.beforeViewTransitionTo(view);
+            }
+        }, this);
+        Ext.getBody().on('aftertransition', function(evt, el, o) {
+            var view = this.getView(el);
+            if (view)
+            {
+                if (evt.browserEvent.out)
+                    this.viewTransitionAway(view);
+                else
+                    this.viewTransitionTo(view);
+            }
+        }, this);
     },
     init: function() {        
         this.setup();
@@ -42,15 +64,37 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     getViews: function() {
         return this.views;
     },
-    getView: function(id) {
-        if (typeof id === 'string') 
-            return this.viewsById[id];
-        else if (typeof id.id !== 'undefined')
-            return this.viewsById[id.id];
-        else return null;
+    getActiveView: function() {
+        var el = iui.getCurrentPage() || iui.getCurrentDialog();
+        if (el)
+            return this.getView(el);
+
+        return null;
+    },
+    getPreviousView: function() {
+        var el = iui.getPreviousPage();
+        if (el)
+            return this.getView(el);
+
+        return null;
+    },
+    getView: function(key) {
+        if (key)
+        {
+            if (typeof key === 'string')
+                return this.viewsById[key];
+            
+            if (typeof key === 'object' && typeof key.id === 'string')
+                return this.viewsById[key.id];                
+        }
+        return null;
     },
     getService: function() {
         return this.service;
+    },
+    setTitle: function(title) {
+        if (this.tbar && this.tbar.setTitle)
+            this.tbar.setTitle(title);
     },
     allowSearch: function(allow, has) {
         if (this.tbar && this.tbar.allowSearch)
@@ -59,6 +103,30 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     allowEdit: function(allow) {
         if (this.tbar && this.tbar.allowEdit)
             this.tbar.allowEdit(allow);
+    },
+    allowSave: function(allow) {
+        if (this.tbar && this.tbar.allowSave)
+            this.tbar.allowSave(allow);
+    },
+    beforeViewTransitionAway: function(view) {
+        this.allowSearch(false);
+        this.allowEdit(false);
+        this.allowSave(false);
+
+        view.beforeTransitionAway();
+    },
+    beforeViewTransitionTo: function(view) {
+        view.beforeTransitionTo();
+    },
+    viewTransitionAway: function(view) {
+        view.transitionAway();
+    },
+    viewTransitionTo: function(view) {
+        this.allowSearch(view.canSearch, view.queryText); // todo: adjust naming   
+        this.allowEdit(view.canEdit);
+        this.allowSave(view.canSave);
+
+        view.transitionTo();
     }
 });
 

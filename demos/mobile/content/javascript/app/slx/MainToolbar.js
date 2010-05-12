@@ -12,15 +12,16 @@ Mobile.SalesLogix.MainToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
         '<a id="backButton" class="button" href="#"></a>',
         '<a class="button" href="#search_dialog" target="_search" style="display: none;">Search</a>',
         '<a class="button" href="#" target="_edit" style="display: none;">Edit</a>',
+        '<a class="button" href="#" target="_save" style="display: none;">Save</a>',
         '</div>'
     ]),
     constructor: function(o) {
         Mobile.SalesLogix.MainToolbar.superclass.constructor.apply(this, arguments);        
     }, 
     init: function() {
-        Mobile.SalesLogix.MainToolbar.superclass.init.call(this);
+        Mobile.SalesLogix.MainToolbar.superclass.init.call(this);        
 
-         this.el.select('a[target="_search"]')
+        this.el.select('a[target="_search"]')
             .on('click', function(evt, el, o) {
                 this.displaySearch(Ext.get(el));
             }, this, { preventDefault: true, stopPropagation: true });
@@ -29,6 +30,14 @@ Mobile.SalesLogix.MainToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
             .on('click', function(evt, el, o) {
                 this.displayEdit(Ext.get(el));
             }, this, { preventDefault: true, stopPropagation: true });
+
+        this.el.select('a[target="_save"]')
+            .on('click', function(evt, el, o) {
+                this.displaySave(Ext.get(el));
+            }, this, { preventDefault: true, stopPropagation: true });
+    },
+    setTitle: function(title) {
+        Ext.get('pageTitle').update(title);
     },
     displaySearch: function(el) {
         var id = el.dom.hash.substring(1);
@@ -37,6 +46,9 @@ Mobile.SalesLogix.MainToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
     },
     displayEdit: function() {
         App.fireEvent('edit');
+    },
+    displaySave: function() {
+        App.fireEvent('save');
     },
     allowSearch: function(allow, has) {
         this.searchText = false;
@@ -65,5 +77,11 @@ Mobile.SalesLogix.MainToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
             this.el.down('a[target="_edit"]').show();
         else
             this.el.down('a[target="_edit"]').hide(); 
-    }     
+    },
+    allowSave: function(allow) {
+        if (allow)
+            this.el.down('a[target="_save"]').show();
+        else
+            this.el.down('a[target="_save"]').hide(); 
+    }  
 });

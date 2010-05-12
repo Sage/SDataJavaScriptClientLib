@@ -36,8 +36,20 @@ window.iui =
 	},
 
     getCurrentPage: function() {
-        return currentDialog || currentPage;
+        return currentPage;
     }, 
+
+    getPreviousPage: function() {
+        if (pageHistory.length > 2)
+        {
+            return  $(pageHistory[pageHistory.length - 2]); /* top is -1, prev is -2 */
+        }
+        return null;
+    },
+
+    getCurrentDialog: function() {
+        return currentDialog;
+    },
 
 	showPage: function(page, backwards)
 	{
@@ -358,12 +370,12 @@ addEventListener("click", function(event)
 }, true);
 
 
-function sendEvent(type, node, props)
+function sendEvent(type, node, props, bubble, cancel)
 {
     if (node)
     {
         var event = document.createEvent("UIEvent");
-        event.initEvent(type, false, false);  // no bubble, no cancel
+        event.initEvent(type, bubble || false, cancel || false);  // no bubble, no cancel
         if (props)
         {
             for (i in props)
@@ -523,8 +535,8 @@ function slidePages(fromPage, toPage, backwards)
 
 	clearInterval(checkTimer);
 	
-	sendEvent("beforetransition", fromPage, {out:true});
-	sendEvent("beforetransition", toPage, {out:false});
+	sendEvent("beforetransition", fromPage, {out:true}, true);
+	sendEvent("beforetransition", toPage, {out:false}, true);
 	if (canDoSlideAnim() && axis != 'y')
 	{
 	  slide2(fromPage, toPage, backwards, slideDone);
@@ -541,8 +553,8 @@ function slidePages(fromPage, toPage, backwards)
 	  checkTimer = setInterval(checkOrientAndLocation, 300);
 	  setTimeout(updatePage, 0, toPage, fromPage);
 	  fromPage.removeEventListener('webkitTransitionEnd', slideDone, false);
-	  sendEvent("aftertransition", fromPage, {out:true});
-      sendEvent("aftertransition", toPage, {out:false});
+	  sendEvent("aftertransition", fromPage, {out:true}, true);
+      sendEvent("aftertransition", toPage, {out:false}, true);
 
 	}
 }
