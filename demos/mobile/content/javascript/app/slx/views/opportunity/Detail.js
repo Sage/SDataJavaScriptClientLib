@@ -16,7 +16,7 @@ Mobile.SalesLogix.Opportunity.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
         Ext.apply(this, o, {
             id: 'opportunity_detail',
             title: 'Opportunity',
-            expose: false
+            resourceKind: 'opportunities'
         });
 
         this.layout = [
@@ -38,8 +38,9 @@ Mobile.SalesLogix.Opportunity.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
         Mobile.SalesLogix.Opportunity.Detail.superclass.init.call(this);   
     },
     createRequest: function() {
-        return new Sage.SData.Client.SDataSingleResourceRequest(this.getService())            
-            .setResourceKind('opportunities')
+        var request = Mobile.SalesLogix.Opportunity.Detail.superclass.createRequest.call(this); 
+
+        request            
             .setQueryArgs({
                 'include': 'Account,AccountManager,AccountManager/UserInfo',                
                 'select': [
@@ -57,7 +58,8 @@ Mobile.SalesLogix.Opportunity.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
                     'CreateDate',
                     'CreateUser'
                 ].join(',')             
-            })
-            .setResourceSelector(String.format("'{0}'", this.context.key));
+            });
+
+        return request;
     } 
 });

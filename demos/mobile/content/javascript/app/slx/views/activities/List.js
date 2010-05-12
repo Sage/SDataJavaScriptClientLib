@@ -22,6 +22,7 @@ Mobile.SalesLogix.Activity.List = Ext.extend(Sage.Platform.Mobile.List, {
         Ext.apply(this, o, {
             id: 'activity_list',
             title: 'Activities',
+            resourceKind: 'activities',
             pageSize: 10,
             icon: 'content/images/app/slx/Task_List_3D_24x24.gif'
         });
@@ -33,7 +34,6 @@ Mobile.SalesLogix.Activity.List = Ext.extend(Sage.Platform.Mobile.List, {
         var request = Mobile.SalesLogix.Activity.List.superclass.createRequest.call(this);
 
         request
-            .setResourceKind('activities')
             .setQueryArgs({                
                 'orderby': 'Description',
                 'select': 'Description,Category'                

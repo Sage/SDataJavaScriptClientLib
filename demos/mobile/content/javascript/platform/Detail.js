@@ -81,7 +81,17 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         App.on('edit', function() {
             if (this.el.getAttribute('selected') == 'true')
                 this.navigateToEdit();
-        }, this);    
+        }, this);  
+        
+        App.on('refresh', function(o) {
+            if (this.current && o.key === this.current.key)
+            {
+                if (o.descriptor) 
+                    this.setTitle(o.descriptor);
+
+                this.clear();                
+            }
+        }, this);  
     },
     formatRelatedQuery: function(entry, fmt) {
         return String.format(fmt, entry['$key']);        
@@ -114,7 +124,13 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         }                                              
     },    
     createRequest: function() {
-       
+        var request = new Sage.SData.Client.SDataSingleResourceRequest(this.getService())
+            .setResourceSelector(String.format("'{0}'", this.current.key)); 
+
+        if (this.resourceKind) 
+            request.setResourceKind(this.resourceKind);
+
+        return request;
     },    
     processLayout: function(layout, options, entry)
     {
@@ -217,12 +233,13 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         });       
     },
     show: function(o) {
-        this.context = o; 
-
-        if (this.isNewContext())
+        if (o)
         {
-            if (this.context && this.context.descriptor) 
-                this.setTitle(this.context.descriptor);
+            if (o.key) 
+                this.context = o;
+
+            if (o.descriptor)
+                this.setTitle(o.descriptor);
         }
 
         Sage.Platform.Mobile.Detail.superclass.show.call(this);                     

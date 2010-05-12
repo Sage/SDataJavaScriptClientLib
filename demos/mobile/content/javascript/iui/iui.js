@@ -2,6 +2,9 @@
    Copyright (c) 2007-9, iUI Project Members
    See LICENSE.txt for licensing terms
    Version 0.40-dev2
+
+   This is a modified version of iUI v0.40-dev2.  It includes additional features and bug fixes required by
+   the SData Mobile Application Framework.
  */
 
 
@@ -29,9 +32,27 @@ window.iui =
 {
 	animOn: true,	// Slide animation with CSS transition is now enabled by default where supported
 
+    delayInit: false,
+
 	httpHeaders: {
 	    "X-Requested-With" : "XMLHttpRequest"
 	},
+
+    getCurrentPage: function() {
+        return currentPage;
+    }, 
+
+    getPreviousPage: function() {
+        if (pageHistory.length > 2)
+        {
+            return  $(pageHistory[pageHistory.length - 2]); /* top is -1, prev is -2 */
+        }
+        return null;
+    },
+
+    getCurrentDialog: function() {
+        return currentDialog;
+    },
 
 	showPage: function(page, backwards)
 	{
@@ -249,33 +270,35 @@ window.iui =
 		  var reg = new RegExp('(\\s|^)'+name+'(\\s|$)');
 		self.className=self.className.replace(reg,' ');
 	  }
-	}
+	},
+
+    init: function() {
+        var page = iui.getSelectedPage();
+	    var locPage = getPageFromLoc();    
+		
+	    if (page)
+			    iui.showPage(page);
+	
+	    if (locPage && (locPage != page))
+		    iui.showPage(locPage);
+	
+	    setTimeout(preloadImages, 0);
+	    if (typeof window.onorientationchange == "object")
+	    {
+		    window.onorientationchange=orientChangeHandler;
+		    hasOrientationEvent = true;
+		    setTimeout(orientChangeHandler, 0);
+	    }
+	    setTimeout(checkOrientAndLocation, 0);
+	    checkTimer = setInterval(checkOrientAndLocation, 300);
+    }
 };
 
 // *************************************************************************************************
 
 addEventListener("load", function(event)
 {
-    console.log("iui.load");
-
-	var page = iui.getSelectedPage();
-	var locPage = getPageFromLoc();    
-		
-	if (page)
-			iui.showPage(page);
-	
-	if (locPage && (locPage != page))
-		iui.showPage(locPage);
-	
-	setTimeout(preloadImages, 0);
-	if (typeof window.onorientationchange == "object")
-	{
-		window.onorientationchange=orientChangeHandler;
-		hasOrientationEvent = true;
-		setTimeout(orientChangeHandler, 0);
-	}
-	setTimeout(checkOrientAndLocation, 0);
-	checkTimer = setInterval(checkOrientAndLocation, 300);
+    if (!iui.delayInit) iui.init();
 }, false);
 
 addEventListener("unload", function(event)
@@ -350,12 +373,12 @@ addEventListener("click", function(event)
 }, true);
 
 
-function sendEvent(type, node, props)
+function sendEvent(type, node, props, bubble, cancel)
 {
     if (node)
     {
         var event = document.createEvent("UIEvent");
-        event.initEvent(type, false, false);  // no bubble, no cancel
+        event.initEvent(type, bubble || false, cancel || false);  // no bubble, no cancel
         if (props)
         {
             for (i in props)
@@ -448,22 +471,27 @@ function showDialog(page)
 
 function showForm(form)
 {
-	form.onsubmit = function(event)
-	{
-//  submitForm and preventDefault are called in the click handler
-//  when the user clicks the submit a.button
-// 
-		event.preventDefault();
-		submitForm(form);
-	};
+    
+    // sage: only bind to onsubmit when there is no onsubmit
+    if (typeof form.onsubmit === 'undefined')
+	    form.onsubmit = function(event)
+	    {
+            //  submitForm and preventDefault are called in the click handler
+            //  when the user clicks the submit a.button
+            // 
+		    event.preventDefault();
+		    submitForm(form);
+	    };
 	
-	form.onclick = function(event)
-	{
-// Why is this code needed?  cancelDialog is called from
-// the click hander.  When will this be called?
-		if (event.target == form && hasClass(form, "dialog"))
-			cancelDialog(form);
-	};
+	//form.onclick = function(event)
+	//{
+        // Why is this code needed?  cancelDialog is called from
+        // the click hander.  When will this be called?
+
+        // removed: sage        
+		//if (event.target == form && hasClass(form, "dialog"))
+		//	cancelDialog(form);
+	//};
 }
 
 function cancelDialog(form)
@@ -510,8 +538,8 @@ function slidePages(fromPage, toPage, backwards)
 
 	clearInterval(checkTimer);
 	
-	sendEvent("beforetransition", fromPage, {out:true});
-	sendEvent("beforetransition", toPage, {out:false});
+	sendEvent("beforetransition", fromPage, {out:true}, true);
+	sendEvent("beforetransition", toPage, {out:false}, true);
 	if (canDoSlideAnim() && axis != 'y')
 	{
 	  slide2(fromPage, toPage, backwards, slideDone);
@@ -528,8 +556,8 @@ function slidePages(fromPage, toPage, backwards)
 	  checkTimer = setInterval(checkOrientAndLocation, 300);
 	  setTimeout(updatePage, 0, toPage, fromPage);
 	  fromPage.removeEventListener('webkitTransitionEnd', slideDone, false);
-	  sendEvent("aftertransition", fromPage, {out:true});
-      sendEvent("aftertransition", toPage, {out:false});
+	  sendEvent("aftertransition", fromPage, {out:true}, true);
+      sendEvent("aftertransition", toPage, {out:false}, true);
 
 	}
 }

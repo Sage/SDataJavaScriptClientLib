@@ -22,6 +22,7 @@ Mobile.SalesLogix.Opportunity.List = Ext.extend(Sage.Platform.Mobile.List, {
         Ext.apply(this, o, {
             id: 'opportunity_list',
             title: 'Opportunities',
+            resourceKind: 'opportunities',
             pageSize: 10,
             icon: 'content/images/app/slx/Opportunity_List_24x24.gif'
         });
@@ -37,7 +38,6 @@ Mobile.SalesLogix.Opportunity.List = Ext.extend(Sage.Platform.Mobile.List, {
         var request = Mobile.SalesLogix.Opportunity.List.superclass.createRequest.call(this);
 
         request           
-            .setResourceKind('opportunities')
             .setQueryArgs({
                 'include': 'Account',
                 'orderby': 'Description',

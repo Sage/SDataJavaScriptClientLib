@@ -22,6 +22,7 @@ Mobile.SalesLogix.Contact.List = Ext.extend(Sage.Platform.Mobile.List, {
         Ext.apply(this, o, {
             id: 'contact_list',
             title: 'Contacts',
+            resourceKind: 'contacts',
             pageSize: 10,
             icon: 'content/images/app/slx/Contacts_24x24.gif'
         });

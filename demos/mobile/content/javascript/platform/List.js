@@ -57,11 +57,17 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
             }, this, { preventDefault: true, stopPropagation: true });                
 
+        // todo: find a better way to handle these notifications
         if (this.canSearch) 
             App.on('search', function(query) {
                 if (this.el.getAttribute('selected') == 'true')
                     this.search(query);
             }, this);
+
+        App.on('refresh', function(o) {
+            if (this.resourceKind && o.resourceKind === this.resourceKind)
+                this.clear();
+        }, this); 
     },
     search: function(searchText) {
         this.clear();
@@ -93,6 +99,9 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         var request = new Sage.SData.Client.SDataResourceCollectionRequest(this.getService())                         
             .setCount(pageSize)
             .setStartIndex(startIndex); 
+
+        if (this.resourceKind) 
+            request.setResourceKind(this.resourceKind)
 
         var where = [];
         var expr;

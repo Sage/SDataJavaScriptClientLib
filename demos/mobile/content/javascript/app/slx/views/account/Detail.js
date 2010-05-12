@@ -15,8 +15,8 @@ Mobile.SalesLogix.Account.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
         Ext.apply(this, o, {
             id: 'account_detail',
             title: 'Account',
-            expose: false,
-            editor: 'account_edit'
+            editor: 'account_edit',
+            resourceKind: 'accounts'
         });
 
         this.layout = [
@@ -51,8 +51,9 @@ Mobile.SalesLogix.Account.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
         Mobile.SalesLogix.Account.Detail.superclass.init.call(this);   
     },
     createRequest: function() {
-        return new Sage.SData.Client.SDataSingleResourceRequest(this.getService())            
-            .setResourceKind('accounts')
+        var request = Mobile.SalesLogix.Account.Detail.superclass.createRequest.call(this);
+        
+        request                     
             .setQueryArgs({
                 'include': 'Address,AccountManager,AccountManager/UserInfo,Owner',
                 'select': [
@@ -69,7 +70,8 @@ Mobile.SalesLogix.Account.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
                     'CreateDate',
                     'CreateUser'
                 ].join(',')                  
-            })
-            .setResourceSelector(String.format("'{0}'", this.context.key));            
+            });     
+        
+        return request;                   
     } 
 });

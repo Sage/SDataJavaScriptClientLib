@@ -99,10 +99,11 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         this.bodyEl.show();
 
         // todo: find a better way to handle these notifications
-        App.on('save', function() {
-            if (this.el.getAttribute('selected') == 'true')
-                this.save();
-        }, this);  
+        if (this.canSave)
+            App.on('save', function() {
+                if (this.el.getAttribute('selected') == 'true')
+                    this.save();
+            }, this);  
     },      
     createRequest: function() {
        
@@ -226,13 +227,15 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
             var request = this.createRequest();            
             if (request)
                 request.update(entry, {
-                    success: function(modified) {   
-                        // todo: evaluate whether or not to use the modified data, or just refresh the previous view?
-                        var previous = App.getPreviousView();
-                        if (previous && typeof previous.clear === 'function')
-                            previous.clear();
+                    success: function(modified) {                          
+                        App.fireEvent('refresh', {
+                            resourceKind: this.resourceKind,
+                            key: modified['$key'],
+                            descriptor: modified['$descriptor']
+                        });
                             
-                        iui.goBack();                        
+                        /* ensures that the browsers back button and the iUI history are in sync */                        
+                        history.go(-1);
                     },
                     failure: function(response, o) {
                         

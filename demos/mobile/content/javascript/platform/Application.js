@@ -17,7 +17,8 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
             'registered',
             'search',
             'edit',
-            'save'
+            'save',
+            'refresh'
         );
     },
     setup: function() {

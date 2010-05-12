@@ -15,7 +15,7 @@ Mobile.SalesLogix.Activity.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
         Ext.apply(this, o, {
             id: 'activity_detail',
             title: 'Activity',
-            expose: false
+            resourceKind: 'activities'
         });
 
         this.layout = [
@@ -26,12 +26,14 @@ Mobile.SalesLogix.Activity.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
         Mobile.SalesLogix.Activity.Detail.superclass.init.call(this);   
     },
     createRequest: function() {
-        return new Sage.SData.Client.SDataSingleResourceRequest(this.getService())            
-            .setResourceKind('activities')
+        var request = Mobile.SalesLogix.Activity.Detail.superclass.createRequest.call(this);
+        
+        request            
             .setQueryArgs({                
                 'orderby': 'Description',
                 'select': 'Description,Category'                
-            })
-            .setResourceSelector(String.format("'{0}'", this.context.key));
+            });
+        
+        return request;            
     } 
 });
