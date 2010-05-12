@@ -1,0 +1,58 @@
+{
+	projectName: 'SalesLogix Mobile',
+	licenseText: '',
+	deployDir: 'slx/',
+	pkgs: [{
+		name: 'SalesLogix Mobile',
+		file: 'slx.js',
+		isDebug: true,
+		fileIncludes: [{
+			text: 'Application.js',
+			path: 'slx/'
+		},{
+			text: 'Format.js',
+			path: 'slx/'
+		},{
+			text: 'MainToolbar.js',
+			path: 'slx/'
+		},{
+			text: 'Template.js',
+			path: 'slx/'
+		},{
+			text: 'Home.js',
+			path: 'slx/views/'
+		},{
+			text: 'LoginDialog.js',
+			path: 'slx/views/'
+		},{
+			text: 'SearchDialog.js',
+			path: 'slx/views/'
+		},{
+			text: 'Detail.js',
+			path: 'slx/views/account/'
+		},{
+			text: 'Edit.js',
+			path: 'slx/views/account/'
+		},{
+			text: 'List.js',
+			path: 'slx/views/account/'
+		},{
+			text: 'Detail.js',
+			path: 'slx/views/contact/'
+		},{
+			text: 'List.js',
+			path: 'slx/views/contact/'
+		},{
+			text: 'Detail.js',
+			path: 'slx/views/opportunity/'
+		},{
+			text: 'List.js',
+			path: 'slx/views/opportunity/'
+		}]
+	}],
+	resources: [{
+		src: 'slx/',
+		dest: 'slx/',
+		filters: ".*\\.js"
+	}]
+}

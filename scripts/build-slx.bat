@@ -1,0 +1,1 @@
+"%JAVA_HOME%\bin\java.exe" -Dfile.encoding=UTF-8 -jar "..\tools\JSBuilder\JSBuilder2.jar" -v -p "..\applications\mobile\content\javascript\app\slx.jsb2" -d "..\build"
