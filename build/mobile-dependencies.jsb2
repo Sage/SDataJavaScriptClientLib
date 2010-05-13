@@ -1,0 +1,39 @@
+{
+	projectName: 'SData Mobile Application Platform Dependencies',
+	licenseText: '',
+	deployDir: 'mobile-dependencies/',
+	pkgs: [{
+		name: 'SData Mobile Application Platform Dependencies',
+		file: 'mobile-dependencies.js',
+		isDebug: true,
+		fileIncludes: [{
+			text: 'Base64.js',
+			path: '../applications/mobile/content/javascript/'
+		},{
+			text: 'ObjTree.js',
+			path: '../applications/mobile/content/javascript/'
+		},{
+			text: 'Simplate.js',
+			path: '../applications/mobile/content/javascript/'
+		},{
+			text: 'iui.js',
+			path: '../applications/mobile/content/javascript/iui/'
+		},{
+			text: 'core-debug.js',
+			path: '../applications/mobile/content/javascript/datejs/src/'
+		}]
+	}],
+	resources: [{
+		src: '../applications/mobile/content/javascript/',
+		dest: 'src/',
+		filters: ".*[Base64|ObjTree|Simplate]"
+	},{
+		src: '../applications/mobile/content/javascript/iui/',
+		dest: 'src/iui/',
+		filters: ".*[iui\\.js]"
+	},{
+		src: '../applications/mobile/content/javascript/datejs/src/',
+		dest: 'src/datejs/',
+		filters: ".*[core\\-debug\\.js]"
+	}]
+}

@@ -1,0 +1,58 @@
+{
+	projectName: 'SalesLogix Mobile',
+	licenseText: '',
+	deployDir: 'mobile-slx/',
+	pkgs: [{
+		name: 'SalesLogix Mobile',
+		file: 'mobile-slx.js',
+		isDebug: true,
+		fileIncludes: [{
+			text: 'Application.js',
+			path: 'applications/mobile/content/javascript/app/slx/'
+		},{
+			text: 'Format.js',
+			path: 'applications/mobile/content/javascript/app/slx/'
+		},{
+			text: 'MainToolbar.js',
+			path: 'applications/mobile/content/javascript/app/slx/'
+		},{
+			text: 'Template.js',
+			path: 'applications/mobile/content/javascript/app/slx/'
+		},{
+			text: 'Home.js',
+			path: 'applications/mobile/content/javascript/app/slx/views/'
+		},{
+			text: 'LoginDialog.js',
+			path: 'applications/mobile/content/javascript/app/slx/views/'
+		},{
+			text: 'SearchDialog.js',
+			path: 'applications/mobile/content/javascript/app/slx/views/'
+		},{
+			text: 'Detail.js',
+			path: 'applications/mobile/content/javascript/app/slx/views/account/'
+		},{
+			text: 'Edit.js',
+			path: 'applications/mobile/content/javascript/app/slx/views/account/'
+		},{
+			text: 'List.js',
+			path: 'applications/mobile/content/javascript/app/slx/views/account/'
+		},{
+			text: 'Detail.js',
+			path: 'applications/mobile/content/javascript/app/slx/views/contact/'
+		},{
+			text: 'List.js',
+			path: 'applications/mobile/content/javascript/app/slx/views/contact/'
+		},{
+			text: 'Detail.js',
+			path: 'applications/mobile/content/javascript/app/slx/views/opportunity/'
+		},{
+			text: 'List.js',
+			path: 'applications/mobile/content/javascript/app/slx/views/opportunity/'
+		}]
+	}],
+	resources: [{
+		src: 'applications/mobile/content/javascript/app/slx',
+		dest: 'applications/mobile/content/javascript/app/slx',
+		filters: ".*\\.js"
+	}]
+}

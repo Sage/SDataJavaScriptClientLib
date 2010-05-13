@@ -1,0 +1,37 @@
+{
+	projectName: 'SData JavaScript Client',
+	licenseText: '',
+	deployDir: 'sdata-client/',
+	pkgs: [{
+		name: 'SData JavaScript Client',
+		file: 'sdata-client.js',
+		isDebug: true,
+		fileIncludes: [{
+			text: 'SDataBaseRequest.js',
+			path: '../applications/mobile/content/javascript/sdata/'
+		},{
+			text: 'SDataApplicationRequest.js',
+			path: '../applications/mobile/content/javascript/sdata/'
+		},{
+			text: 'SDataResourceCollectionRequest.js',
+			path: '../applications/mobile/content/javascript/sdata/'
+		},{
+			text: 'SDataSingleResourceRequest.js',
+			path: '../applications/mobile/content/javascript/sdata/'
+		},{
+			text: 'SDataSystemRequest.js',
+			path: '../applications/mobile/content/javascript/sdata/'
+		},{
+			text: 'SDataUri.js',
+			path: '../applications/mobile/content/javascript/sdata/'
+		},{
+			text: 'SDataService.js',
+			path: '../applications/mobile/content/javascript/sdata/'
+		}]
+	}],
+	resources: [{
+		src: '../applications/mobile/content/javascript/sdata',
+		dest: 'src/',
+		filters: ".*\\.js"
+	}]
+}
