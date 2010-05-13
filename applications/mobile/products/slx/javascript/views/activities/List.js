@@ -24,7 +24,7 @@ Mobile.SalesLogix.Activity.List = Ext.extend(Sage.Platform.Mobile.List, {
             title: 'Activities',
             resourceKind: 'activities',
             pageSize: 10,
-            icon: 'content/images/app/slx/Task_List_3D_24x24.gif'
+            icon: 'products/slx/images/Task_List_3D_24x24.gif'
         });
     },  
     formatSearchQuery: function(query) {

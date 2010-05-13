@@ -8,20 +8,23 @@
     <link type="text/css" rel="stylesheet" href="content/javascript/iui/iui.css" />
     <link type="text/css" rel="stylesheet" href="content/javascript/iui/default/default-theme.css" />
     <link type="text/css" rel="stylesheet" href="content/javascript/iui/default/default-panel-list.css" />
-    <link type="text/css" rel="stylesheet" href="content/css/app.css" />        
+    <link type="text/css" rel="stylesheet" href="content/css/app.css" />  
+    <link type="text/css" rel="stylesheet" href="products/slx/css/app.css" />      
+
     <script type="text/javascript" src="content/javascript/ext/ext-core.js"></script>   
-    <script type="text/javascript" src="content/packages/mobile-dependencies.js"></script>
+    <script type="text/javascript" src="packages/mobile-dependencies.js"></script>
     <script type="text/javascript">iui.delayInit = true;</script> 
+    <script type="text/javascript" src="packages/sdata-client.js"></script>
+    <script type="text/javascript" src="packages/mobile-platform.js"></script>
+    <script type="text/javascript" src="packages/mobile-slx.js"></script>
+
+    <script type="text/javascript">
+    Ext.onReady(function() {  
+        App.init(); 
+        iui.init();
+    });
+    </script>
 </head>
 <body>
-<script type="text/javascript">
-Ext.onReady(function() {  
-    App.init(); 
-    iui.init();
-});
-</script>
-<script type="text/javascript" src="content/packages/sdata-client.js"></script>
-<script type="text/javascript" src="content/packages/mobile-platform.js"></script>
-<script type="text/javascript" src="content/packages/mobile-slx.js"></script>
 </body>
 </html>

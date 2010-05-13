@@ -24,7 +24,7 @@ Mobile.SalesLogix.Contact.List = Ext.extend(Sage.Platform.Mobile.List, {
             title: 'Contacts',
             resourceKind: 'contacts',
             pageSize: 10,
-            icon: 'content/images/app/slx/Contacts_24x24.gif'
+            icon: 'products/slx/images/Contacts_24x24.gif'
         });
     },   
     formatSearchQuery: function(query) {

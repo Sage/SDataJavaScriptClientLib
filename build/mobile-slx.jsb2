@@ -8,50 +8,50 @@
 		isDebug: true,
 		fileIncludes: [{
 			text: 'Application.js',
-			path: '../applications/mobile/content/javascript/app/slx/'
+			path: '../applications/mobile/products/slx/javascript/'
 		},{
 			text: 'Format.js',
-			path: '../applications/mobile/content/javascript/app/slx/'
+			path: '../applications/mobile/products/slx/javascript/'
 		},{
 			text: 'MainToolbar.js',
-			path: '../applications/mobile/content/javascript/app/slx/'
+			path: '../applications/mobile/products/slx/javascript/'
 		},{
 			text: 'Template.js',
-			path: '../applications/mobile/content/javascript/app/slx/'
+			path: '../applications/mobile/products/slx/javascript/'
 		},{
 			text: 'Home.js',
-			path: '../applications/mobile/content/javascript/app/slx/views/'
+			path: '../applications/mobile/products/slx/javascript/views/'
 		},{
 			text: 'LoginDialog.js',
-			path: '../applications/mobile/content/javascript/app/slx/views/'
+			path: '../applications/mobile/products/slx/javascript/views/'
 		},{
 			text: 'SearchDialog.js',
-			path: '../applications/mobile/content/javascript/app/slx/views/'
+			path: '../applications/mobile/products/slx/javascript/views/'
 		},{
 			text: 'Detail.js',
-			path: '../applications/mobile/content/javascript/app/slx/views/account/'
+			path: '../applications/mobile/products/slx/javascript/views/account/'
 		},{
 			text: 'Edit.js',
-			path: '../applications/mobile/content/javascript/app/slx/views/account/'
+			path: '../applications/mobile/products/slx/javascript/views/account/'
 		},{
 			text: 'List.js',
-			path: '../applications/mobile/content/javascript/app/slx/views/account/'
+			path: '../applications/mobile/products/slx/javascript/views/account/'
 		},{
 			text: 'Detail.js',
-			path: '../applications/mobile/content/javascript/app/slx/views/contact/'
+			path: '../applications/mobile/products/slx/javascript/views/contact/'
 		},{
 			text: 'List.js',
-			path: '../applications/mobile/content/javascript/app/slx/views/contact/'
+			path: '../applications/mobile/products/slx/javascript/views/contact/'
 		},{
 			text: 'Detail.js',
-			path: '../applications/mobile/content/javascript/app/slx/views/opportunity/'
+			path: '../applications/mobile/products/slx/javascript/views/opportunity/'
 		},{
 			text: 'List.js',
-			path: '../applications/mobile/content/javascript/app/slx/views/opportunity/'
+			path: '../applications/mobile/products/slx/javascript/views/opportunity/'
 		}]
 	}],
 	resources: [{
-		src: '../applications/mobile/content/javascript/app/slx/',
+		src: '../applications/mobile/products/slx/javascript/',
 		dest: 'src/',
 		filters: ".*\\.js"
 	}]

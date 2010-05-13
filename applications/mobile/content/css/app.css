@@ -161,18 +161,6 @@ body > *
 	margin: 17px 0 0 6px;
 }
 
-/* adjust input positions for search dialog */
-#search_dialog input:not(input[type|=radio]):not(input[type|=checkbox])
-{
-	padding: 6px 6px 6px 50px;
-}
-
-/* same as above, but for chrome fix */
-#search_dialog input:not([type|=radio]):not([type|=checkbox]) 
-{
-	padding: 6px 6px 6px 50px;
-}
-
 .dialog-busy .blueButton
 {
 	-webkit-border-image: url(../javascript/iui/default/toolButton.png) 0 5 0 5;

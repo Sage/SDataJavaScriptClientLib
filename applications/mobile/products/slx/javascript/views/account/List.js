@@ -24,7 +24,7 @@ Mobile.SalesLogix.Account.List = Ext.extend(Sage.Platform.Mobile.List, {
             title: 'Accounts',
             resourceKind: 'accounts',
             pageSize: 10,
-            icon: 'content/images/app/slx/Accounts_24x24.gif'
+            icon: 'products/slx/images/Accounts_24x24.gif'
         });
     },  
     formatSearchQuery: function(query) {

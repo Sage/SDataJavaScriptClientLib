@@ -24,7 +24,7 @@ Mobile.SalesLogix.Opportunity.List = Ext.extend(Sage.Platform.Mobile.List, {
             title: 'Opportunities',
             resourceKind: 'opportunities',
             pageSize: 10,
-            icon: 'content/images/app/slx/Opportunity_List_24x24.gif'
+            icon: 'products/slx/images/Opportunity_List_24x24.gif'
         });
     },   
     formatSearchQuery: function(query) {

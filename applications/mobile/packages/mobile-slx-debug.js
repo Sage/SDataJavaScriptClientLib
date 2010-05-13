@@ -571,13 +571,13 @@ Mobile.SalesLogix.Account.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
                     view: 'contact_related', 
                     where: this.formatRelatedQuery.createDelegate(this, ['Account.id eq "{0}"'], true),
                     label: 'Contacts',
-                    icon: 'content/images/app/slx/Contacts_24x24.gif'
+                    icon: 'products/slx/images/Contacts_24x24.gif'
                 },
                 {
                     view: 'opportunity_related', 
                     where: this.formatRelatedQuery.createDelegate(this, ['Account.id eq "{0}"'], true),
                     label: 'Opportunities',
-                    icon: 'content/images/app/slx/Opportunity_List_24x24.gif'
+                    icon: 'products/slx/images/Opportunity_List_24x24.gif'
                 }
             ]}
         ];
@@ -685,7 +685,7 @@ Mobile.SalesLogix.Account.List = Ext.extend(Sage.Platform.Mobile.List, {
             title: 'Accounts',
             resourceKind: 'accounts',
             pageSize: 10,
-            icon: 'content/images/app/slx/Accounts_24x24.gif'
+            icon: 'products/slx/images/Accounts_24x24.gif'
         });
     },  
     formatSearchQuery: function(query) {
@@ -741,7 +741,7 @@ Mobile.SalesLogix.Contact.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
                     view: 'opportunity_related', 
                     where: this.formatAccountRelatedQuery.createDelegate(this, ['Account.id eq "{0}"'], true),
                     label: 'Opportunities',
-                    icon: 'content/images/app/slx/Opportunity_List_24x24.gif'
+                    icon: 'products/slx/images/Opportunity_List_24x24.gif'
                 }
             ]}           
         ];
@@ -804,7 +804,7 @@ Mobile.SalesLogix.Contact.List = Ext.extend(Sage.Platform.Mobile.List, {
             title: 'Contacts',
             resourceKind: 'contacts',
             pageSize: 10,
-            icon: 'content/images/app/slx/Contacts_24x24.gif'
+            icon: 'products/slx/images/Contacts_24x24.gif'
         });
     },   
     formatSearchQuery: function(query) {
@@ -912,7 +912,7 @@ Mobile.SalesLogix.Opportunity.List = Ext.extend(Sage.Platform.Mobile.List, {
             title: 'Opportunities',
             resourceKind: 'opportunities',
             pageSize: 10,
-            icon: 'content/images/app/slx/Opportunity_List_24x24.gif'
+            icon: 'products/slx/images/Opportunity_List_24x24.gif'
         });
     },   
     formatSearchQuery: function(query) {
