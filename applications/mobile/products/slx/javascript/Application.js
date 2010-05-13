@@ -10,12 +10,15 @@ Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {
 
         this.service = new Sage.SData.Client.SDataService();
         this.service
-            .setServerName(window.location.hostname)
-            .setPort(3333)
-            .setVirtualDirectory('sdata-slx')
+            .setServerName(window.location.hostname)            
+            .setVirtualDirectory('sdata')
             .setApplicationName('slx')
             .setContractName('dynamic')
             .setIncludeContent(false);
+
+        if (window.location.port && window.location.port != 80)
+            this.service.setPort(window.location.port);
+
         this.context = {};
     },
     setup: function () {
