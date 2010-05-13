@@ -1,0 +1,11 @@
+﻿/* adjust input positions for search dialog */
+#search_dialog input:not(input[type|=radio]):not(input[type|=checkbox])
+{
+	padding: 6px 6px 6px 50px;
+}
+
+/* same as above, but for chrome fix */
+#search_dialog input:not([type|=radio]):not([type|=checkbox]) 
+{
+	padding: 6px 6px 6px 50px;
+}
