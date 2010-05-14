@@ -96,8 +96,10 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
                     .setUserName(false)
                     .setPassword(false);
 
-                if (response.status = 403)
-                    alert('Username or password is invalid.');                
+                if (response.status == 403)
+                    alert('Username or password is invalid.');
+                else if (response.status == 401)
+                    alert('You are not authorized to view this page.');
                 else
                     alert('A problem occured on the server.');                                   
             },
