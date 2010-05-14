@@ -13,12 +13,15 @@ Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {
 
         this.service = new Sage.SData.Client.SDataService();
         this.service
-            .setServerName(window.location.hostname)
-            .setPort(3333)
-            .setVirtualDirectory('sdata-slx')
+            .setServerName(window.location.hostname)            
+            .setVirtualDirectory('sdata')
             .setApplicationName('slx')
             .setContractName('dynamic')
             .setIncludeContent(false);
+
+        if (window.location.port && window.location.port != 80)
+            this.service.setPort(window.location.port);
+
         this.context = {};
     },
     setup: function () {
@@ -183,7 +186,7 @@ Mobile.SalesLogix.MainToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
         '<a id="backButton" class="button" href="#"></a>',
         '<a class="button" href="#search_dialog" target="_search" style="display: none;">Search</a>',
         '<a class="button" href="#" target="_edit" style="display: none;">Edit</a>',
-        '<a class="button" href="#" target="_save" style="display: none;">Save</a>',
+        '<a class="button blueButton" href="#" target="_save" style="display: none;"><span>Save</span></a>',
         '</div>'
     ]),
     constructor: function(o) {
@@ -440,8 +443,8 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
                     .setUserName(false)
                     .setPassword(false);
 
-                if (response.status = 403)
-                    alert('Username or password is invalid.');                
+                if (response.status == 403)
+                    alert('Username or password is invalid.');
                 else
                     alert('A problem occured on the server.');                                   
             },

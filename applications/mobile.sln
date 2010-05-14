@@ -22,6 +22,14 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "mobile", "mobile\", "{23A7B
 		DefaultWebSiteLanguage = "Visual C#"
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{6674C26E-9639-4B32-8082-F889511DC682}"
+	ProjectSection(SolutionItems) = preProject
+		..\build\mobile-dependencies.jsb2 = ..\build\mobile-dependencies.jsb2
+		..\build\mobile-platform.jsb2 = ..\build\mobile-platform.jsb2
+		..\build\mobile-slx.jsb2 = ..\build\mobile-slx.jsb2
+		..\build\sdata-client.jsb2 = ..\build\sdata-client.jsb2
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
