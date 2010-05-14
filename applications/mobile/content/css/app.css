@@ -161,20 +161,23 @@ body > *
 	margin: 17px 0 0 6px;
 }
 
-.dialog-busy .blueButton
+.dialog-busy .blueButton,
+.toolbar-busy .blueButton
 {
 	-webkit-border-image: url(../javascript/iui/default/toolButton.png) 0 5 0 5;
     -moz-border-image: url(../javascript/iui/default/toolButton.png) 0 5 0 5;
 }
 
-.dialog-busy .blueButton span
+.dialog-busy .blueButton span,
+.toolbar-busy .blueButton span
 {
 	background: url('../images/loading-indicator-tool-button.gif') no-repeat scroll 0 50%;
 	padding: 0 0 0 20px;
 	color: #CCCCCC;
 }
 
-.dialog-busy input
+.dialog-busy input,
+.view-busy input
 {
 	background: #CCCCCC;
 }
@@ -196,15 +199,18 @@ input:not([type|=radio]):not([type|=checkbox])
 }
 
 .row > input:not([type|=radio]):not([type|=checkbox]) 
-{
+{	
     box-sizing: border-box;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
+    -webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
     margin: 0;
     border: none;
     padding: 12px 10px 0 110px;
     height: 42px;
-    background: none;
+    border: none 0px transparent;
+    background: transparent;
 }
 
 .row > input[type|=radio], .row > input[type|=checkbox] 

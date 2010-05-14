@@ -217,15 +217,27 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         });
     },
     save: function() {
-        var values = this.getValues();        
+        if (this.busy) return;        
+
+        var values = this.getValues();                        
         if (values) 
         {           
+            this.busy = true;
+            this.el.addClass('view-busy');
+            if (App.tbar)
+                App.tbar.el.addClass('toolbar-busy');
+
             var entry = this.createEntryForUpdate(values);
 
             var request = this.createRequest();            
             if (request)
                 request.update(entry, {
-                    success: function(modified) {                          
+                    success: function(modified) {  
+                        this.busy = false;
+                        this.el.removeClass('view-busy');
+                        if (App.tbar)
+                            App.tbar.el.removeClass('toolbar-busy');
+                                                
                         App.fireEvent('refresh', {
                             resourceKind: this.resourceKind,
                             key: modified['$key'],
@@ -238,10 +250,17 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
                         history.go(-1);
                     },
                     failure: function(response, o) {
-                        
+                        this.busy = false;
+                        this.el.removeClass('view-busy');
+                        if (App.tbar)
+                            App.tbar.el.removeClass('toolbar-busy');
                     },
                     scope: this
                 });
+        } 
+        else
+        {
+            history.go(-1); /* nothing to save */
         }
     },
     transitionTo: function() {

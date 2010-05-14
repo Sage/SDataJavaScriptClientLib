@@ -12,7 +12,7 @@ Mobile.SalesLogix.MainToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
         '<a id="backButton" class="button" href="#"></a>',
         '<a class="button" href="#search_dialog" target="_search" style="display: none;">Search</a>',
         '<a class="button" href="#" target="_edit" style="display: none;">Edit</a>',
-        '<a class="button" href="#" target="_save" style="display: none;">Save</a>',
+        '<a class="button blueButton" href="#" target="_save" style="display: none;"><span>Save</span></a>',
         '</div>'
     ]),
     constructor: function(o) {
