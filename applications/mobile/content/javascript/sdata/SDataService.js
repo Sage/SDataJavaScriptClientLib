@@ -24,6 +24,7 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
         return this.uri;
     },
     getUserName: function() {
+        /// <returns type="String" />
         return this.username;
     },
     setUserName: function(val) {

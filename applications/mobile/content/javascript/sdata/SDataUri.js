@@ -1,14 +1,10 @@
 ﻿/// <reference path="../ext/ext-core-debug.js"/>
-/// <reference path="../ObjTree.js"/>
 
 Ext.namespace("Sage.SData.Client");
 
 Sage.SData.Client.SDataUri = Ext.extend(Ext.util.Observable, {   
     constructor: function(uri) {
-        /// <field name="scheme" type="String"></field>
-        /// <field name="scheme" type="String"></field>
-        /// <field name="scheme" type="String"></field>
-        /// <field name="scheme" type="String"></field>
+        /// <field name="scheme" type="String"></field>        
 
         Sage.SData.Client.SDataUri.superclass.constructor.call(this);     
         
@@ -23,52 +19,77 @@ Sage.SData.Client.SDataUri = Ext.extend(Ext.util.Observable, {
 
         Ext.apply(this, uri);                                     
     },
-    getScheme: function() {             
+    getScheme: function() {   
+        /// <returns type="String">The scheme component of the URI.</returns>          
         return this.scheme; 
     },
     setScheme: function(val) { 
+        /// <param name="val" type="String">The new scheme for the URI</param>
         this.scheme = val; 
         return this;
     },
     getHost: function() { 
+        /// <returns type="String">The host component of the URI.</returns>
         return this.host; 
     },
     setHost: function(val) {
+        /// <param name="val" type="String">The new host for the URI</param>
         this.host = val;
         return this;
     },
     getPort: function() {
+        /// <returns type="Number">The port component of the URI.</returns>
         return this.port;
     },
     setPort: function(val) {
+        /// <param name="val" type="String">The new port for the URI</param>
         this.port = val;
         return this;
     },
     getServer: function() {
+        /// <summary>
+        ///     Access the SData "server" component of the URI.  This is the first path segment in the URI.
+        ///
+        ///     i.e. [scheme]://[host]/[server]
+        /// </summary>
+        /// <returns type="String">The SData "server" component of URI.</returns>
         return this.server;
     },
     setServer: function(val) {
+        /// <param name="val" type="String">The new SData "server" for the URI</param>
         this.server = val;
         return this;
     },
     getQueryArgs: function() { 
+        /// <returns type="Object">The query arguments of the URI.</returns> 
         return this.queryArgs;
     },
     setQueryArgs: function(val, replace) {       
+        /// <param name="val" type="Object">
+        ///     The query arguments that will either be merged with the existing values, or replace
+        ///     them entirely.
+        /// <param>
+        /// <param name="replace" type="Boolean" optional="true">True if you want to replace the existing query arguments.</param>          
         this.queryArgs = replace !== true 
             ? Ext.apply(this.queryArgs, val) 
             : val;
         return this;
     },
     getQueryArg: function(key) {
+        /// <summary>Returns the requested query argument.</summary>
+        /// <param name="key" type="String">The name of the query argument to be returned.</param>
+        /// <returns type="String">The value of the requested query argument.</returns>
         return this.queryArgs[key];
     },
     setQueryArg: function(key, val) {
+        /// <summary>Sets a requested query argument.</summary>
+        /// <param name="key" type="String">The name of the query argument to be set.</param>
+        /// <param name="val" type="String">The new value for the query argument.</param>
         this.queryArgs[key] = val;
         return this;
     },
     getPathSegments: function() {
-        /// <returns elementType="String"></returns>
+        /// <returns elementType="String">The path segments of the URI.</returns>        
         return this.pathSegments;
     },
     setPathSegments: function(val) {

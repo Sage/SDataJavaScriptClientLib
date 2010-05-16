@@ -22,6 +22,9 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         );
     },
     setup: function() {
+        /// <summary>
+        ///     Sets up the handling for transition events from iUI.
+        /// </summary>
         Ext.getBody().on('beforetransition', function(evt, el, o) {
             var view = this.getView(el);
             if (view)
@@ -43,7 +46,10 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
             }
         }, this);
     },
-    init: function() {        
+    init: function() { 
+        /// <summary>
+        ///     Initializes this application as well as the toolbar and all currently registered views.
+        /// </summary>
         this.setup();
 
         if (this.tbar)
@@ -55,6 +61,11 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         this.initialized = true;
     },
     registerView: function(view) {
+        /// <summary>
+        ///     Registers a view with the application.  If the application has already been 
+        ///     initialized, the view is immediately initialized as well.
+        /// </summary>
+        /// <param name="view" type="Sage.Platform.Mobile.View">The view to be registered.</param>
         this.views.push(view);
         this.viewsById[view.id] = view;
 
@@ -63,9 +74,11 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         this.fireEvent('registered', view);
     },
     getViews: function() {
+        /// <returns elementType="Sage.Platform.Mobile.View">An array containing the currently registered views.</returns>
         return this.views;
     },
     getActiveView: function() {
+        /// <returns type="Sage.Platform.Mobile.View">The currently active view.</returns>
         var el = iui.getCurrentPage() || iui.getCurrentDialog();
         if (el)
             return this.getView(el);
@@ -73,6 +86,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         return null;
     },
     getPreviousView: function() {
+        /// <returns type="Sage.Platform.Mobile.View">The previously active view.</returns>
         var el = iui.getPreviousPage();
         if (el)
             return this.getView(el);
@@ -80,6 +94,11 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         return null;
     },
     getView: function(key) {
+        /// <returns type="Sage.Platform.Mobile.View">The requested view.</returns>
+        /// <param name="key" type="String">
+        ///     1: id - The id of the view to get.
+        ///     2: element - The main element of the view to get.        
+        /// <param>
         if (key)
         {
             if (typeof key === 'string')
@@ -91,21 +110,31 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         return null;
     },
     getService: function() {
+        /// <returns type="Sage.SData.Client.SDataService">The application's SData service instance.</returns>
         return this.service;
     },
     setTitle: function(title) {
+        /// <summary>Sets the applications current title.</summary>
+        /// <param name="title" type="String">The new title.</summary>
         if (this.tbar && this.tbar.setTitle)
             this.tbar.setTitle(title);
     },
     allowSearch: function(allow, has) {
+        /// <summary>Instructs the toolbar to either enable or disable search.</summary>
+        /// <param name="allow" type="Boolean">True to enable search, otherwise False.</param>
+        /// <param name="has" optional="true">The current search query, if any.</param>
         if (this.tbar && this.tbar.allowSearch)
             this.tbar.allowSearch(allow, has);
     },
     allowEdit: function(allow) {
+        /// <summary>Instructs the toolbar to either enable or disable edit.</summary>
+        /// <param name="allow" type="Boolean">True to enable edit, otherwise False.</param>
         if (this.tbar && this.tbar.allowEdit)
             this.tbar.allowEdit(allow);
     },
     allowSave: function(allow) {
+        /// <summary>Instructs the toolbar to either enable or disable save.</summary>
+        /// <param name="allow" type="Boolean">True to enable save, otherwise False.</param>
         if (this.tbar && this.tbar.allowSave)
             this.tbar.allowSave(allow);
     },
