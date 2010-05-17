@@ -10,6 +10,11 @@ Ext.namespace('Sage.Platform.Mobile');
 
 Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     constructor: function() {
+        /// <field name="initialized" type="Boolean">True if the application has been initialized; False otherwise.</field>
+        /// <field name="context" type="Object">A general store for global context data.</field>
+        /// <field name="views" elementType="Sage.Platform.Mobile.View">A list of registered views.</field>
+        /// <field name="viewsById" type="Object">A map for looking up a view by its ID.</field>
+
         Sage.Platform.Mobile.Application.superclass.constructor.call(this);
 
         this.initialized = false;
@@ -25,6 +30,9 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         );
     },
     setup: function() {
+        /// <summary>
+        ///     Sets up the handling for transition events from iUI.
+        /// </summary>
         Ext.getBody().on('beforetransition', function(evt, el, o) {
             var view = this.getView(el);
             if (view)
@@ -32,7 +40,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
                 if (evt.browserEvent.out)
                     this.beforeViewTransitionAway(view);
                 else
-                    this.beforeViewTransitionTo(view);
+                    this.beforeViewTransitionTo(view);               
             }
         }, this);
         Ext.getBody().on('aftertransition', function(evt, el, o) {
@@ -44,9 +52,12 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
                 else
                     this.viewTransitionTo(view);
             }
-        }, this);
+        }, this);        
     },
-    init: function() {        
+    init: function() { 
+        /// <summary>
+        ///     Initializes this application as well as the toolbar and all currently registered views.
+        /// </summary>
         this.setup();
 
         if (this.tbar)
@@ -58,6 +69,11 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         this.initialized = true;
     },
     registerView: function(view) {
+        /// <summary>
+        ///     Registers a view with the application.  If the application has already been 
+        ///     initialized, the view is immediately initialized as well.
+        /// </summary>
+        /// <param name="view" type="Sage.Platform.Mobile.View">The view to be registered.</param>
         this.views.push(view);
         this.viewsById[view.id] = view;
 
@@ -66,9 +82,11 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         this.fireEvent('registered', view);
     },
     getViews: function() {
+        /// <returns elementType="Sage.Platform.Mobile.View">An array containing the currently registered views.</returns>
         return this.views;
     },
     getActiveView: function() {
+        /// <returns type="Sage.Platform.Mobile.View">The currently active view.</returns>
         var el = iui.getCurrentPage() || iui.getCurrentDialog();
         if (el)
             return this.getView(el);
@@ -76,6 +94,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         return null;
     },
     getPreviousView: function() {
+        /// <returns type="Sage.Platform.Mobile.View">The previously active view.</returns>
         var el = iui.getPreviousPage();
         if (el)
             return this.getView(el);
@@ -83,6 +102,11 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         return null;
     },
     getView: function(key) {
+        /// <returns type="Sage.Platform.Mobile.View">The requested view.</returns>
+        /// <param name="key" type="String">
+        ///     1: id - The id of the view to get.
+        ///     2: element - The main element of the view to get.        
+        /// <param>
         if (key)
         {
             if (typeof key === 'string')
@@ -94,21 +118,31 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         return null;
     },
     getService: function() {
+        /// <returns type="Sage.SData.Client.SDataService">The application's SData service instance.</returns>
         return this.service;
     },
     setTitle: function(title) {
+        /// <summary>Sets the applications current title.</summary>
+        /// <param name="title" type="String">The new title.</summary>
         if (this.tbar && this.tbar.setTitle)
             this.tbar.setTitle(title);
     },
     allowSearch: function(allow, has) {
+        /// <summary>Instructs the toolbar to either enable or disable search.</summary>
+        /// <param name="allow" type="Boolean">True to enable search; False otherwise.</param>
+        /// <param name="has" optional="true">The current search query, if any.</param>
         if (this.tbar && this.tbar.allowSearch)
             this.tbar.allowSearch(allow, has);
     },
     allowEdit: function(allow) {
+        /// <summary>Instructs the toolbar to either enable or disable edit.</summary>
+        /// <param name="allow" type="Boolean">True to enable edit; False otherwise.</param>
         if (this.tbar && this.tbar.allowEdit)
             this.tbar.allowEdit(allow);
     },
     allowSave: function(allow) {
+        /// <summary>Instructs the toolbar to either enable or disable save.</summary>
+        /// <param name="allow" type="Boolean">True to enable save; False otherwise.</param>
         if (this.tbar && this.tbar.allowSave)
             this.tbar.allowSave(allow);
     },
@@ -147,6 +181,15 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
         '</ul>'
     ]),    
     constructor: function(o) {
+        /// <field name="id" type="String">The view's ID.</field>
+        /// <field name="title" type="String">The view's title.  This will be applied to the top bar's title area by iUI.</field>
+        /// <field name="expose" type="Boolean">True if the view is exposed to the home screen; False otherwise.</field>
+        /// <field name="loaded" type="Boolean">True if the view has been loaded; False otherwise.</field>
+        /// <field name="canSearch" type="Boolean">True if the view supports search; False otherwise.</field>
+        /// <field name="canEdit" type="Boolean">True if the view supports editing; False otherwise.</field>
+        /// <field name="canSave" type="Boolean">True if the view supports saving; False otherwise.</field>
+        /// <field name="viewTemplate" type="Simplate">The template used for rendering the view's main element.</field>
+        /// <field name="el" type=Ext.Element">The view's main element.</field>
         Sage.Platform.Mobile.View.superclass.constructor.call(this);        
         
         Ext.apply(this, o, {
@@ -158,6 +201,9 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
         this.loaded = false;
     },
     render: function() {
+        /// <summary> 
+        ///     Renders the view to the body of the page and stores the rendered element in the 'el' field.
+        /// </summary>
         this.el = Ext.DomHelper.append(
             Ext.getBody(), 
             this.viewTemplate.apply(this), 
@@ -165,6 +211,10 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
         );
     },
     init: function() {
+        /// <summary>
+        ///     Initializes the view by rendering calling render and binding any applicable events to the 
+        ///     view's main element.
+        /// </summary>
         this.render();
         this.el
             .on('load', function(evt, el, o) {
@@ -176,23 +226,49 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
             }, this);        
     },
     setTitle: function(title) {
+        /// <summary>
+        ///     Sets the title attribute on the view's main element.  This will be used by iUI during transition
+        ///     to replace the title in the top bar.
+        /// </summary>
+        /// <param name="title" type="String">The new title.</param>
         this.el.dom.setAttribute('title', title);
     },
     load: function() {
+        /// <summary>
+        ///     Called once the first time the view is about to be transitioned to.
+        /// </summary>
     },
     show: function() {
+        /// <summary>
+        ///     Show's the view using iUI in order to transition to the new element.
+        /// </summary>
         iui.showPage(this.el.dom);
     },
     beforeTransitionTo: function() {
+        /// <summary>
+        ///     Called before the view is transitioned (slide animation complete) to.
+        /// </summary>
     },
-    beforeTransitionAway: function() {        
+    beforeTransitionAway: function() {      
+        /// <summary>
+        ///     Called before the view is transitioned (slide animation complete) away from.
+        /// </summary>  
     },
     transitionTo: function() {                
+        /// <summary>
+        ///     Called after the view has been transitioned (slide animation complete) to.
+        /// </summary>
     },
     transitionAway: function() {                    
+        /// <summary>
+        ///     Called after the view has been transitioned (slide animation complete) away from.
+        /// </summary>
     },
     getService: function() {
-        /// <returns type="Sage.SData.Client.SDataService" />
+        /// <summary>
+        ///     Returns the primary SDataService instance for the view.  
+        /// </summary>
+        /// <returns type="Sage.SData.Client.SDataService">The SDataService instance.</returns>
         return App.getService();
     }  
 });﻿/// <reference path="../ext/ext-core-debug.js"/>
@@ -223,6 +299,16 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         '</li>'
     ]),
     constructor: function(o) {
+        /// <field name="resourceKind" type="String">The resource kind that is bound to this view.</field>
+        /// <field name="pageSize" type="Number">The number of records to return with each request.</field>
+        /// <field name="requestedFirstPage" type="Boolean">True if the first page has been request; False otherwise.<field>
+        /// <field name="noDataText" type="String">A message to display when there is no data.</field>
+        /// <field name="contentTemplate" type="Simplate">A template used to render the initial content of the view.</field>
+        /// <field name="itemTemplate" type="Simplate">
+        ///     A template used to render each resource feed entry.  This template is rendered and then applied to the DOM
+        ///     before the "li.more" element.
+        /// </field>
+        /// <field name="noDataTemplate" type="Simplate">A template used to render the no data message.</field>
         Sage.Platform.Mobile.List.superclass.constructor.call(this);        
         
         Ext.apply(this, o, {
@@ -267,6 +353,11 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         }, this); 
     },
     search: function(searchText) {
+        /// <summary> 
+        ///     Called when a new search is activated.  This method sets up the SData query, clears the content 
+        ///     of the view, and fires a request for updated data.
+        /// </summary>
+        /// <param name="searchText" type="String">The search query.</param>        
         this.clear();
 
         this.queryText = searchText && searchText.length > 0
@@ -284,10 +375,17 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         this.requestData(); 
     },
     formatSearchQuery: function(query) {
+        /// <summary>
+        ///     Called to transform a textual query into an SData query compatible search expression.
+        /// </summary>
+        /// <returns type="String">An SData query compatible search expression.</returns>
         return false;
     },        
     createRequest:function() {
-        /// <returns type="Sage.SData.Client.SDataResourceCollectionRequest" />
+        /// <summary>
+        ///     Creates SDataResourceCollectionRequest instance and sets a number of known properties.        
+        /// </summary>
+        /// <returns type="Sage.SData.Client.SDataResourceCollectionRequest">An SDataResourceCollectionRequest instance.<returns>
         var pageSize = this.pageSize;
         var startIndex = this.feed && this.feed['$startIndex'] > 0 && this.feed['$itemsPerPage'] > 0 
             ? this.feed['$startIndex'] + this.feed['$itemsPerPage']
@@ -316,6 +414,10 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         return request;
     },
     navigateToDetail: function(el) {
+        /// <summary>
+        ///     Navigates to the requested detail view.
+        /// </summary>
+        /// <param name="el" type="Ext.Element">The element that initiated the navigation.</param>
         if (el) 
         {
             var id = el.dom.hash.substring(1);
@@ -329,6 +431,10 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         }
     },
     processFeed: function(feed) {
+        /// <summary>
+        ///     Processes the feed result from the SData request and renders out the resource feed entries.
+        /// </summary>
+        /// <param name="feed" type="Object">The feed object.</param>
         if (this.requestedFirstPage == false) 
         {
             this.requestedFirstPage = true;
@@ -362,6 +468,10 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             this.moreEl.hide();
     },
     hasMoreData: function() {
+        /// <summary>
+        ///     Deterimines if there is more data to be shown by inspecting the last feed result.
+        /// </summary>
+        /// <returns type="Boolean">True if the feed has more data; False otherwise.</returns>
         if (this.feed['$startIndex'] > 0 && this.feed['$itemsPerPage'] > 0 && this.feed['$totalResults'] >= 0)
         {
             var start = this.feed['$startIndex'];
@@ -376,9 +486,16 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         }        
     },
     requestFailure: function(response, o) {
-        
+        /// <summary>
+        ///     Called when an error occurs while request data from the SData endpoint.
+        /// </summary>
+        /// <param name="response" type="Object">The response object.</param>
+        /// <param name="o" type="Object">The options that were passed to Ext when creating the Ajax request.</param>
     },
     requestData: function() {
+        /// <summary>
+        ///     Initiates the SData request.
+        /// </summary>
         var request = this.createRequest();        
         request.read({  
             success: function(feed) {     
@@ -391,19 +508,37 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         });       
     },
     more: function() {
+        /// <summary>
+        ///     Called when the more button is clicked.
+        /// </summary>
         this.moreEl.addClass('more-loading');
         this.requestData();
     },  
     expandExpression: function(expression) {
+        /// <summary>
+        ///     Expands the passed expression if it is a function.
+        /// </summary>
+        /// <param name="expression" type="String">
+        ///     1: function - Called on this object and must return a string.
+        ///     2: string - Returned directly.
+        /// </param>
         if (typeof expression === 'function') 
             return expression.call(this);
         else
             return expression;
     },
     hasContext: function() {
+        /// <summary> 
+        ///     Indicates whether or not the view has a context.
+        /// </summary>
+        /// <returns type="Boolean">True if there is a current, or new, context; False otherwise.</returns>
         return (this.context || this.newContext);
     },         
     isNewContext: function() {   
+        /// <summary>
+        ///     Indicates whether or not the view has a new context.
+        /// </summary>
+        /// <returns type="Boolean">True if there is a new context; False otherwise.</returns>
         if (!this.context) return true;
          
         return (this.expandExpression(this.context.where) != this.expandExpression(this.newContext.where))
@@ -433,6 +568,9 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         Sage.Platform.Mobile.List.superclass.show.call(this);                     
     },  
     clear: function() {
+        /// <summary>
+        ///     Clears the view and re-applies the default content template.
+        /// </summary>
         this.el.update(this.contentTemplate.apply(this));
 
         this.moreEl = this.el.down(".more"); 

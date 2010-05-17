@@ -1,4 +1,8 @@
-﻿index.html
+﻿CACHE MANIFEST
+# rev 2
+
+CACHE:
+index-slx.html
 content/css/app.css
 content/images/loading-arrows-tool-button.gif
 content/images/loading-arrows-white.gif
@@ -8,6 +12,7 @@ content/images/loading-indicator-white.gif
 content/images/loading-indicator-white-button.gif
 products/slx/css/app.css
 products/slx/images/icon.png
+products/slx/images/loading.png
 products/slx/images/Accounts_24x24.gif
 products/slx/images/Contacts_24x24.gif
 products/slx/images/Opportunity_List_24x24.gif
@@ -42,3 +47,9 @@ packages/mobile-dependencies.js
 packages/mobile-platform.js
 packages/mobile-slx.js
 packages/sdata-client.js
+
+NETWORK:
+*
+
+
+
