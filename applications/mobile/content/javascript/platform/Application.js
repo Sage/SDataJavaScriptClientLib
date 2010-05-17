@@ -7,7 +7,7 @@ Ext.namespace('Sage.Platform.Mobile');
 
 Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     constructor: function() {
-        /// <field name="initialized" type="Boolean">True if the application has been initialized, False otherwise.</field>
+        /// <field name="initialized" type="Boolean">True if the application has been initialized; False otherwise.</field>
         /// <field name="context" type="Object">A general store for global context data.</field>
         /// <field name="views" elementType="Sage.Platform.Mobile.View">A list of registered views.</field>
         /// <field name="viewsById" type="Object">A map for looking up a view by its ID.</field>
@@ -126,20 +126,20 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     },
     allowSearch: function(allow, has) {
         /// <summary>Instructs the toolbar to either enable or disable search.</summary>
-        /// <param name="allow" type="Boolean">True to enable search, otherwise False.</param>
+        /// <param name="allow" type="Boolean">True to enable search; False otherwise.</param>
         /// <param name="has" optional="true">The current search query, if any.</param>
         if (this.tbar && this.tbar.allowSearch)
             this.tbar.allowSearch(allow, has);
     },
     allowEdit: function(allow) {
         /// <summary>Instructs the toolbar to either enable or disable edit.</summary>
-        /// <param name="allow" type="Boolean">True to enable edit, otherwise False.</param>
+        /// <param name="allow" type="Boolean">True to enable edit; False otherwise.</param>
         if (this.tbar && this.tbar.allowEdit)
             this.tbar.allowEdit(allow);
     },
     allowSave: function(allow) {
         /// <summary>Instructs the toolbar to either enable or disable save.</summary>
-        /// <param name="allow" type="Boolean">True to enable save, otherwise False.</param>
+        /// <param name="allow" type="Boolean">True to enable save; False otherwise.</param>
         if (this.tbar && this.tbar.allowSave)
             this.tbar.allowSave(allow);
     },

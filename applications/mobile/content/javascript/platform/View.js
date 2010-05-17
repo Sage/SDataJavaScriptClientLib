@@ -13,14 +13,13 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
     constructor: function(o) {
         /// <field name="id" type="String">The view's ID.</field>
         /// <field name="title" type="String">The view's title.  This will be applied to the top bar's title area by iUI.</field>
-        /// <field name="expose" type="Boolean">True if the view is exposed to the home screen, False otherwise.</field>
-        /// <field name="loaded" type="Boolean">True if the view has been loaded, False otherwise.</field>
-        /// <field name="canSearch" type="Boolean">True if the view supports search, False otherwise.</field>
-        /// <field name="canEdit" type="Boolean">True if the view supports editing, False otherwise.</field>
-        /// <field name="canSave" type="Boolean">True if the view supports saving, False otherwise.</field>
+        /// <field name="expose" type="Boolean">True if the view is exposed to the home screen; False otherwise.</field>
+        /// <field name="loaded" type="Boolean">True if the view has been loaded; False otherwise.</field>
+        /// <field name="canSearch" type="Boolean">True if the view supports search; False otherwise.</field>
+        /// <field name="canEdit" type="Boolean">True if the view supports editing; False otherwise.</field>
+        /// <field name="canSave" type="Boolean">True if the view supports saving; False otherwise.</field>
         /// <field name="viewTemplate" type="Simplate">The template used for rendering the view's main element.</field>
         /// <field name="el" type=Ext.Element">The view's main element.</field>
-
         Sage.Platform.Mobile.View.superclass.constructor.call(this);        
         
         Ext.apply(this, o, {
