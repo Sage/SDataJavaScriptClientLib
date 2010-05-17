@@ -7,6 +7,11 @@ Ext.namespace('Sage.Platform.Mobile');
 
 Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     constructor: function() {
+        /// <field name="initialized" type="Boolean">True if the application has been initialized, False otherwise.</field>
+        /// <field name="context" type="Object">A general store for global context data.</field>
+        /// <field name="views" elementType="Sage.Platform.Mobile.View">A list of registered views.</field>
+        /// <field name="viewsById" type="Object">A map for looking up a view by its ID.</field>
+
         Sage.Platform.Mobile.Application.superclass.constructor.call(this);
 
         this.initialized = false;
@@ -32,7 +37,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
                 if (evt.browserEvent.out)
                     this.beforeViewTransitionAway(view);
                 else
-                    this.beforeViewTransitionTo(view);
+                    this.beforeViewTransitionTo(view);               
             }
         }, this);
         Ext.getBody().on('aftertransition', function(evt, el, o) {
@@ -44,7 +49,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
                 else
                     this.viewTransitionTo(view);
             }
-        }, this);
+        }, this);        
     },
     init: function() { 
         /// <summary>
