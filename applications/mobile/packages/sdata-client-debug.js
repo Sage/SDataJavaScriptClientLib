@@ -1,8 +1,8 @@
 /*!
  * 
  */
-﻿/// <reference path="../ext/ext-core-debug.js"/>
-/// <reference path="../ObjTree.js"/>
+﻿/// <reference path="../dependencies/ext/ext-core-debug.js"/>
+/// <reference path="../dependencies/ObjTree.js"/>
 /// <reference path="SDataUri.js"/>
 
 Ext.namespace("Sage.SData.Client");
@@ -89,8 +89,8 @@ Sage.SData.Client.SDataBaseRequest = Ext.extend(Ext.util.Observable, {
     }
 });
 
-﻿/// <reference path="../ext/ext-core-debug.js"/>
-/// <reference path="../ObjTree.js"/>
+﻿/// <reference path="../dependencies/ext/ext-core-debug.js"/>
+/// <reference path="../dependencies/ObjTree.js"/>
 /// <reference path="SDataUri.js"/>
 /// <reference path="SDataBaseRequest.js"/>
 
@@ -98,7 +98,7 @@ Ext.namespace("Sage.SData.Client");
 
 Sage.SData.Client.SDataApplicationRequest = Ext.extend(Sage.SData.Client.SDataBaseRequest, {   
     constructor: function() {        
-        Sage.SData.Client.SDataApplicationRequest.superclass.constructor.apply(this, arguments);  
+        Sage.SData.Client.SDataApplicationRequest.superclass.constructor.apply(this, arguments);          
         
         if (this.service)
         {
@@ -143,8 +143,8 @@ Sage.SData.Client.SDataApplicationRequest = Ext.extend(Sage.SData.Client.SDataBa
         uri.appendPath(this.getResourceKind());
     }
 });
-﻿/// <reference path="../ext/ext-core-debug.js"/>
-/// <reference path="../ObjTree.js"/>
+﻿/// <reference path="../dependencies/ext/ext-core-debug.js"/>
+/// <reference path="../dependencies/ObjTree.js"/>
 /// <reference path="SDataUri.js"/>
 /// <reference path="SDataBaseRequest.js"/>
 /// <reference path="SDataApplicationRequest.js"/>
@@ -173,8 +173,8 @@ Sage.SData.Client.SDataResourceCollectionRequest = Ext.extend(Sage.SData.Client.
         return this.service.readFeed(this, options);
     } 
 });
-﻿/// <reference path="../ext/ext-core-debug.js"/>
-/// <reference path="../ObjTree.js"/>
+﻿/// <reference path="../dependencies/ext/ext-core-debug.js"/>
+/// <reference path="../dependencies/ObjTree.js"/>
 /// <reference path="SDataUri.js"/>
 /// <reference path="SDataBaseRequest.js"/>
 /// <reference path="SDataApplicationRequest.js"/>
@@ -207,8 +207,8 @@ Sage.SData.Client.SDataSingleResourceRequest = Ext.extend(Sage.SData.Client.SDat
 
         if (this.resourceSelector) uri.setCollectionPredicate(this.resourceSelector);
     }
-});﻿/// <reference path="../ext/ext-core-debug.js"/>
-/// <reference path="../ObjTree.js"/>
+});﻿/// <reference path="../dependencies/ext/ext-core-debug.js"/>
+/// <reference path="../dependencies/ObjTree.js"/>
 /// <reference path="SDataUri.js"/>
 /// <reference path="SDataBaseRequest.js"/>
 
@@ -240,7 +240,7 @@ Sage.SData.Client.SDataSystemRequest = Ext.extend(Sage.SData.Client.SDataBaseReq
         return this.service.readFeed(this, options);
     } 
 });
-﻿/// <reference path="../ext/ext-core-debug.js"/>
+﻿/// <reference path="../dependencies/ext/ext-core-debug.js"/>
 
 Ext.namespace("Sage.SData.Client");
 
@@ -512,9 +512,9 @@ Ext.apply(Sage.SData.Client.SDataUri, {
     CollectionTypePathIndex: 3,
     ServiceMethodSegment: '$service'
 });
-﻿/// <reference path="../ext/ext-core-debug.js"/>
-/// <reference path="../ObjTree.js"/>
-/// <reference path="../Base64.js"/>
+﻿/// <reference path="../dependencies/ext/ext-core-debug.js"/>
+/// <reference path="../dependencies/ObjTree.js"/>
+/// <reference path="../dependencies/Base64.js"/>
 /// <reference path="SDataBaseRequest.js"/>
 /// <reference path="SDataApplicationRequest.js"/>
 /// <reference path="SDataResourceCollectionRequest.js"/>
@@ -531,7 +531,13 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
         this.uri = new Sage.SData.Client.SDataUri();
         this.userAgent = 'Sage';
         this.username = false;
-        this.password = '';
+        this.password = '';    
+        
+        this.addEvents(
+            'beforerequest',
+            'requestcomplete',
+            'requestexception'
+        );   
     },
     getUri: function() {
         /// <returns type="Sage.SData.Client.SDataUri" />
@@ -639,16 +645,31 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
             success: function(response, opt) {                
                 var feed = this.processFeed(response.responseText);
 
+                this.fireEvent('requestcomplete', request, opt, feed);
+
                 if (options.success)
                     options.success.call(options.scope || this, feed);
             },
             failure: function(response, opt) {
+                this.fireEvent('requestexception', request, opt, response);
+
                 if (options.failure)
                     options.failure.call(options.scope || this, response, opt);
             }                            
         }, ajax);
 
         Ext.apply(o.headers, this.createHeadersForRequest(request));
+
+        this.fireEvent('beforerequest', request, o);
+
+        /* if the event provied its own result, do not execute the ajax call */
+        if (typeof o.result !== 'undefined')
+        {
+            if (options.success)
+                options.success.call(options.scope || this, o.result);
+
+            return;
+        }
 
         Ext.Ajax.request(o);
     },    

@@ -8,29 +8,29 @@
 		isDebug: true,
 		fileIncludes: [{
 			text: 'SDataBaseRequest.js',
-			path: '../applications/mobile/content/javascript/sdata/'
+			path: '../Sage.SData.Client/'
 		},{
 			text: 'SDataApplicationRequest.js',
-			path: '../applications/mobile/content/javascript/sdata/'
+			path: '../Sage.SData.Client/'
 		},{
 			text: 'SDataResourceCollectionRequest.js',
-			path: '../applications/mobile/content/javascript/sdata/'
+			path: '../Sage.SData.Client/'
 		},{
 			text: 'SDataSingleResourceRequest.js',
-			path: '../applications/mobile/content/javascript/sdata/'
+			path: '../Sage.SData.Client/'
 		},{
 			text: 'SDataSystemRequest.js',
-			path: '../applications/mobile/content/javascript/sdata/'
+			path: '../Sage.SData.Client/'
 		},{
 			text: 'SDataUri.js',
-			path: '../applications/mobile/content/javascript/sdata/'
+			path: '../Sage.SData.Client/'
 		},{
 			text: 'SDataService.js',
-			path: '../applications/mobile/content/javascript/sdata/'
+			path: '../Sage.SData.Client/'
 		}]
 	}],
 	resources: [{
-		src: '../applications/mobile/content/javascript/sdata',
+		src: '../Sage.SData.Client/',
 		dest: 'src/',
 		filters: ".*\\.js"
 	}]

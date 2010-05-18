@@ -67,8 +67,11 @@ Mobile.SalesLogix.Home = Ext.extend(Sage.Platform.Mobile.View, {
     load: function() {
         Mobile.SalesLogix.Home.superclass.load.call(this);
 
-        var user = App.getService().getUserName();
-        if (!user || !user.length)
-            iui.showPageById("login_dialog");
+        if (App.isOnline() || !App.enableCaching)
+        {
+            var user = App.getService().getUserName();
+            if (!user || !user.length)
+                iui.showPageById("login_dialog");
+        }
     }   
 });

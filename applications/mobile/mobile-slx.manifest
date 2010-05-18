@@ -1,6 +1,5 @@
 ﻿CACHE MANIFEST
-# rev 2
-
+# version 4
 CACHE:
 index-slx.html
 content/css/app.css
@@ -47,9 +46,8 @@ packages/mobile-dependencies.js
 packages/mobile-platform.js
 packages/mobile-slx.js
 packages/sdata-client.js
-
 NETWORK:
-*
+../sdata/
 
 
 

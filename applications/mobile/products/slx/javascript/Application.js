@@ -8,6 +8,7 @@ Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {
     constructor: function () {
         Mobile.SalesLogix.Application.superclass.constructor.call(this);
 
+        this.enableCaching = true;
         this.service = new Sage.SData.Client.SDataService();
         this.service
             .setServerName(window.location.hostname)            

@@ -1,9 +1,11 @@
 ﻿/// <reference path="../ext/ext-core-debug.js"/>
-/// <reference path="../iui/iui-sage.js"/>
+/// <reference path="../iui/iui.js"/>
+/// <reference path="../../../packages/sdata-client-debug.js"/>
 /// <reference path="Format.js"/>
 /// <reference path="Utility.js"/>
 
 Ext.namespace('Sage.Platform.Mobile');
+Ext.USE_NATIVE_JSON = true;
 
 Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     constructor: function() {
@@ -15,6 +17,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         Sage.Platform.Mobile.Application.superclass.constructor.call(this);
 
         this.initialized = false;
+        this.enableCaching = false;
         this.context = {};
         this.views = [];        
         this.viewsById = {};
@@ -49,7 +52,40 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
                 else
                     this.viewTransitionTo(view);
             }
-        }, this);        
+        }, this);  
+        
+        if (this.service && this.enableCaching)
+        {
+            this.service.on('beforerequest', this.loadSDataRequest, this);
+            this.service.on('requestcomplete', this.cacheSDataRequest, this);
+        }      
+    },   
+    isOnline: function() {
+        return navigator.onLine;
+    },
+    loadSDataRequest: function(request, o) {
+        /// <param name="request" type="Sage.SData.Client.SDataBaseRequest" />   
+        if (this.isOnline()) return;
+        
+        var key = request.toString();  
+        var feed = window.localStorage.getItem(key);   
+        if (feed)
+        {
+            console.log("cache hit: %s", key);
+
+            o.result = Ext.decode(feed);
+        }                    
+    },
+    cacheSDataRequest: function(request, o, feed) {        
+        if (typeof feed === 'object')
+        {
+            var key = request.toString();
+
+            console.log("caching: %s", key);
+
+            window.localStorage.removeItem(key);
+            window.localStorage.setItem(key, Ext.encode(feed));            
+        }
     },
     init: function() { 
         /// <summary>

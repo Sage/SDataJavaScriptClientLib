@@ -17,7 +17,13 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
         this.uri = new Sage.SData.Client.SDataUri();
         this.userAgent = 'Sage';
         this.username = false;
-        this.password = '';
+        this.password = '';    
+        
+        this.addEvents(
+            'beforerequest',
+            'requestcomplete',
+            'requestexception'
+        );   
     },
     getUri: function() {
         /// <returns type="Sage.SData.Client.SDataUri" />
@@ -125,16 +131,31 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
             success: function(response, opt) {                
                 var feed = this.processFeed(response.responseText);
 
+                this.fireEvent('requestcomplete', request, opt, feed);
+
                 if (options.success)
                     options.success.call(options.scope || this, feed);
             },
             failure: function(response, opt) {
+                this.fireEvent('requestexception', request, opt, response);
+
                 if (options.failure)
                     options.failure.call(options.scope || this, response, opt);
             }                            
         }, ajax);
 
         Ext.apply(o.headers, this.createHeadersForRequest(request));
+
+        this.fireEvent('beforerequest', request, o);
+
+        /* if the event provied its own result, do not execute the ajax call */
+        if (typeof o.result !== 'undefined')
+        {
+            if (options.success)
+                options.success.call(options.scope || this, o.result);
+
+            return;
+        }
 
         Ext.Ajax.request(o);
     },    
