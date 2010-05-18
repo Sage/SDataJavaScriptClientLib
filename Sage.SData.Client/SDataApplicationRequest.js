@@ -1,5 +1,5 @@
-﻿/// <reference path="../ext/ext-core-debug.js"/>
-/// <reference path="../ObjTree.js"/>
+﻿/// <reference path="../dependencies/ext/ext-core-debug.js"/>
+/// <reference path="../dependencies/ObjTree.js"/>
 /// <reference path="SDataUri.js"/>
 /// <reference path="SDataBaseRequest.js"/>
 
@@ -7,7 +7,7 @@ Ext.namespace("Sage.SData.Client");
 
 Sage.SData.Client.SDataApplicationRequest = Ext.extend(Sage.SData.Client.SDataBaseRequest, {   
     constructor: function() {        
-        Sage.SData.Client.SDataApplicationRequest.superclass.constructor.apply(this, arguments);  
+        Sage.SData.Client.SDataApplicationRequest.superclass.constructor.apply(this, arguments);          
         
         if (this.service)
         {

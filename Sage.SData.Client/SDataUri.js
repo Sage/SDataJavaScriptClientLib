@@ -1,4 +1,4 @@
-﻿/// <reference path="../ext/ext-core-debug.js"/>
+﻿/// <reference path="../dependencies/ext/ext-core-debug.js"/>
 
 Ext.namespace("Sage.SData.Client");
 

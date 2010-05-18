@@ -30,6 +30,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{6674C26E
 		..\build\sdata-client.jsb2 = ..\build\sdata-client.jsb2
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sage.SData.Client", "Sage.SData.Client", "{C51DDCE7-6D5D-4517-A650-993E747491B6}"
+	ProjectSection(SolutionItems) = preProject
+		..\Sage.SData.Client\SDataApplicationRequest.js = ..\Sage.SData.Client\SDataApplicationRequest.js
+		..\Sage.SData.Client\SDataBaseRequest.js = ..\Sage.SData.Client\SDataBaseRequest.js
+		..\Sage.SData.Client\SDataResourceCollectionRequest.js = ..\Sage.SData.Client\SDataResourceCollectionRequest.js
+		..\Sage.SData.Client\SDataService.js = ..\Sage.SData.Client\SDataService.js
+		..\Sage.SData.Client\SDataSingleResourceRequest.js = ..\Sage.SData.Client\SDataSingleResourceRequest.js
+		..\Sage.SData.Client\SDataSystemRequest.js = ..\Sage.SData.Client\SDataSystemRequest.js
+		..\Sage.SData.Client\SDataUri.js = ..\Sage.SData.Client\SDataUri.js
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

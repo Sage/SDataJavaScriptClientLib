@@ -1,5 +1,5 @@
-﻿/// <reference path="../ext/ext-core-debug.js"/>
-/// <reference path="../ObjTree.js"/>
+﻿/// <reference path="../dependencies/ext/ext-core-debug.js"/>
+/// <reference path="../dependencies/ObjTree.js"/>
 /// <reference path="SDataUri.js"/>
 /// <reference path="SDataBaseRequest.js"/>
 /// <reference path="SDataApplicationRequest.js"/>
