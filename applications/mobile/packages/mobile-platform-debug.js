@@ -20,7 +20,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         Sage.Platform.Mobile.Application.superclass.constructor.call(this);
 
         this.initialized = false;
-        this.enableCaching = false;
+        this.enableCaching = false;        
         this.context = {};
         this.views = [];        
         this.viewsById = {};
@@ -59,18 +59,35 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         
         if (this.service && this.enableCaching)
         {
+            if (this.isOnline())
+                this.clearSDataRequestCache();
+
             this.service.on('beforerequest', this.loadSDataRequest, this);
             this.service.on('requestcomplete', this.cacheSDataRequest, this);
         }      
     },   
     isOnline: function() {
-        return navigator.onLine;
+        return window.navigator.onLine;
+    },
+    clearSDataRequestCache: function() {        
+        for (var key in localStorage)
+        {
+            if (/^sdata\:/i.test(key))
+            {
+                console.log("clearing cache: %s", key);
+
+                localStorage.removeItem(key);
+            }
+        }
+    },
+    createCacheKey: function(request) {
+        return "sdata:" + request.toString();
     },
     loadSDataRequest: function(request, o) {
         /// <param name="request" type="Sage.SData.Client.SDataBaseRequest" />   
         if (this.isOnline()) return;
         
-        var key = request.toString();  
+        var key = this.createCacheKey(request); 
         var feed = window.localStorage.getItem(key);   
         if (feed)
         {
@@ -82,7 +99,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     cacheSDataRequest: function(request, o, feed) {        
         if (typeof feed === 'object')
         {
-            var key = request.toString();
+            var key = this.createCacheKey(request);
 
             console.log("caching: %s", key);
 
