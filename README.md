@@ -1,4 +1,5 @@
 This repository contains the following:
+
 * A JavaScript library for consuming [SData](http://sdata.sage.com).
 * A framework for developing mobile applications driven by SData.
 * A set of customizations for the mobile framework pertaining to SalesLogix.
