@@ -66,19 +66,31 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     isOnline: function() {
         return window.navigator.onLine;
     },
-    clearSDataRequestCache: function() {        
-        for (var key in localStorage)
-        {
-            if (/^sdata\:/i.test(key))
+    clearSDataRequestCache: function() {   
+        var check = function(k) {
+            if (/^\[sdata\]\:/i.test(k))
             {
-                console.log("clearing cache: %s", key);
+                console.log("clearing cache: %s", k);
 
-                localStorage.removeItem(key);
+                window.localStorage.removeItem(k);
             }
+        };
+        
+        /* firefox currently does not support standard iteration over storage classes */
+        /* todo: find a better way to detect */
+        if (Ext.isGecko) 
+        {
+            for (var i = 0; i < window.localStorage.length; i++) 
+                check(window.localStorage.key(i));
+        }
+        else
+        {     
+            for (var key in window.localStorage) 
+                check(key);            
         }
     },
     createCacheKey: function(request) {
-        return "sdata:" + request.toString();
+        return "[sdata] " + request.toString();
     },
     loadSDataRequest: function(request, o) {
         /// <param name="request" type="Sage.SData.Client.SDataBaseRequest" />   
