@@ -51,10 +51,25 @@
     <script type="text/javascript" src="products/slx/javascript/views/opportunity/List.js" type="text/javascript"></script>
     <script type="text/javascript" src="products/slx/javascript/views/opportunity/Detail.js" type="text/javascript"></script>
 
+    <style>
+        a 
+        {
+        	-webkit-touch-callout: none;
+        }
+    </style>
+
     <script type="text/javascript">
     Ext.onReady(function() {  
         App.init(); 
         iui.init();
+             
+        Ext.getBody().on('hold', function(evt, el, o) {
+            console.log('hold: %s', el.hash);
+        }, this, {delegate: 'a'});
+
+        Ext.getBody().on('clicklong', function(evt, el, o) {
+            console.log('clicklong: %s', el.hash);
+        }, this, {delegate: 'a'});
     });
     </script>
 </head>
