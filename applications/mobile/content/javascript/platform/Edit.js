@@ -49,14 +49,14 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
     viewTemplate: new Simplate([            
         '<div id="{%= id %}" title="{%= title %}" class="panel">',  
         '<fieldset class="loading">',
-        '<div class="row"><div class="loading-indicator">loading...</div></div>',
+        '<div class="row"><div class="loading-indicator">{%= loadingText %}</div></div>',
         '</fieldset>',
         '<div class="body" style="display: none;">',
         '</div>',           
         '</div>'
     ]),       
     sectionBeginTemplate: new Simplate([
-        '<h2>{%= $["title"] || "Details" %}</h2>',
+        '<h2>{%= $["title"] %}</h2>',
         '{% if ($["list"]) { %}<ul>{% } else { %}<fieldset>{% } %}'
     ]),
     sectionEndTemplate: new Simplate([
@@ -71,14 +71,26 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
     textFieldTemplate: new Simplate([
         '<input type="text" name="{%= name %}">'
     ]),
+    saveText: 'Save',
+    titleText: 'Edit',
+    detailsText: 'Details',    
+    loadingText: 'loading...',
     constructor: function(o) {
         Sage.Platform.Mobile.Edit.superclass.constructor.call(this);        
         
         Ext.apply(this, o, {
             id: 'generic_edit',
-            title: 'Edit',
+            title: this.titleText,
             expose: false,
-            canSave: true,
+            tools: {
+                tbar: [{
+                    name: 'edit',
+                    title: this.saveText,                                                              
+                    cls: 'button blueButton',                 
+                    fn: this.save,
+                    scope: this                
+                }]
+            },
             fields: {}          
         });
     },
@@ -91,7 +103,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
     init: function() {  
         Sage.Platform.Mobile.Edit.superclass.init.call(this);                
 
-        this.processLayout(this.layout, {});
+        this.processLayout(this.layout, {title: this.detailsText});
 
         for (var name in this.fields) this.fields[name].bind(this.el);
 

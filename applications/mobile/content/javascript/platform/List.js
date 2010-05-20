@@ -10,8 +10,8 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         '</ul>'
     ]),
     contentTemplate: new Simplate([
-        '<li class="loading"><div class="loading-indicator">loading...</div></li>',
-        '<li class="more" style="display: none;"><a href="#" target="_none" class="whiteButton moreButton"><span>More</span></a></li>'
+        '<li class="loading"><div class="loading-indicator">{%= loadingText %}</div></li>',
+        '<li class="more" style="display: none;"><a href="#" target="_none" class="whiteButton moreButton"><span>{%= moreText %}</span></a></li>'
     ]),
     itemTemplate: new Simplate([
         '<li>',
@@ -25,6 +25,11 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         '<h3>{%= noDataText %}</h3>',
         '</li>'
     ]),
+    moreText: 'More',
+    titleText: 'List',
+    searchText: 'Search',
+    noDataText: 'no records',
+    loadingText: 'loading...',    
     constructor: function(o) {
         /// <field name="resourceKind" type="String">The resource kind that is bound to this view.</field>
         /// <field name="pageSize" type="Number">The number of records to return with each request.</field>
@@ -40,11 +45,19 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         
         Ext.apply(this, o, {
             id: 'generic_list',
-            title: 'List',
+            title: this.titleText,
             pageSize: 20,
             requestedFirstPage: false,
-            canSearch: true,
-            noDataText: 'no records'
+            searchDialog: 'search_dialog',
+            tools: {
+                tbar: [{
+                    name: 'search',
+                    title: this.searchText,                        
+                    cls: function() { return this.query ? 'button greenButton' : 'button blueButton'; },                 
+                    fn: this.showSearchDialog,
+                    scope: this                
+                }]
+            }
         });
     },   
     render: function() {
@@ -65,19 +78,22 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
                 else if (source.is('a[target="_detail"]') || (target = source.up('a[target="_detail"]')))
                     this.navigateToDetail(target || source, evt);
 
-            }, this, { preventDefault: true, stopPropagation: true });                
-
-        // todo: find a better way to handle these notifications
-        if (this.canSearch) 
-            App.on('search', function(query) {
-                if (this.el.getAttribute('selected') == 'true')
-                    this.search(query);
-            }, this);
+            }, this, { preventDefault: true, stopPropagation: true });                      
 
         App.on('refresh', function(o) {
             if (this.resourceKind && o.resourceKind === this.resourceKind)
                 this.clear();
         }, this); 
+    },
+    showSearchDialog: function() {
+        /// <summary>
+        ///     Called when the search tool button is clicked.  This method displays the search dialog.
+        /// </summary>
+        App.getView(this.searchDialog).show({
+            query: this.queryText,
+            fn: this.search,
+            scope: this
+        });
     },
     search: function(searchText) {
         /// <summary> 
@@ -93,12 +109,16 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
         this.query = this.queryText !== false
             ? this.formatSearchQuery(this.queryText)
-            : false;      
+            : false;   
 
-        // reset search button state
-        // todo: is this the best way to do this?
-        App.allowSearch(this.canSearch, this.queryText);  
-        
+        if (App.tbar && App.tbar.tool)
+        {                        
+            if (this.query)
+                App.tbar.tool.el.replaceClass('blueButton', 'greenButton');
+            else
+                App.tbar.tool.el.replaceClass('greenButton', 'blueButton');
+        }
+
         this.requestData(); 
     },
     formatSearchQuery: function(query) {

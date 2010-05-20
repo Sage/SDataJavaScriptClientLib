@@ -20,6 +20,9 @@ Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {
         if (window.location.port && window.location.port != 80)
             this.service.setPort(window.location.port);
 
+        if (/https/i.test(window.location.protocol))
+            this.service.setProtocol('https');
+
         this.context = {};
     },
     setup: function () {

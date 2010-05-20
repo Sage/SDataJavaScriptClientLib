@@ -13,11 +13,11 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     ]),
     contentTemplate: new Simplate([
         '<fieldset class="loading">',
-        '<div class="row"><div class="loading-indicator">loading...</div></div>',
+        '<div class="row"><div class="loading-indicator">{%= loadingText %}</div></div>',
         '</fieldset>',
     ]),
     sectionBeginTemplate: new Simplate([
-        '<h2>{%= $["title"] || "Details" %}</h2>',
+        '<h2>{%= $["title"] %}</h2>',
         '{% if ($["list"]) { %}<ul>{% } else { %}<fieldset>{% } %}'
     ]),
     sectionEndTemplate: new Simplate([
@@ -45,15 +45,28 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         '</a>',
         '</li>'
     ]),    
+    editText: 'Edit',
+    titleText: 'Detail',
+    detailsText: 'Details',
+    loadingText: 'loading...',
     constructor: function(o) {
         Sage.Platform.Mobile.Detail.superclass.constructor.call(this);        
         
         Ext.apply(this, o, {
             id: 'generic_detail',
-            title: 'Detail',
+            title: this.titleText,
             expose: false,
-            canEdit: false,
-            editor: false        
+            editor: false,
+            tools: {
+                tbar: [{
+                    name: 'edit',
+                    title: this.editText,
+                    hidden: function() { return !this.editor; },                                                                
+                    cls: 'button blueButton',                 
+                    fn: this.navigateToEdit,
+                    scope: this                
+                }]
+            }        
         });        
     },
     render: function() {
@@ -78,11 +91,6 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
             }, this);
         
         // todo: find a better way to handle these notifications
-        App.on('edit', function() {
-            if (this.el.getAttribute('selected') == 'true')
-                this.navigateToEdit();
-        }, this);  
-        
         App.on('refresh', function(o) {
             if (this.context && o.key === this.context.key)
             {
@@ -224,7 +232,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
                 this.entry = entry;
                 
                 if (this.entry)                  
-                    this.processLayout(this.layout, {}, this.entry);
+                    this.processLayout(this.layout, {title: this.detailsText}, this.entry);
             },
             failure: function(response, o) {
                 this.requestFailure(response, o);

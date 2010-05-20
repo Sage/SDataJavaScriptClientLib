@@ -70,8 +70,6 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         var check = function(k) {
             if (/^\[sdata\]\:/i.test(k))
             {
-                console.log("clearing cache: %s", k);
-
                 window.localStorage.removeItem(k);
             }
         };
@@ -100,17 +98,14 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         var feed = window.localStorage.getItem(key);   
         if (feed)
         {
-            console.log("cache hit: %s", key);
-
             o.result = Ext.decode(feed);
         }                    
     },
     cacheSDataRequest: function(request, o, feed) {        
-        if (typeof feed === 'object')
+        /* todo: decide how to handle PUT/POST/DELETE */
+        if (/get/i.test(o.method) && typeof feed === 'object')
         {
             var key = this.createCacheKey(request);
-
-            console.log("caching: %s", key);
 
             window.localStorage.removeItem(key);
             window.localStorage.setItem(key, Ext.encode(feed));            
@@ -188,30 +183,13 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         /// <param name="title" type="String">The new title.</summary>
         if (this.tbar && this.tbar.setTitle)
             this.tbar.setTitle(title);
-    },
-    allowSearch: function(allow, has) {
-        /// <summary>Instructs the toolbar to either enable or disable search.</summary>
-        /// <param name="allow" type="Boolean">True to enable search; False otherwise.</param>
-        /// <param name="has" optional="true">The current search query, if any.</param>
-        if (this.tbar && this.tbar.allowSearch)
-            this.tbar.allowSearch(allow, has);
-    },
-    allowEdit: function(allow) {
-        /// <summary>Instructs the toolbar to either enable or disable edit.</summary>
-        /// <param name="allow" type="Boolean">True to enable edit; False otherwise.</param>
-        if (this.tbar && this.tbar.allowEdit)
-            this.tbar.allowEdit(allow);
-    },
-    allowSave: function(allow) {
-        /// <summary>Instructs the toolbar to either enable or disable save.</summary>
-        /// <param name="allow" type="Boolean">True to enable save; False otherwise.</param>
-        if (this.tbar && this.tbar.allowSave)
-            this.tbar.allowSave(allow);
-    },
-    beforeViewTransitionAway: function(view) {
-        this.allowSearch(false);
-        this.allowEdit(false);
-        this.allowSave(false);
+    },    
+    beforeViewTransitionAway: function(view) {        
+        if (this.tbar)
+            this.tbar.clear();
+
+        if (this.bbar)
+            this.bbar.clear();
 
         view.beforeTransitionAway();
     },
@@ -222,9 +200,11 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         view.transitionAway();
     },
     viewTransitionTo: function(view) {
-        this.allowSearch(view.canSearch, view.queryText); // todo: adjust naming   
-        this.allowEdit(view.canEdit);
-        this.allowSave(view.canSave);
+        if (this.tbar && view.tools && view.tools.tbar)
+            this.tbar.display(view.tools.tbar);
+
+        if (this.bbar && view.tools && view.tools.bbar)
+            this.bbar.display(view.tools.bbar);
 
         view.transitionTo();
     }
@@ -253,6 +233,9 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         if (duration > 1000) 
         {            
             prevent = true;
+
+            evt.stopEvent();
+
             dispatch.call(this, el, 'clicklong', true, true);            
         }
     };
@@ -268,7 +251,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
 
             return false;
         } 
-    };
+    }; 
 
     if (typeof window.orientation === 'undefined')
     {    

@@ -28,11 +28,9 @@ Sage.Platform.Mobile.Toolbar = Ext.extend(Ext.util.Observable, {
     init: function() {
         this.render();            
     },
-    allowSearch: function(allow, has) {
+    clear: function() {
     },
-    allowEdit: function(allow) {
-    },
-    allowSave: function(allow) {
+    display: function(tools) {        
     }
 });
 

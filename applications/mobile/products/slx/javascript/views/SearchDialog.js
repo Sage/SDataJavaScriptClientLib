@@ -61,10 +61,11 @@ Mobile.SalesLogix.SearchDialog = Ext.extend(Sage.Platform.Mobile.View, {
                 }
             }, this);            
     },    
-    show: function(query) {
+    show: function(context) {
+        this.context = context;
         this.el
             .child('input[name="query"]')
-            .dom.value = typeof query === 'string' ? query : '';
+            .dom.value = typeof this.context.query === 'string' ? this.context.query : '';
 
         Mobile.SalesLogix.SearchDialog.superclass.show.call(this);
 
@@ -79,7 +80,8 @@ Mobile.SalesLogix.SearchDialog = Ext.extend(Sage.Platform.Mobile.View, {
             .child('input[name="query"]')
             .getValue();
 
-        App.fireEvent('search', query);
+        if (this.context && this.context.fn)
+            this.context.fn.call(this.context.scope || this, query);
      
         this.el.dom.removeAttribute('selected');
     }
