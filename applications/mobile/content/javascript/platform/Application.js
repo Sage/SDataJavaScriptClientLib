@@ -120,6 +120,9 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         if (this.tbar)
             this.tbar.init();
 
+        if (this.bbar)
+            this.bbar.init();
+
         for (var i = 0; i < this.views.length; i++) 
             this.views[i].init();
 

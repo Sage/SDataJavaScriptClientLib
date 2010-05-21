@@ -840,9 +840,13 @@ window.iui =
         }
         return null;
     },
-
+        
     getCurrentDialog: function() {
         return currentDialog;
+    },
+
+    getPageHistory: function() {
+        return pageHistory;
     },
 
 	showPage: function(page, backwards)
@@ -1162,7 +1166,6 @@ addEventListener("click", function(event)
 		event.preventDefault();		   
 	}
 }, true);
-
 
 function sendEvent(type, node, props, bubble, cancel)
 {

@@ -56,7 +56,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
                     this.viewTransitionTo(view);
             }
         }, this);  
-        
+                
         if (this.service && this.enableCaching)
         {
             if (this.isOnline())
@@ -73,8 +73,6 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         var check = function(k) {
             if (/^\[sdata\]\:/i.test(k))
             {
-                console.log("clearing cache: %s", k);
-
                 window.localStorage.removeItem(k);
             }
         };
@@ -103,17 +101,14 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         var feed = window.localStorage.getItem(key);   
         if (feed)
         {
-            console.log("cache hit: %s", key);
-
             o.result = Ext.decode(feed);
         }                    
     },
     cacheSDataRequest: function(request, o, feed) {        
-        if (typeof feed === 'object')
+        /* todo: decide how to handle PUT/POST/DELETE */
+        if (/get/i.test(o.method) && typeof feed === 'object')
         {
             var key = this.createCacheKey(request);
-
-            console.log("caching: %s", key);
 
             window.localStorage.removeItem(key);
             window.localStorage.setItem(key, Ext.encode(feed));            
@@ -127,6 +122,9 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
 
         if (this.tbar)
             this.tbar.init();
+
+        if (this.bbar)
+            this.bbar.init();
 
         for (var i = 0; i < this.views.length; i++) 
             this.views[i].init();
@@ -191,30 +189,13 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         /// <param name="title" type="String">The new title.</summary>
         if (this.tbar && this.tbar.setTitle)
             this.tbar.setTitle(title);
-    },
-    allowSearch: function(allow, has) {
-        /// <summary>Instructs the toolbar to either enable or disable search.</summary>
-        /// <param name="allow" type="Boolean">True to enable search; False otherwise.</param>
-        /// <param name="has" optional="true">The current search query, if any.</param>
-        if (this.tbar && this.tbar.allowSearch)
-            this.tbar.allowSearch(allow, has);
-    },
-    allowEdit: function(allow) {
-        /// <summary>Instructs the toolbar to either enable or disable edit.</summary>
-        /// <param name="allow" type="Boolean">True to enable edit; False otherwise.</param>
-        if (this.tbar && this.tbar.allowEdit)
-            this.tbar.allowEdit(allow);
-    },
-    allowSave: function(allow) {
-        /// <summary>Instructs the toolbar to either enable or disable save.</summary>
-        /// <param name="allow" type="Boolean">True to enable save; False otherwise.</param>
-        if (this.tbar && this.tbar.allowSave)
-            this.tbar.allowSave(allow);
-    },
-    beforeViewTransitionAway: function(view) {
-        this.allowSearch(false);
-        this.allowEdit(false);
-        this.allowSave(false);
+    },    
+    beforeViewTransitionAway: function(view) {        
+        if (this.tbar)
+            this.tbar.clear();
+
+        if (this.bbar)
+            this.bbar.clear();
 
         view.beforeTransitionAway();
     },
@@ -225,14 +206,73 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         view.transitionAway();
     },
     viewTransitionTo: function(view) {
-        this.allowSearch(view.canSearch, view.queryText); // todo: adjust naming   
-        this.allowEdit(view.canEdit);
-        this.allowSave(view.canSave);
+        if (this.tbar && view.tools && view.tools.tbar)
+            this.tbar.display(view.tools.tbar);
+
+        if (this.bbar && view.tools && view.tools.bbar)
+            this.bbar.display(view.tools.bbar);
 
         view.transitionTo();
     }
 });
 
+/* DOM event extensions */
+(function(){   
+    var hold; 
+    var touch;
+    var prevent;
+    var dispatch = function(el, type, bubble, cancel) {
+        var evt = document.createEvent("UIEvent");
+
+        evt.initEvent(type, bubble, cancel);
+        
+        el.dispatchEvent(evt);
+    };
+    var handleTouchStart = function(evt, el, o) {
+        hold = setTimeout(dispatch.createDelegate(this, [el, 'hold', true, true]), 1500);
+        touch = (new Date()).getTime();
+    };
+    var handleTouchEnd = function(evt, el, o) {
+        clearTimeout(hold);
+
+        var duration = (new Date()).getTime() - touch;
+        if (duration > 1000) 
+        {            
+            prevent = true;
+
+            evt.stopEvent();
+
+            dispatch.call(this, el, 'clicklong', true, true);            
+        }
+    };
+    var handleClick = function(evt) {
+        if (prevent)
+        {          	        
+            if (evt.preventBubble) evt.preventBubble();
+            if (evt.preventDefault) evt.preventDefault();
+	        if (evt.stopPropagation) evt.stopPropagation();                        
+            if (evt.stopImmediatePropagation) evt.stopImmediatePropagation();
+
+            prevent = false;
+
+            return false;
+        } 
+    }; 
+
+    if (typeof window.orientation === 'undefined')
+    {    
+        Ext.getBody().on('mousedown', handleTouchStart);
+        Ext.getBody().on('mouseup', handleTouchEnd);
+    } 
+    else
+    {
+        Ext.getBody().on('touchstart', handleTouchStart);
+        Ext.getBody().on('touchend', handleTouchEnd);
+    }
+
+    /* todo: this will not work on IE, not that anything else will either, on current versions */    
+    Ext.getBody().dom.addEventListener('click', handleClick, true); /* we want to capture click */
+})();
 ﻿/// <reference path="../ext/ext-core-debug.js"/>
 /// <reference path="../iui/iui-sage.js"/>
 /// <reference path="../Simplate.js"/>
@@ -348,8 +388,8 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         '</ul>'
     ]),
     contentTemplate: new Simplate([
-        '<li class="loading"><div class="loading-indicator">loading...</div></li>',
-        '<li class="more" style="display: none;"><a href="#" target="_none" class="whiteButton moreButton"><span>More</span></a></li>'
+        '<li class="loading"><div class="loading-indicator">{%= loadingText %}</div></li>',
+        '<li class="more" style="display: none;"><a href="#" target="_none" class="whiteButton moreButton"><span>{%= moreText %}</span></a></li>'
     ]),
     itemTemplate: new Simplate([
         '<li>',
@@ -363,6 +403,11 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         '<h3>{%= noDataText %}</h3>',
         '</li>'
     ]),
+    moreText: 'More',
+    titleText: 'List',
+    searchText: 'Search',
+    noDataText: 'no records',
+    loadingText: 'loading...',    
     constructor: function(o) {
         /// <field name="resourceKind" type="String">The resource kind that is bound to this view.</field>
         /// <field name="pageSize" type="Number">The number of records to return with each request.</field>
@@ -378,11 +423,19 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         
         Ext.apply(this, o, {
             id: 'generic_list',
-            title: 'List',
+            title: this.titleText,
             pageSize: 20,
             requestedFirstPage: false,
-            canSearch: true,
-            noDataText: 'no records'
+            searchDialog: 'search_dialog',
+            tools: {
+                tbar: [{
+                    name: 'search',
+                    title: this.searchText,                        
+                    cls: function() { return this.query ? 'button greenButton' : 'button blueButton'; },                 
+                    fn: this.showSearchDialog,
+                    scope: this                
+                }]
+            }
         });
     },   
     render: function() {
@@ -403,19 +456,22 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
                 else if (source.is('a[target="_detail"]') || (target = source.up('a[target="_detail"]')))
                     this.navigateToDetail(target || source, evt);
 
-            }, this, { preventDefault: true, stopPropagation: true });                
-
-        // todo: find a better way to handle these notifications
-        if (this.canSearch) 
-            App.on('search', function(query) {
-                if (this.el.getAttribute('selected') == 'true')
-                    this.search(query);
-            }, this);
+            }, this, { preventDefault: true, stopPropagation: true });                      
 
         App.on('refresh', function(o) {
             if (this.resourceKind && o.resourceKind === this.resourceKind)
                 this.clear();
         }, this); 
+    },
+    showSearchDialog: function() {
+        /// <summary>
+        ///     Called when the search tool button is clicked.  This method displays the search dialog.
+        /// </summary>
+        App.getView(this.searchDialog).show({
+            query: this.queryText,
+            fn: this.search,
+            scope: this
+        });
     },
     search: function(searchText) {
         /// <summary> 
@@ -431,12 +487,16 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
         this.query = this.queryText !== false
             ? this.formatSearchQuery(this.queryText)
-            : false;      
+            : false;   
 
-        // reset search button state
-        // todo: is this the best way to do this?
-        App.allowSearch(this.canSearch, this.queryText);  
-        
+        if (App.tbar && App.tbar.tool)
+        {                        
+            if (this.query)
+                App.tbar.tool.el.replaceClass('blueButton', 'greenButton');
+            else
+                App.tbar.tool.el.replaceClass('greenButton', 'blueButton');
+        }
+
         this.requestData(); 
     },
     formatSearchQuery: function(query) {
@@ -660,11 +720,11 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     ]),
     contentTemplate: new Simplate([
         '<fieldset class="loading">',
-        '<div class="row"><div class="loading-indicator">loading...</div></div>',
+        '<div class="row"><div class="loading-indicator">{%= loadingText %}</div></div>',
         '</fieldset>',
     ]),
     sectionBeginTemplate: new Simplate([
-        '<h2>{%= $["title"] || "Details" %}</h2>',
+        '<h2>{%= $["title"] %}</h2>',
         '{% if ($["list"]) { %}<ul>{% } else { %}<fieldset>{% } %}'
     ]),
     sectionEndTemplate: new Simplate([
@@ -692,15 +752,28 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         '</a>',
         '</li>'
     ]),    
+    editText: 'Edit',
+    titleText: 'Detail',
+    detailsText: 'Details',
+    loadingText: 'loading...',
     constructor: function(o) {
         Sage.Platform.Mobile.Detail.superclass.constructor.call(this);        
         
         Ext.apply(this, o, {
             id: 'generic_detail',
-            title: 'Detail',
+            title: this.titleText,
             expose: false,
-            canEdit: false,
-            editor: false        
+            editor: false,
+            tools: {
+                tbar: [{
+                    name: 'edit',
+                    title: this.editText,
+                    hidden: function() { return !this.editor; },                                                                
+                    cls: 'button blueButton',                 
+                    fn: this.navigateToEdit,
+                    scope: this                
+                }]
+            }        
         });        
     },
     render: function() {
@@ -725,11 +798,6 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
             }, this);
         
         // todo: find a better way to handle these notifications
-        App.on('edit', function() {
-            if (this.el.getAttribute('selected') == 'true')
-                this.navigateToEdit();
-        }, this);  
-        
         App.on('refresh', function(o) {
             if (this.context && o.key === this.context.key)
             {
@@ -871,7 +939,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
                 this.entry = entry;
                 
                 if (this.entry)                  
-                    this.processLayout(this.layout, {}, this.entry);
+                    this.processLayout(this.layout, {title: this.detailsText}, this.entry);
             },
             failure: function(response, o) {
                 this.requestFailure(response, o);
@@ -971,14 +1039,14 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
     viewTemplate: new Simplate([            
         '<div id="{%= id %}" title="{%= title %}" class="panel">',  
         '<fieldset class="loading">',
-        '<div class="row"><div class="loading-indicator">loading...</div></div>',
+        '<div class="row"><div class="loading-indicator">{%= loadingText %}</div></div>',
         '</fieldset>',
         '<div class="body" style="display: none;">',
         '</div>',           
         '</div>'
     ]),       
     sectionBeginTemplate: new Simplate([
-        '<h2>{%= $["title"] || "Details" %}</h2>',
+        '<h2>{%= $["title"] %}</h2>',
         '{% if ($["list"]) { %}<ul>{% } else { %}<fieldset>{% } %}'
     ]),
     sectionEndTemplate: new Simplate([
@@ -993,14 +1061,26 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
     textFieldTemplate: new Simplate([
         '<input type="text" name="{%= name %}">'
     ]),
+    saveText: 'Save',
+    titleText: 'Edit',
+    detailsText: 'Details',    
+    loadingText: 'loading...',
     constructor: function(o) {
         Sage.Platform.Mobile.Edit.superclass.constructor.call(this);        
         
         Ext.apply(this, o, {
             id: 'generic_edit',
-            title: 'Edit',
+            title: this.titleText,
             expose: false,
-            canSave: true,
+            tools: {
+                tbar: [{
+                    name: 'edit',
+                    title: this.saveText,                                                              
+                    cls: 'button blueButton',                 
+                    fn: this.save,
+                    scope: this                
+                }]
+            },
             fields: {}          
         });
     },
@@ -1013,7 +1093,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
     init: function() {  
         Sage.Platform.Mobile.Edit.superclass.init.call(this);                
 
-        this.processLayout(this.layout, {});
+        this.processLayout(this.layout, {title: this.detailsText});
 
         for (var name in this.fields) this.fields[name].bind(this.el);
 
@@ -1282,11 +1362,9 @@ Sage.Platform.Mobile.Toolbar = Ext.extend(Ext.util.Observable, {
     init: function() {
         this.render();            
     },
-    allowSearch: function(allow, has) {
+    clear: function() {
     },
-    allowEdit: function(allow) {
-    },
-    allowSave: function(allow) {
+    display: function(tools) {        
     }
 });
 

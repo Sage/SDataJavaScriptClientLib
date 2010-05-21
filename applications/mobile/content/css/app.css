@@ -224,3 +224,53 @@ input:not([type|=radio]):not([type|=checkbox])
 {
 	cursor: pointer;
 }
+
+body.has-toolbar-bottom
+{
+	
+}
+
+body.has-toolbar-bottom > :not(.toolbar):not(.toolbar-bottom):not(.toolbar-bottom-fix)
+{
+	padding: 0 0 50px 0;
+}
+
+body > div.toolbar-bottom,
+body[orient] > div.toolbar-bottom
+{
+	display: block;
+	height: 49px;
+	width: 100%;
+	position: fixed;
+	bottom: 0;
+	top: auto;
+	min-height: 0;
+	z-index: 1;
+	border-top: solid 1px black;
+	-moz-box-shadow: 0 -1px 3px #000000;
+	-webkit-box-shadow: 0 -1px 3px #000000;	
+}
+
+.toolbar-bottom .toolbar-bottom-wrap
+{
+	border-top: solid 1px #434343;
+	height: 49px;
+	background: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0, rgb(44,44,44)),
+		color-stop(0.5, rgb(21,21,21)),
+		color-stop(0.5, rgb(49,49,49)),
+		color-stop(1, rgb(79,79,79))
+	);
+	background: -moz-linear-gradient(
+		center bottom,
+		rgb(44,44,44) 0%,
+		rgb(21,21,21) 50%,
+		rgb(49,49,49) 50%,
+		rgb(79,79,79) 100%
+	);
+}
+
+

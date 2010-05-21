@@ -31,7 +31,11 @@ Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {
         this.tbar = new Mobile.SalesLogix.MainToolbar({
             title: 'Mobile Demo'
         });
-
+        /*
+        this.bbar = new Mobile.SalesLogix.BottomToolbar({
+            
+        });
+        */
         this.registerView(new Mobile.SalesLogix.LoginDialog());
         this.registerView(new Mobile.SalesLogix.SearchDialog());
         this.registerView(new Mobile.SalesLogix.Home());

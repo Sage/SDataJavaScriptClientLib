@@ -1,25 +1,35 @@
-﻿/// <reference path="../../ext/ext-core-debug.js"/>
-/// <reference path="../../platform/Application.js"/>
-/// <reference path="../../platform/Toolbar.js"/>
-/// <reference path="../../sdata/SDataService.js"/>
+﻿/// <reference path="../../../content/javascript/ext/ext-core-debug.js"/>
+/// <reference path="../../../content/javascript/platform/Application.js"/>
+/// <reference path="../../../content/javascript/platform/Toolbar.js"/>
 
 Ext.namespace("Mobile.SalesLogix");
 
-Mobile.SalesLogix.MainToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
+Mobile.SalesLogix.BottomToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
     barTemplate: new Simplate([
+        '<div class="{%= cls %}-fix">',
         '<div class="{%= cls %}">',
-        '<h1 id="pageTitle">{%= title %}</h1>',
-        '<a id="backButton" class="button" href="#"></a>',              
+        '<div class="{%= cls %}-wrap">',
+        '</div>',               
+        '</div>',
         '</div>'
     ]),
-    toolTemplate: new Simplate([
-        '<a target="_tool" class="{%= cls %}" style="display: {%= $["hidden"] ? "none" : "block" %}"><span>{%= title %}</span></a>',
+    toolTemplate: new Simplate([        
+        '<a target="_tool" m:action="{%= name %}" class="{%= cls %}" style="display: {%= $["hidden"] ? "none" : "block" %}">',
+        '<span>{%= title %}</span>',
+        '</a>',
     ]),
     constructor: function(o) {
-        Mobile.SalesLogix.MainToolbar.superclass.constructor.apply(this, arguments);        
+        Mobile.SalesLogix.MainToolbar.superclass.constructor.apply(this, arguments); 
+        
+        this.cls = 'toolbar-bottom';       
     }, 
+    render: function() {
+        Mobile.SalesLogix.BottomToolbar.superclass.render.call(this);   
+        
+        Ext.getBody().addClass('has-toolbar-bottom');
+    },
     init: function() {
-        Mobile.SalesLogix.MainToolbar.superclass.init.call(this);        
+        Mobile.SalesLogix.BottomToolbar.superclass.init.call(this);        
 
         this.el
             .on('click', function(evt, el, o) {
@@ -34,10 +44,7 @@ Mobile.SalesLogix.MainToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
                         this.tool.fn.call(this.tool.scope || this);
                 }
             }, this);
-    },
-    setTitle: function(title) {
-        Ext.get('pageTitle').update(title);
-    },  
+    },   
     clear: function() {
         if (this.tool)
         {

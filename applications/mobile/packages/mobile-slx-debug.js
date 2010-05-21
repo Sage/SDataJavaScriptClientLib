@@ -23,6 +23,9 @@ Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {
         if (window.location.port && window.location.port != 80)
             this.service.setPort(window.location.port);
 
+        if (/https/i.test(window.location.protocol))
+            this.service.setProtocol('https');
+
         this.context = {};
     },
     setup: function () {
@@ -31,7 +34,11 @@ Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {
         this.tbar = new Mobile.SalesLogix.MainToolbar({
             title: 'Mobile Demo'
         });
-
+        /*
+        this.bbar = new Mobile.SalesLogix.BottomToolbar({
+            
+        });
+        */
         this.registerView(new Mobile.SalesLogix.LoginDialog());
         this.registerView(new Mobile.SalesLogix.SearchDialog());
         this.registerView(new Mobile.SalesLogix.Home());
@@ -184,11 +191,11 @@ Mobile.SalesLogix.MainToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
     barTemplate: new Simplate([
         '<div class="{%= cls %}">',
         '<h1 id="pageTitle">{%= title %}</h1>',
-        '<a id="backButton" class="button" href="#"></a>',
-        '<a class="button" href="#search_dialog" target="_search" style="display: none;">Search</a>',
-        '<a class="button" href="#" target="_edit" style="display: none;">Edit</a>',
-        '<a class="button blueButton" href="#" target="_save" style="display: none;"><span>Save</span></a>',
+        '<a id="backButton" class="button" href="#"></a>',              
         '</div>'
+    ]),
+    toolTemplate: new Simplate([
+        '<a target="_tool" class="{%= cls %}" style="display: {%= $["hidden"] ? "none" : "block" %}"><span>{%= title %}</span></a>',
     ]),
     constructor: function(o) {
         Mobile.SalesLogix.MainToolbar.superclass.constructor.apply(this, arguments);        
@@ -196,69 +203,43 @@ Mobile.SalesLogix.MainToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
     init: function() {
         Mobile.SalesLogix.MainToolbar.superclass.init.call(this);        
 
-        this.el.select('a[target="_search"]')
+        this.el
             .on('click', function(evt, el, o) {
-                this.displaySearch(Ext.get(el));
-            }, this, { preventDefault: true, stopPropagation: true });
+                var source = Ext.get(el);
+                var target;
 
-        this.el.select('a[target="_edit"]')
-            .on('click', function(evt, el, o) {
-                this.displayEdit(Ext.get(el));
-            }, this, { preventDefault: true, stopPropagation: true });
+                if (source.is('a[target="_tool"]') || (target = source.up('a[target="_tool"]')))
+                {
+                    evt.stopEvent();
 
-        this.el.select('a[target="_save"]')
-            .on('click', function(evt, el, o) {
-                this.displaySave(Ext.get(el));
-            }, this, { preventDefault: true, stopPropagation: true });
+                    if (this.tool && this.tool.fn)
+                        this.tool.fn.call(this.tool.scope || this);
+                }
+            }, this);
     },
     setTitle: function(title) {
         Ext.get('pageTitle').update(title);
-    },
-    displaySearch: function(el) {
-        var id = el.dom.hash.substring(1);
-        if (id)
-            App.getView(id).show(this.searchText);
-    },
-    displayEdit: function() {
-        App.fireEvent('edit');
-    },
-    displaySave: function() {
-        App.fireEvent('save');
-    },
-    allowSearch: function(allow, has) {
-        this.searchText = false;
-
-        if (allow)
+    },  
+    clear: function() {
+        if (this.tool)
         {
-            var button = this.el
-                .down('a[target="_search"]')
-                .removeClass("greenButton");
-
-            if (has) 
-            {
-                button.addClass("greenButton");
-
-                if (typeof has === 'string') 
-                    this.searchText = has;
-            }               
-                
-            button.show();  
+            this.el.child('a[target="_tool"]').remove(); 
+            this.tool = false;
         }
-        else        
-            this.el.down('a[target="_search"]').hide();                                     
     },
-    allowEdit: function(allow) {
-        if (allow)
-            this.el.down('a[target="_edit"]').show();
-        else
-            this.el.down('a[target="_edit"]').hide(); 
-    },
-    allowSave: function(allow) {
-        if (allow)
-            this.el.down('a[target="_save"]').show();
-        else
-            this.el.down('a[target="_save"]').hide(); 
-    }  
+    display: function(tools) {
+        /* this toolbar only supports a single action */
+        if (tools.length > 0)
+        {
+            this.tool = Ext.apply({}, tools[0]);
+
+            for (var p in this.tool)
+                if (p !== 'fn' && typeof this.tool[p] === 'function')
+                    this.tool[p] = this.tool[p].call(this.tool.scope || this);
+                                
+            this.tool.el = Ext.DomHelper.append(this.el, this.toolTemplate.apply(this.tool), true);
+        }
+    }    
 });
 ﻿/// <reference path="../ext/ext-core-debug.js"/>
 /// <reference path="../platform/Application.js"/>
@@ -284,7 +265,7 @@ Ext.namespace("Mobile.SalesLogix");
 Mobile.SalesLogix.Home = Ext.extend(Sage.Platform.Mobile.View, {      
     itemTemplate: new Simplate([
         '<li>',
-        '<a href="#{%= id %}">',
+        '<a href="#{%= id %}" target="_view">',
         '{% if ($["icon"]) { %}',
         '<img src="{%= $["icon"] %}" alt="icon" class="icon" />',
         '{% } %}',
@@ -518,10 +499,11 @@ Mobile.SalesLogix.SearchDialog = Ext.extend(Sage.Platform.Mobile.View, {
                 }
             }, this);            
     },    
-    show: function(query) {
+    show: function(context) {
+        this.context = context;
         this.el
             .child('input[name="query"]')
-            .dom.value = typeof query === 'string' ? query : '';
+            .dom.value = typeof this.context.query === 'string' ? this.context.query : '';
 
         Mobile.SalesLogix.SearchDialog.superclass.show.call(this);
 
@@ -536,7 +518,8 @@ Mobile.SalesLogix.SearchDialog = Ext.extend(Sage.Platform.Mobile.View, {
             .child('input[name="query"]')
             .getValue();
 
-        App.fireEvent('search', query);
+        if (this.context && this.context.fn)
+            this.context.fn.call(this.context.scope || this, query);
      
         this.el.dom.removeAttribute('selected');
     }
