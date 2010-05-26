@@ -1,4 +1,9 @@
-﻿body[orient="landscape"] > form.dialog,
+﻿body
+{
+
+}
+
+body[orient="landscape"] > form.dialog,
 body > form.dialog
 {
 	height: 100%;
@@ -220,42 +225,48 @@ input:not([type|=radio]):not([type|=checkbox])
   width: 25px;
 }
 
+a 
+{
+    -webkit-touch-callout: none;
+}
+
 .button
 {
 	cursor: pointer;
 }
 
-body.has-toolbar-bottom
+body > :not(.dialog):not(.toolbar):not(.toolbar-float) 
 {
-	
+	padding-bottom: 66px;
 }
 
-body.has-toolbar-bottom > :not(.toolbar):not(.toolbar-bottom):not(.toolbar-bottom-fix)
+/* remove iUI styling from the toolbar */
+body > div.toolbar-float,
+body[orient] > div.toolbar-float
 {
-	padding: 0 0 50px 0;
-}
-
-body > div.toolbar-bottom,
-body[orient] > div.toolbar-bottom
-{
+	box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
 	display: block;
-	height: 49px;
-	width: 100%;
-	position: fixed;
-	bottom: 0;
-	top: auto;
+	height: 50px;
+	width: auto;
+	min-width: 36px;
+	position: absolute;	
+	top: 0px;
+	right: 0px;
+	left: auto;
 	min-height: 0;
-	z-index: 1;
-	border-top: solid 1px black;
-	-moz-box-shadow: 0 -1px 3px #000000;
-	-webkit-box-shadow: 0 -1px 3px #000000;	
+	z-index: 1;	
+	padding: 0 0 0 36px;
 }
 
-.toolbar-bottom .toolbar-bottom-wrap
-{
-	border-top: solid 1px #434343;
-	height: 49px;
-	background: -webkit-gradient(
+.toolbar-float 
+{			
+    -moz-border-radius-topleft: 8px;
+    -webkit-border-top-left-radius: 8px;
+    -moz-border-radius-bottomleft: 8px;
+    -webkit-border-bottom-left-radius: 8px;
+	background-image: url(../images/arrow-left.png), -webkit-gradient(
 		linear,
 		left bottom,
 		left top,
@@ -263,14 +274,57 @@ body[orient] > div.toolbar-bottom
 		color-stop(0.5, rgb(21,21,21)),
 		color-stop(0.5, rgb(49,49,49)),
 		color-stop(1, rgb(79,79,79))
-	);
-	background: -moz-linear-gradient(
+	);	
+	background-image: url(../images/arrow-left.png), -moz-linear-gradient(
 		center bottom,
 		rgb(44,44,44) 0%,
 		rgb(21,21,21) 50%,
 		rgb(49,49,49) 50%,
 		rgb(79,79,79) 100%
 	);
+	background-position: 6px center, top left;
+	background-repeat: no-repeat, no-repeat;
+}
+
+.toolbar-float-fx
+{
+}
+
+.toolbar-float-container
+{	
+	/* use with column-count (and width) for alternate layout method */
+	-moz-column-gap: 0px;
+	-webkit-column-gap: 0px;
+	
+	height: 50px;	
+	
+	display: -webkit-box;
+    -webkit-box-orient: horizontal;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+ 
+    display: -moz-box;
+    -moz-box-orient: horizontal;
+    -moz-box-pack: center;
+    -moz-box-align: center;
+ 
+    display: box;
+    box-orient: horizontal;
+    -moz-box-pack: center;
+    -moz-box-align: center;
+}
+
+.toolbar-float-container a
+{
+    color: #fff;
+    width: 48px;
+    text-align: center;
+}
+
+.toolbar-float-container a span
+{
+	display: block;
+	font-size: .6em;
 }
 
 

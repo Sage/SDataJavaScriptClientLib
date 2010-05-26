@@ -111,12 +111,12 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             ? this.formatSearchQuery(this.queryText)
             : false;   
 
-        if (App.tbar && App.tbar.tool)
+        if (App.bars.tbar && App.bars.tbar.tool)
         {                        
             if (this.query)
-                App.tbar.tool.el.replaceClass('blueButton', 'greenButton');
+                App.bars.tbar.tool.el.replaceClass('blueButton', 'greenButton');
             else
-                App.tbar.tool.el.replaceClass('greenButton', 'blueButton');
+                App.bars.tbar.tool.el.replaceClass('greenButton', 'blueButton');
         }
 
         this.requestData(); 

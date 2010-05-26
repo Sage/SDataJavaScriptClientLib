@@ -26,6 +26,23 @@ Mobile.SalesLogix.Account.List = Ext.extend(Sage.Platform.Mobile.List, {
             pageSize: 10,
             icon: 'products/slx/images/Accounts_24x24.gif'
         });
+
+        Ext.apply(this.tools || {}, {            
+            fbar: [{
+                name: 'test',
+                title: 'note',                        
+                cls: 'tool-note',  
+                icon: 'products/slx/images/Note_32x32.gif',               
+                fn: function() { alert("one"); },
+                scope: this                
+            },{
+                name: 'test2',
+                title: 'note',                        
+                icon: 'products/slx/images/Whats_New_3D_Files_32x32.gif',             
+                fn: function() { alert("two");},
+                scope: this                
+            }]            
+        })
     },  
     formatSearchQuery: function(query) {
         return String.format('AccountName like "%{0}%"', query);

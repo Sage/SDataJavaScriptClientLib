@@ -28,6 +28,12 @@
 			text: 'Toolbar.js',
 			path: '../applications/mobile/content/javascript/platform/'
 		},{
+			text: 'MainToolbar.js',
+			path: '../applications/mobile/content/javascript/platform/'
+		},{
+			text: 'FloatToolbar.js',
+			path: '../applications/mobile/content/javascript/platform/'
+		},{
 			text: 'Utility.js',
 			path: '../applications/mobile/content/javascript/platform/'
 		}]

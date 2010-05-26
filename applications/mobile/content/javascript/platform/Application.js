@@ -19,14 +19,15 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         this.initialized = false;
         this.enableCaching = false;        
         this.context = {};
-        this.views = [];        
+        this.views = [];    
+        this.bars = {};    
         this.viewsById = {};
         this.addEvents(
             'registered',
-            'search',
-            'edit',
-            'save',
-            'refresh'
+            'beforeviewtransitionaway',
+            'beforeviewtransitionto',
+            'viewtransitionaway',
+            'viewtransitionto'
         );
     },
     setup: function() {
@@ -117,11 +118,8 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         /// </summary>
         this.setup();
 
-        if (this.tbar)
-            this.tbar.init();
-
-        if (this.bbar)
-            this.bbar.init();
+        for (var n in this.bars) 
+            this.bars[n].init();
 
         for (var i = 0; i < this.views.length; i++) 
             this.views[i].init();
@@ -140,6 +138,18 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         if (this.initialized) view.init();
 
         this.fireEvent('registered', view);
+    },
+    registerToolbar: function(name, tbar)
+    {
+        if (typeof name === 'object')
+        {
+            tbar = name;
+            name = tbar.name;
+        }
+
+        this.bars[name] = tbar;
+
+        if (this.initialized) tbar.init();
     },
     getViews: function() {
         /// <returns elementType="Sage.Platform.Mobile.View">An array containing the currently registered views.</returns>
@@ -184,30 +194,37 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     setTitle: function(title) {
         /// <summary>Sets the applications current title.</summary>
         /// <param name="title" type="String">The new title.</summary>
-        if (this.tbar && this.tbar.setTitle)
-            this.tbar.setTitle(title);
+        for (var n in this.bars)
+            if (this.bars[n].setTitle)
+                this.bars[n].setTitle(title);
     },    
-    beforeViewTransitionAway: function(view) {        
-        if (this.tbar)
-            this.tbar.clear();
-
-        if (this.bbar)
-            this.bbar.clear();
+    beforeViewTransitionAway: function(view) { 
+        this.fireEvent('beforeviewtransitionaway', view);
+    
+        for (var n in this.bars) 
+            this.bars[n].clear();
 
         view.beforeTransitionAway();
     },
     beforeViewTransitionTo: function(view) {
+        this.fireEvent('beforeviewtransitionto', view);
+
         view.beforeTransitionTo();
     },
     viewTransitionAway: function(view) {
+        this.fireEvent('viewtransitionaway', view);
+
         view.transitionAway();
     },
     viewTransitionTo: function(view) {
-        if (this.tbar && view.tools && view.tools.tbar)
-            this.tbar.display(view.tools.tbar);
+        this.fireEvent('viewtransitionto', view);
 
-        if (this.bbar && view.tools && view.tools.bbar)
-            this.bbar.display(view.tools.bbar);
+        if (view.tools)
+        {
+            for (var n in view.tools)
+                if (this.bars[n])
+                    this.bars[n].display(view.tools[n]);
+        }
 
         view.transitionTo();
     }

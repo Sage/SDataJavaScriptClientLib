@@ -13,9 +13,6 @@
 			text: 'Format.js',
 			path: '../applications/mobile/products/slx/javascript/'
 		},{
-			text: 'MainToolbar.js',
-			path: '../applications/mobile/products/slx/javascript/'
-		},{
 			text: 'Template.js',
 			path: '../applications/mobile/products/slx/javascript/'
 		},{

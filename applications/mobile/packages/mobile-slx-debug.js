@@ -31,14 +31,15 @@ Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {
     setup: function () {
         Mobile.SalesLogix.Application.superclass.setup.apply(this, arguments);
 
-        this.tbar = new Mobile.SalesLogix.MainToolbar({
+        this.registerToolbar(new Sage.Platform.Mobile.MainToolbar({
+            name: 'tbar',
             title: 'Mobile Demo'
-        });
-        /*
-        this.bbar = new Mobile.SalesLogix.BottomToolbar({
-            
-        });
-        */
+        }));
+
+        this.registerToolbar(new Sage.Platform.Mobile.FloatToolbar({
+            name: 'fbar' 
+        }));
+
         this.registerView(new Mobile.SalesLogix.LoginDialog());
         this.registerView(new Mobile.SalesLogix.SearchDialog());
         this.registerView(new Mobile.SalesLogix.Home());
@@ -180,68 +181,7 @@ Mobile.SalesLogix.Format = (function() {
             return v;
         }             
     }, F);
-})();﻿/// <reference path="../../ext/ext-core-debug.js"/>
-/// <reference path="../../platform/Application.js"/>
-/// <reference path="../../platform/Toolbar.js"/>
-/// <reference path="../../sdata/SDataService.js"/>
-
-Ext.namespace("Mobile.SalesLogix");
-
-Mobile.SalesLogix.MainToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
-    barTemplate: new Simplate([
-        '<div class="{%= cls %}">',
-        '<h1 id="pageTitle">{%= title %}</h1>',
-        '<a id="backButton" class="button" href="#"></a>',              
-        '</div>'
-    ]),
-    toolTemplate: new Simplate([
-        '<a target="_tool" class="{%= cls %}" style="display: {%= $["hidden"] ? "none" : "block" %}"><span>{%= title %}</span></a>',
-    ]),
-    constructor: function(o) {
-        Mobile.SalesLogix.MainToolbar.superclass.constructor.apply(this, arguments);        
-    }, 
-    init: function() {
-        Mobile.SalesLogix.MainToolbar.superclass.init.call(this);        
-
-        this.el
-            .on('click', function(evt, el, o) {
-                var source = Ext.get(el);
-                var target;
-
-                if (source.is('a[target="_tool"]') || (target = source.up('a[target="_tool"]')))
-                {
-                    evt.stopEvent();
-
-                    if (this.tool && this.tool.fn)
-                        this.tool.fn.call(this.tool.scope || this);
-                }
-            }, this);
-    },
-    setTitle: function(title) {
-        Ext.get('pageTitle').update(title);
-    },  
-    clear: function() {
-        if (this.tool)
-        {
-            this.el.child('a[target="_tool"]').remove(); 
-            this.tool = false;
-        }
-    },
-    display: function(tools) {
-        /* this toolbar only supports a single action */
-        if (tools.length > 0)
-        {
-            this.tool = Ext.apply({}, tools[0]);
-
-            for (var p in this.tool)
-                if (p !== 'fn' && typeof this.tool[p] === 'function')
-                    this.tool[p] = this.tool[p].call(this.tool.scope || this);
-                                
-            this.tool.el = Ext.DomHelper.append(this.el, this.toolTemplate.apply(this.tool), true);
-        }
-    }    
-});
-﻿/// <reference path="../ext/ext-core-debug.js"/>
+})();﻿/// <reference path="../ext/ext-core-debug.js"/>
 /// <reference path="../platform/Application.js"/>
 /// <reference path="../sdata/SDataService.js"/>
 
@@ -677,6 +617,23 @@ Mobile.SalesLogix.Account.List = Ext.extend(Sage.Platform.Mobile.List, {
             pageSize: 10,
             icon: 'products/slx/images/Accounts_24x24.gif'
         });
+
+        Ext.apply(this.tools || {}, {            
+            fbar: [{
+                name: 'test',
+                title: 'note',                        
+                cls: 'tool-note',  
+                icon: 'products/slx/images/Note_32x32.gif',               
+                fn: function() { alert("one"); },
+                scope: this                
+            },{
+                name: 'test2',
+                title: 'note',                        
+                icon: 'products/slx/images/Whats_New_3D_Files_32x32.gif',             
+                fn: function() { alert("two");},
+                scope: this                
+            }]            
+        })
     },  
     formatSearchQuery: function(query) {
         return String.format('AccountName like "%{0}%"', query);

@@ -22,14 +22,15 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         this.initialized = false;
         this.enableCaching = false;        
         this.context = {};
-        this.views = [];        
+        this.views = [];    
+        this.bars = {};    
         this.viewsById = {};
         this.addEvents(
             'registered',
-            'search',
-            'edit',
-            'save',
-            'refresh'
+            'beforeviewtransitionaway',
+            'beforeviewtransitionto',
+            'viewtransitionaway',
+            'viewtransitionto'
         );
     },
     setup: function() {
@@ -120,11 +121,8 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         /// </summary>
         this.setup();
 
-        if (this.tbar)
-            this.tbar.init();
-
-        if (this.bbar)
-            this.bbar.init();
+        for (var n in this.bars) 
+            this.bars[n].init();
 
         for (var i = 0; i < this.views.length; i++) 
             this.views[i].init();
@@ -143,6 +141,18 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         if (this.initialized) view.init();
 
         this.fireEvent('registered', view);
+    },
+    registerToolbar: function(name, tbar)
+    {
+        if (typeof name === 'object')
+        {
+            tbar = name;
+            name = tbar.name;
+        }
+
+        this.bars[name] = tbar;
+
+        if (this.initialized) tbar.init();
     },
     getViews: function() {
         /// <returns elementType="Sage.Platform.Mobile.View">An array containing the currently registered views.</returns>
@@ -187,30 +197,37 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     setTitle: function(title) {
         /// <summary>Sets the applications current title.</summary>
         /// <param name="title" type="String">The new title.</summary>
-        if (this.tbar && this.tbar.setTitle)
-            this.tbar.setTitle(title);
+        for (var n in this.bars)
+            if (this.bars[n].setTitle)
+                this.bars[n].setTitle(title);
     },    
-    beforeViewTransitionAway: function(view) {        
-        if (this.tbar)
-            this.tbar.clear();
-
-        if (this.bbar)
-            this.bbar.clear();
+    beforeViewTransitionAway: function(view) { 
+        this.fireEvent('beforeviewtransitionaway', view);
+    
+        for (var n in this.bars) 
+            this.bars[n].clear();
 
         view.beforeTransitionAway();
     },
     beforeViewTransitionTo: function(view) {
+        this.fireEvent('beforeviewtransitionto', view);
+
         view.beforeTransitionTo();
     },
     viewTransitionAway: function(view) {
+        this.fireEvent('viewtransitionaway', view);
+
         view.transitionAway();
     },
     viewTransitionTo: function(view) {
-        if (this.tbar && view.tools && view.tools.tbar)
-            this.tbar.display(view.tools.tbar);
+        this.fireEvent('viewtransitionto', view);
 
-        if (this.bbar && view.tools && view.tools.bbar)
-            this.bbar.display(view.tools.bbar);
+        if (view.tools)
+        {
+            for (var n in view.tools)
+                if (this.bars[n])
+                    this.bars[n].display(view.tools[n]);
+        }
 
         view.transitionTo();
     }
@@ -489,12 +506,12 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             ? this.formatSearchQuery(this.queryText)
             : false;   
 
-        if (App.tbar && App.tbar.tool)
+        if (App.bars.tbar && App.bars.tbar.tool)
         {                        
             if (this.query)
-                App.tbar.tool.el.replaceClass('blueButton', 'greenButton');
+                App.bars.tbar.tool.el.replaceClass('blueButton', 'greenButton');
             else
-                App.tbar.tool.el.replaceClass('greenButton', 'blueButton');
+                App.bars.tbar.tool.el.replaceClass('greenButton', 'blueButton');
         }
 
         this.requestData(); 
@@ -1359,6 +1376,9 @@ Sage.Platform.Mobile.Toolbar = Ext.extend(Ext.util.Observable, {
             true
         );
     },
+    getToolEl: function(name) {
+        return this.el;
+    },
     init: function() {
         this.render();            
     },
@@ -1368,6 +1388,241 @@ Sage.Platform.Mobile.Toolbar = Ext.extend(Ext.util.Observable, {
     }
 });
 
+﻿/// <reference path="../../ext/ext-core-debug.js"/>
+/// <reference path="../../platform/Application.js"/>
+/// <reference path="../../platform/Toolbar.js"/>
+/// <reference path="../../sdata/SDataService.js"/>
+
+Ext.namespace("Sage.Platform.Mobile");
+
+Sage.Platform.Mobile.MainToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
+    barTemplate: new Simplate([
+        '<div class="{%= cls %}">',
+        '<h1 id="pageTitle">{%= title %}</h1>',
+        '<a id="backButton" class="button" href="#"></a>',              
+        '</div>'
+    ]),
+    toolTemplate: new Simplate([
+        '<a target="_tool" class="{%= cls %}" style="display: {%= $["hidden"] ? "none" : "block" %}"><span>{%= title %}</span></a>',
+    ]),
+    constructor: function(o) {
+        Sage.Platform.Mobile.MainToolbar.superclass.constructor.apply(this, arguments);        
+    }, 
+    init: function() {
+        Sage.Platform.Mobile.MainToolbar.superclass.init.call(this);        
+
+        this.el
+            .on('click', function(evt, el, o) {
+                var source = Ext.get(el);
+                var target;
+
+                if (source.is('a[target="_tool"]') || (target = source.up('a[target="_tool"]')))
+                {
+                    evt.stopEvent();
+
+                    if (this.tool && this.tool.fn)
+                        this.tool.fn.call(this.tool.scope || this);
+                }
+            }, this);
+    },
+    setTitle: function(title) {
+        Ext.get('pageTitle').update(title);
+    },  
+    clear: function() {
+        if (this.tool)
+        {
+            this.el.child('a[target="_tool"]').remove(); 
+            this.tool = false;
+        }
+    },
+    display: function(tools) {
+        /* this toolbar only supports a single action */
+        if (tools.length > 0)
+        {
+            this.tool = Ext.apply({}, tools[0]);
+
+            for (var p in this.tool)
+                if (p !== 'fn' && typeof this.tool[p] === 'function')
+                    this.tool[p] = this.tool[p].call(this.tool.scope || this);
+                                
+            this.tool.el = Ext.DomHelper.append(this.el, this.toolTemplate.apply(this.tool), true);
+        }
+    }    
+});
+﻿/// <reference path="../../../content/javascript/ext/ext-core-debug.js"/>
+/// <reference path="../../../content/javascript/platform/Application.js"/>
+/// <reference path="../../../content/javascript/platform/Toolbar.js"/>
+
+Ext.namespace("Sage.Platform.Mobile");
+
+Sage.Platform.Mobile.FloatToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
+    barTemplate: new Simplate([
+        '<div class="{%= cls %}" style="visibility: hidden">',
+        '<div class="{%= containerCls %}">',
+        '</div>',        
+        '</div>'
+    ]),
+    toolTemplate: new Simplate([        
+        '<a target="_tool" href="#{%= $["name"] %}" class="{%= $["cls"] %}" style="display: {%= $["hidden"] ? "none" : "block" %}">',
+        '<img src="{%= $["icon"] %}" />',
+        '<span>{%= $["title"] %}</span>',
+        '</a>',
+    ]),
+    constructor: function(o) {
+        Sage.Platform.Mobile.MainToolbar.superclass.constructor.apply(this, arguments); 
+        
+        Ext.apply(this, o, {
+            expanded: false,
+            cls: 'toolbar-float',
+            containerCls: 'toolbar-float-container'
+        });
+        
+        this.tools = {};   
+    }, 
+    render: function() {
+        Sage.Platform.Mobile.FloatToolbar.superclass.render.call(this);
+        
+        this.containerEl = this.el.child('.' + this.containerCls);
+
+        this.setup();
+    },
+    init: function() {
+        Sage.Platform.Mobile.FloatToolbar.superclass.init.call(this);        
+
+        this.el
+            .on('click', function(evt, el, o) {
+                var source = Ext.get(el);
+                var target;
+
+                if (source.is('a[target="_tool"]') || (target = source.up('a[target="_tool"]')))
+                {
+                    evt.stopEvent();
+
+                    var name = (target || source).dom.hash.substring(1);
+
+                    if (this.tools.hasOwnProperty(name))
+                        this.execute(this.tools[name]);
+                }
+            }, this);
+        
+        Ext.fly(window)
+            .on("scroll", this.onBodyScroll, this, {buffer: 250})
+            .on("resize", this.onBodyScroll, this, {buffer: 250});
+    },
+    execute: function(tool) {
+        if (tool && tool.fn)
+            tool.fn.call(tool.scope || this);
+    },   
+    calculateY: function() {
+        var wH = window.innerHeight;
+        var sH = Ext.getBody().getScroll().top;
+        var eH = this.el.getHeight();
+
+        return (wH + sH) - eH - 8;
+    },
+    calculateNoVisY: function() {
+        var wH = window.innerHeight;
+        var sH = Ext.getBody().getScroll().top;
+
+        return wH + sH + 8;
+    },
+    setup: function() {              
+                
+    },
+    move: function(y, fx)
+    {
+        if (Ext.isGecko) 
+        { 
+            if (fx === false)
+            {
+                this.el.setStyle({
+                    'top': String.format('{0}px', y)
+                });
+            }
+            else
+            {
+                this.el.shift({
+                    y: y,
+                    easing: 'easeBothStrong',
+                    duration: .5,
+                    stopFx: true,
+                    callback: function() {
+                        this.el.setStyle({
+                            'right': '0px',
+                            'left': 'auto'
+                        });
+                    },
+                    scope: this   
+                });
+            } 
+        }
+        else
+        {
+            if (fx === false)
+            {
+                this.el.setStyle({
+                    '-webkit-transition': '-webkit-transform 0s linear',
+                    '-moz-transition': '-webkit-transform 0s linear'
+                });   
+            }
+            else
+            {
+                this.el.setStyle({
+                    '-webkit-transition': '-webkit-transform .4s ease-in-out',
+                    '-moz-transition': '-webkit-transform .4s ease-in-out'
+                });
+            }
+
+            this.el.setStyle({
+                '-webkit-transform': String.format('translateY({0}px)', y)
+            });
+        }
+    },    
+    onBodyScroll: function(evt, el, o)
+    {
+        this.move(this.calculateY());
+    },    
+    getToolEl: function(name) {
+        if (this.tools[name] && this.tools[name].el) 
+            return this.tools[name].el;
+        return null;
+    },
+    clear: function() {
+        this.el.hide();
+        this.containerEl.update('');        
+    },
+    show: function() {
+        this.el.show();
+    },
+    hide: function() {
+        this.el.hide();
+    },
+    display: function(tools) {
+        /* if there are no tools to display, hide this bar */
+        /* this toolbar only supports a single action */
+        if (tools.length > 0)
+        {
+            var content = [];
+            var width = 0;
+            for (var i = 0; i < tools.length; i++)
+            {
+                var tool = Ext.apply({}, tools[i]);
+
+                for (var p in tool)
+                    if (p !== 'fn' && typeof tool[p] === 'function')
+                        tool[p] = tool[p].call(tool.scope || this);
+
+                tool.el = Ext.DomHelper.append(this.containerEl, this.toolTemplate.apply(tool), true);
+
+                this.tools[tool.name] = tool;
+            }            
+
+            this.move(this.calculateNoVisY(), false);
+            this.el.show();
+            this.move(this.calculateY());
+        }
+    }    
+});
 ﻿/// <reference path="../ext/ext-core-debug.js"/>
 
 Ext.namespace('Sage.Platform.Mobile');
