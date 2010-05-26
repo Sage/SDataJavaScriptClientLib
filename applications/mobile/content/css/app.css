@@ -249,7 +249,7 @@ body[orient] > div.toolbar-float
     -moz-box-sizing: border-box;
 	display: block;
 	height: 50px;
-	width: auto;
+	width: 36px; /* was auto */
 	min-width: 36px;
 	position: absolute;	
 	top: 0px;
@@ -260,12 +260,37 @@ body[orient] > div.toolbar-float
 	padding: 0 0 0 36px;
 }
 
+body > div.toolbar-float[open],
+body[orient] > div.toolbar-float[open]
+{
+	width: auto; 
+	background-image: url(../images/arrow-right.png), -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0, rgb(44,44,44)),
+		color-stop(0.5, rgb(21,21,21)),
+		color-stop(0.5, rgb(49,49,49)),
+		color-stop(1, rgb(79,79,79))
+	);	
+	background-image: url(../images/arrow-right.png), -moz-linear-gradient(
+		center bottom,
+		rgb(44,44,44) 0%,
+		rgb(21,21,21) 50%,
+		rgb(49,49,49) 50%,
+		rgb(79,79,79) 100%
+	);
+}
+
 .toolbar-float 
-{			
+{				
+	/* overflow: hidden; */
+	
     -moz-border-radius-topleft: 8px;
     -webkit-border-top-left-radius: 8px;
     -moz-border-radius-bottomleft: 8px;
     -webkit-border-bottom-left-radius: 8px;
+    
 	background-image: url(../images/arrow-left.png), -webkit-gradient(
 		linear,
 		left bottom,
@@ -281,20 +306,34 @@ body[orient] > div.toolbar-float
 		rgb(21,21,21) 50%,
 		rgb(49,49,49) 50%,
 		rgb(79,79,79) 100%
-	);
+	);	
+	
 	background-position: 6px center, top left;
 	background-repeat: no-repeat, no-repeat;
-}
-
-.toolbar-float-fx
-{
+	
+	/* note: there is a bug with webkit with transitioning to 'auto' */
+	-webkit-transition-property: -webkit-transform; 
+	-webkit-transition-duration: 300ms;
+	-webkit-transition-delay: 0;
+	-webkit-transition-timing-function: ease-in-out;	
+	
+	-moz-transition-property: -moz-transform;
+	-moz-transition-duration: 300ms;
+	-moz-transition-delay: 0;
+	-moz-transition-timing-function: ease-in-out;	
+	
+	transition-property: transform;
+	transition-duration: 300ms;
+	transition-delay: 0;
+	transition-timing-function: ease-in-out;	
 }
 
 .toolbar-float-container
 {	
-	/* use with column-count (and width) for alternate layout method */
-	-moz-column-gap: 0px;
+	/* use with column-count (and width) for alternate layout method */	
 	-webkit-column-gap: 0px;
+	-moz-column-gap: 0px;
+	column-gap: 0px;
 	
 	height: 50px;	
 	
@@ -310,12 +349,12 @@ body[orient] > div.toolbar-float
  
     display: box;
     box-orient: horizontal;
-    -moz-box-pack: center;
-    -moz-box-align: center;
+    box-pack: center;
+    box-align: center;   
 }
 
 .toolbar-float-container a
-{
+{	
     color: #fff;
     width: 48px;
     text-align: center;

@@ -464,7 +464,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         Sage.Platform.Mobile.List.superclass.init.call(this);      
 
         this.el
-            .on('click', function(evt, el, o) {                
+            .on('click', function(evt, el, o) {                                
                 var source = Ext.get(el);
                 var target;
 
@@ -1384,6 +1384,23 @@ Sage.Platform.Mobile.Toolbar = Ext.extend(Ext.util.Observable, {
     },
     clear: function() {
     },
+    show: function() {
+        this.el.show();
+    },
+    hide: function() {
+        this.el.hide();
+    },
+    make: function(tool) {
+        var result = {};
+
+        for (var prop in tool)
+            if (prop !== 'fn' && typeof tool[prop] === 'function')
+                result[prop] = tool[prop].call(tool.scope || this);
+            else
+                result[prop] = tool[prop];
+
+        return result;
+    },
     display: function(tools) {        
     }
 });
@@ -1472,7 +1489,6 @@ Sage.Platform.Mobile.FloatToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
         Sage.Platform.Mobile.MainToolbar.superclass.constructor.apply(this, arguments); 
         
         Ext.apply(this, o, {
-            expanded: false,
             cls: 'toolbar-float',
             containerCls: 'toolbar-float-container'
         });
@@ -1483,8 +1499,6 @@ Sage.Platform.Mobile.FloatToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
         Sage.Platform.Mobile.FloatToolbar.superclass.render.call(this);
         
         this.containerEl = this.el.child('.' + this.containerCls);
-
-        this.setup();
     },
     init: function() {
         Sage.Platform.Mobile.FloatToolbar.superclass.init.call(this);        
@@ -1493,21 +1507,35 @@ Sage.Platform.Mobile.FloatToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
             .on('click', function(evt, el, o) {
                 var source = Ext.get(el);
                 var target;
-
-                if (source.is('a[target="_tool"]') || (target = source.up('a[target="_tool"]')))
+               
+                if (source.hasClass(this.cls))
+                {                    
+                    this.toggle();
+                }
+                else if (source.is('a[target="_tool"]') || (target = source.up('a[target="_tool"]')))
                 {
-                    evt.stopEvent();
-
                     var name = (target || source).dom.hash.substring(1);
 
                     if (this.tools.hasOwnProperty(name))
                         this.execute(this.tools[name]);
-                }
-            }, this);
+                }                
+            }, this, { preventDefault: true, stopPropagation: true });
         
         Ext.fly(window)
-            .on("scroll", this.onBodyScroll, this, {buffer: 250})
-            .on("resize", this.onBodyScroll, this, {buffer: 250});
+            .on("scroll", this.onBodyScroll, this, {buffer: 125})
+            .on("resize", this.onBodyScroll, this, {buffer: 125});
+    },
+    open: function() {
+        this.el.dom.setAttribute('open', 'open');
+    },
+    close: function() {
+        this.el.dom.removeAttribute('open');
+    },
+    toggle: function() {
+        if (this.el.getAttribute('open') === 'open')
+            this.close();
+        else
+            this.open();
     },
     execute: function(tool) {
         if (tool && tool.fn)
@@ -1525,10 +1553,7 @@ Sage.Platform.Mobile.FloatToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
         var sH = Ext.getBody().getScroll().top;
 
         return wH + sH + 8;
-    },
-    setup: function() {              
-                
-    },
+    },   
     move: function(y, fx)
     {
         if (Ext.isGecko) 
@@ -1557,21 +1582,23 @@ Sage.Platform.Mobile.FloatToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
             } 
         }
         else
-        {
+        {            
             if (fx === false)
             {
                 this.el.setStyle({
-                    '-webkit-transition': '-webkit-transform 0s linear',
-                    '-moz-transition': '-webkit-transform 0s linear'
+                    '-webkit-transition-property': 'none',
+                    '-moz-transition-property': 'none',
+                    'transition-property': 'none'
                 });   
             }
             else
             {
                 this.el.setStyle({
-                    '-webkit-transition': '-webkit-transform .4s ease-in-out',
-                    '-moz-transition': '-webkit-transform .4s ease-in-out'
+                    '-webkit-transition-property': 'inherit',
+                    '-moz-transition-property': 'inherit',
+                    'transition-property': 'inherit'
                 });
-            }
+            }                       
 
             this.el.setStyle({
                 '-webkit-transform': String.format('translateY({0}px)', y)
@@ -1590,13 +1617,7 @@ Sage.Platform.Mobile.FloatToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
     clear: function() {
         this.el.hide();
         this.containerEl.update('');        
-    },
-    show: function() {
-        this.el.show();
-    },
-    hide: function() {
-        this.el.hide();
-    },
+    },    
     display: function(tools) {
         /* if there are no tools to display, hide this bar */
         /* this toolbar only supports a single action */
@@ -1606,19 +1627,15 @@ Sage.Platform.Mobile.FloatToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
             var width = 0;
             for (var i = 0; i < tools.length; i++)
             {
-                var tool = Ext.apply({}, tools[i]);
-
-                for (var p in tool)
-                    if (p !== 'fn' && typeof tool[p] === 'function')
-                        tool[p] = tool[p].call(tool.scope || this);
+                var tool = this.make(tools[i]);
 
                 tool.el = Ext.DomHelper.append(this.containerEl, this.toolTemplate.apply(tool), true);
 
                 this.tools[tool.name] = tool;
             }            
 
-            this.move(this.calculateNoVisY(), false);
-            this.el.show();
+            this.move(this.calculateNoVisY(), false); 
+            this.el.show();                       
             this.move(this.calculateY());
         }
     }    

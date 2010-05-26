@@ -33,6 +33,23 @@ Sage.Platform.Mobile.Toolbar = Ext.extend(Ext.util.Observable, {
     },
     clear: function() {
     },
+    show: function() {
+        this.el.show();
+    },
+    hide: function() {
+        this.el.hide();
+    },
+    make: function(tool) {
+        var result = {};
+
+        for (var prop in tool)
+            if (prop !== 'fn' && typeof tool[prop] === 'function')
+                result[prop] = tool[prop].call(tool.scope || this);
+            else
+                result[prop] = tool[prop];
+
+        return result;
+    },
     display: function(tools) {        
     }
 });

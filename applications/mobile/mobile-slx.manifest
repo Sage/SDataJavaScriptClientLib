@@ -1,5 +1,5 @@
 ﻿CACHE MANIFEST
-# version 7
+# version 8
 CACHE:
 index-slx.html
 content/css/app.css
@@ -9,6 +9,8 @@ content/images/loading-arrows-white-button.gif
 content/images/loading-indicator-tool-button.gif
 content/images/loading-indicator-white.gif
 content/images/loading-indicator-white-button.gif
+content/images/arrow-left.png
+content/images/arrow-right.png
 products/slx/css/app.css
 products/slx/images/icon.png
 products/slx/images/loading.png

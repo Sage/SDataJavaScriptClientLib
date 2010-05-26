@@ -69,7 +69,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         Sage.Platform.Mobile.List.superclass.init.call(this);      
 
         this.el
-            .on('click', function(evt, el, o) {                
+            .on('click', function(evt, el, o) {                                
                 var source = Ext.get(el);
                 var target;
 
