@@ -39,19 +39,35 @@ Sage.Platform.Mobile.FloatToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
             .on('click', function(evt, el, o) {
                 var source = Ext.get(el);
                 var target;
-               
-                if (source.hasClass(this.cls))
-                {                    
-                    this.toggle();
-                }
-                else if (source.is('a[target="_tool"]') || (target = source.up('a[target="_tool"]')))
+                               
+                if (source.is('a[target="_tool"]') || (target = source.up('a[target="_tool"]')))
                 {
                     var name = (target || source).dom.hash.substring(1);
 
                     if (this.tools.hasOwnProperty(name))
                         this.execute(this.tools[name]);
                 }                
+                else
+                {
+                    this.toggle();
+                }
             }, this, { preventDefault: true, stopPropagation: true });
+
+        //if (/android/i.test(navigator.userAgent))
+        //{
+            this.el.dom.addEventListener('click', (function(evt) {
+                console.log(evt);
+                if (Ext.get(evt.target).hasClass(this.cls))
+                {                    
+                    this.toggle();
+                    
+                    if (evt.preventBubble) evt.preventBubble();
+                    if (evt.preventDefault) evt.preventDefault();
+	                if (evt.stopPropagation) evt.stopPropagation();                        
+                    if (evt.stopImmediatePropagation) evt.stopImmediatePropagation();
+                }  
+            }).createDelegate(this), true); /* we want to capture click */
+        //}
         
         Ext.fly(window)
             .on("scroll", this.onBodyScroll, this, {buffer: 125})

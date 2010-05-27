@@ -33,9 +33,11 @@ Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {
             title: 'Mobile Demo'
         }));
 
+        /*
         this.registerToolbar(new Sage.Platform.Mobile.FloatToolbar({
             name: 'fbar' 
         }));
+        */
 
         this.registerView(new Mobile.SalesLogix.LoginDialog());
         this.registerView(new Mobile.SalesLogix.SearchDialog());
