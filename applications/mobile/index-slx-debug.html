@@ -51,18 +51,16 @@
     <script type="text/javascript" src="products/slx/javascript/views/contact/Detail.js"></script>
     <script type="text/javascript" src="products/slx/javascript/views/opportunity/List.js"></script>
     <script type="text/javascript" src="products/slx/javascript/views/opportunity/Detail.js"></script>
+    
+    <!-- uncomment one of the following to force the app to connect to the specified sdata environment -->
+    <!--
+    <script type="text/javascript" src="products/slx/environment/cloud-insights.js"></script>
+    -->
+
     <script type="text/javascript">
     Ext.onReady(function() {  
         App.init(); 
-        iui.init();
-             
-        Ext.getBody().on('hold', function(evt, el, o) {
-            console.log('hold: %s', el.hash);
-        }, this, {delegate: 'a'});
-
-        Ext.getBody().on('clicklong', function(evt, el, o) {
-            console.log('clicklong: %s', el.hash);
-        }, this, {delegate: 'a'});
+        iui.init();                    
     });
     </script>
 </head>

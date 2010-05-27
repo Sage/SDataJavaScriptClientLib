@@ -284,7 +284,7 @@ body[orient] > div.toolbar-float[open]
 
 .toolbar-float 
 {				
-	/* overflow: hidden; */
+	overflow: hidden;
 	
     -moz-border-radius-topleft: 8px;
     -webkit-border-top-left-radius: 8px;

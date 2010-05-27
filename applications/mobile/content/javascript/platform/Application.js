@@ -115,7 +115,20 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     init: function() { 
         /// <summary>
         ///     Initializes this application as well as the toolbar and all currently registered views.
-        /// </summary>
+        /// </summary>        
+        this.service = new Sage.SData.Client.SDataService()        
+            .setServerName(this.serverName)            
+            .setVirtualDirectory(this.virtualDirectory)
+            .setApplicationName(this.applicationName)
+            .setContractName(this.contractName)
+            .setIncludeContent(false);
+
+        if (this.port !== false)
+            this.service.setPort(this.port);
+
+        if (this.protocol !== false)
+            this.service.setProtocol(this.protocol);
+
         this.setup();
 
         for (var n in this.bars) 
@@ -231,59 +244,60 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
 });
 
 /* DOM event extensions */
-(function(){   
-    var hold; 
-    var touch;
-    var prevent;
-    var dispatch = function(el, type, bubble, cancel) {
-        var evt = document.createEvent("UIEvent");
+/* not quite ready for prime time yet */
+//(function(){   
+//    var hold; 
+//    var touch;
+//    var prevent;
+//    var dispatch = function(el, type, bubble, cancel) {
+//        var evt = document.createEvent("UIEvent");
 
-        evt.initEvent(type, bubble, cancel);
-        
-        el.dispatchEvent(evt);
-    };
-    var handleTouchStart = function(evt, el, o) {
-        hold = setTimeout(dispatch.createDelegate(this, [el, 'hold', true, true]), 1500);
-        touch = (new Date()).getTime();
-    };
-    var handleTouchEnd = function(evt, el, o) {
-        clearTimeout(hold);
+//        evt.initEvent(type, bubble, cancel);
+//        
+//        el.dispatchEvent(evt);
+//    };
+//    var handleTouchStart = function(evt, el, o) {
+//        hold = setTimeout(dispatch.createDelegate(this, [el, 'hold', true, true]), 1500);
+//        touch = (new Date()).getTime();
+//    };
+//    var handleTouchEnd = function(evt, el, o) {
+//        clearTimeout(hold);
 
-        var duration = (new Date()).getTime() - touch;
-        if (duration > 1000) 
-        {            
-            prevent = true;
+//        var duration = (new Date()).getTime() - touch;
+//        if (duration > 1000) 
+//        {            
+//            prevent = true;
 
-            evt.stopEvent();
+//            evt.stopEvent();
 
-            dispatch.call(this, el, 'clicklong', true, true);            
-        }
-    };
-    var handleClick = function(evt) {
-        if (prevent)
-        {          	        
-            if (evt.preventBubble) evt.preventBubble();
-            if (evt.preventDefault) evt.preventDefault();
-	        if (evt.stopPropagation) evt.stopPropagation();                        
-            if (evt.stopImmediatePropagation) evt.stopImmediatePropagation();
+//            dispatch.call(this, el, 'clicklong', true, true);            
+//        }
+//    };
+//    var handleClick = function(evt) {
+//        if (prevent)
+//        {          	        
+//            if (evt.preventBubble) evt.preventBubble();
+//            if (evt.preventDefault) evt.preventDefault();
+//	        if (evt.stopPropagation) evt.stopPropagation();                        
+//            if (evt.stopImmediatePropagation) evt.stopImmediatePropagation();
 
-            prevent = false;
+//            prevent = false;
 
-            return false;
-        } 
-    }; 
+//            return false;
+//        } 
+//    }; 
 
-    if (typeof window.orientation === 'undefined')
-    {    
-        Ext.getBody().on('mousedown', handleTouchStart);
-        Ext.getBody().on('mouseup', handleTouchEnd);
-    } 
-    else
-    {
-        Ext.getBody().on('touchstart', handleTouchStart);
-        Ext.getBody().on('touchend', handleTouchEnd);
-    }
+//    if (typeof window.orientation === 'undefined')
+//    {    
+//        Ext.getBody().on('mousedown', handleTouchStart);
+//        Ext.getBody().on('mouseup', handleTouchEnd);
+//    } 
+//    else
+//    {
+//        Ext.getBody().on('touchstart', handleTouchStart);
+//        Ext.getBody().on('touchend', handleTouchEnd);
+//    }
 
-    /* todo: this will not work on IE, not that anything else will either, on current versions */    
-    Ext.getBody().dom.addEventListener('click', handleClick, true); /* we want to capture click */
-})();
+//    /* todo: this will not work on IE, not that anything else will either, on current versions */    
+//    Ext.getBody().dom.addEventListener('click', handleClick, true); /* we want to capture click */
+//})();

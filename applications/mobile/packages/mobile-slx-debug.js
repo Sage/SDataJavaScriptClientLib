@@ -8,39 +8,38 @@
 Ext.namespace("Mobile.SalesLogix");
 
 Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {
-    constructor: function () {
+    defaultServerName: window.location.hostname,
+    defaultVirtualDirectory: 'sdata',
+    defaultApplicationName: 'slx',
+    defaultContractName: 'dynamic',
+    defaultPort: window.location.port && window.location.port != 80 ? window.location.port : false,
+    defaultProtocol: /https/i.test(window.location.protocol) ? 'https' : false,
+    titleText: 'Mobile Demo',
+    constructor: function (o) {
         Mobile.SalesLogix.Application.superclass.constructor.call(this);
 
-        this.enableCaching = true;
-        this.service = new Sage.SData.Client.SDataService();
-        this.service
-            .setServerName(window.location.hostname)            
-            .setVirtualDirectory('sdata')
-            .setApplicationName('slx')
-            .setContractName('dynamic')
-            .setIncludeContent(false);
-
-        if (window.location.port && window.location.port != 80)
-            this.service.setPort(window.location.port);
-
-        if (/https/i.test(window.location.protocol))
-            this.service.setProtocol('https');
-
-        this.context = {};
+        Ext.apply(this, o, {
+            enableCaching: true,
+            context: {},
+            serverName: this.defaultServerName,
+            virtualDirectory: this.defaultVirtualDirectory,
+            applicationName: this.defaultApplicationName,
+            contractName: this.defaultContractName,
+            port: this.defaultPort,
+            protocol: this.defaultProtocol
+        });
     },
     setup: function () {
         Mobile.SalesLogix.Application.superclass.setup.apply(this, arguments);
 
         this.registerToolbar(new Sage.Platform.Mobile.MainToolbar({
             name: 'tbar',
-            title: 'Mobile Demo'
+            title: this.titleText
         }));
-
-        /*
+        
         this.registerToolbar(new Sage.Platform.Mobile.FloatToolbar({
             name: 'fbar' 
         }));
-        */
 
         this.registerView(new Mobile.SalesLogix.LoginDialog());
         this.registerView(new Mobile.SalesLogix.SearchDialog());

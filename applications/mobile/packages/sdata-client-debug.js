@@ -677,7 +677,7 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
         /// <param name="request" type="Sage.SData.Client.SDataResourceCollectionRequest">request object</param>          
         this.executeRequest(request, options, {
             headers: {
-                'Accept': 'application/atom+xml;type=feed'
+                'Accept': 'application/atom+xml;type=feed,*/*'
             }
         });
     },   
@@ -694,7 +694,7 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
 
         this.executeRequest(request, o, {
             headers: {
-                'Accept': 'application/atom+xml;type=entry'
+                'Accept': 'application/atom+xml;type=entry,*/*'
             }
         });
     },
@@ -717,7 +717,7 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
             xmlData: body,
             headers: {
                 'Content-Type': 'application/atom+xml;type=entry',
-                'Accept': 'application/atom+xml;type=entry',
+                'Accept': 'application/atom+xml;type=entry,*/*',
                 'If-Match': entry['$etag']
             }
         });

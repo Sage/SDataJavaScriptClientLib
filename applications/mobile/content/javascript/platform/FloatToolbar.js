@@ -17,6 +17,9 @@ Sage.Platform.Mobile.FloatToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
         '<span>{%= $["title"] %}</span>',
         '</a>',
     ]),
+    androidFixTemplate: new Simplate([
+        '<a target="_none" href="#" class="android-webkit-fix"></a>'
+    ]),
     constructor: function(o) {
         Sage.Platform.Mobile.MainToolbar.superclass.constructor.apply(this, arguments); 
         
@@ -35,39 +38,73 @@ Sage.Platform.Mobile.FloatToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
     init: function() {
         Sage.Platform.Mobile.FloatToolbar.superclass.init.call(this);        
 
-        this.el
-            .on('click', function(evt, el, o) {
-                var source = Ext.get(el);
-                var target;
-                               
-                if (source.is('a[target="_tool"]') || (target = source.up('a[target="_tool"]')))
-                {
-                    var name = (target || source).dom.hash.substring(1);
+        if (/android/i.test(navigator.userAgent))
+        {   
+            /*
+             * there is an issue with click "bleed through" on absolutely positioned elements on 
+             * android devices which is why we need to go though the trouble of preventing the actual 
+             * click event.
+             * see: http://code.google.com/p/android/issues/detail?id=6721             
+             */         
+            var prevent = false;
 
-                    if (this.tools.hasOwnProperty(name))
-                        this.execute(this.tools[name]);
-                }                
-                else
-                {
-                    this.toggle();
-                }
-            }, this, { preventDefault: true, stopPropagation: true });
+            this.el
+                .on('touchstart', function(evt, el, o) {                    
+                    var source = Ext.get(el);
+                    var target;
 
-        //if (/android/i.test(navigator.userAgent))
-        //{
-            this.el.dom.addEventListener('click', (function(evt) {
-                console.log(evt);
-                if (Ext.get(evt.target).hasClass(this.cls))
-                {                    
-                    this.toggle();
-                    
+                    prevent = true;
+         
+                    if (source.is('a[target="_tool"]') || (target = source.up('a[target="_tool"]')))
+                    {
+                        var name = (target || source).dom.hash.substring(1);
+
+                        if (this.tools.hasOwnProperty(name))
+                            this.execute(this.tools[name]);
+                    }                
+                    else if (source.is('.' + this.cls) || (target = source.up('.' + this.cls)))
+                    {
+                        this.toggle();
+                    }
+
+                }, this);
+
+            var handleClick = function(evt) {
+                if (prevent)
+                {          	        
                     if (evt.preventBubble) evt.preventBubble();
                     if (evt.preventDefault) evt.preventDefault();
 	                if (evt.stopPropagation) evt.stopPropagation();                        
                     if (evt.stopImmediatePropagation) evt.stopImmediatePropagation();
-                }  
-            }).createDelegate(this), true); /* we want to capture click */
-        //}
+
+                    prevent = false;
+
+                    return false;
+                } 
+            }; 
+        
+            Ext.getBody().dom.addEventListener('click', handleClick, true); /* capture phase */
+        }
+        else
+        {
+            this.el
+                .on('click', function(evt, el, o) {                    
+                    var source = Ext.get(el);
+                    var target;
+                               
+                    if (source.is('a[target="_tool"]') || (target = source.up('a[target="_tool"]')))
+                    {
+                        var name = (target || source).dom.hash.substring(1);
+
+                        if (this.tools.hasOwnProperty(name))
+                            this.execute(this.tools[name]);
+                    }                
+                    else if (source.is('.' + this.cls) || (target = source.up('.' + this.cls)))
+                    {
+                        this.toggle();
+                    }
+                }, this, { preventDefault: true, stopPropagation: true });
+        }       
         
         Ext.fly(window)
             .on("scroll", this.onBodyScroll, this, {buffer: 125})
