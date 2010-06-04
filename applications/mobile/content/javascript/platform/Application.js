@@ -67,25 +67,17 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     isOnline: function() {
         return window.navigator.onLine;
     },
-    clearSDataRequestCache: function() {   
+    clearSDataRequestCache: function() { 
         var check = function(k) {
-            if (/^\[sdata\]\:/i.test(k))
-            {
-                window.localStorage.removeItem(k);
-            }
+            return /^\[sdata\]/i.test(k);
         };
-        
-        /* firefox currently does not support standard iteration over storage classes */
+                
         /* todo: find a better way to detect */
-        if (Ext.isGecko) 
+        for (var i = window.localStorage.length - 1; i >= 0 ; i--) 
         {
-            for (var i = 0; i < window.localStorage.length; i++) 
-                check(window.localStorage.key(i));
-        }
-        else
-        {     
-            for (var key in window.localStorage) 
-                check(key);            
+            var key = window.localStorage.key(i);
+            if (check(key))
+                window.localStorage.removeItem(key);
         }
     },
     createCacheKey: function(request) {
@@ -169,21 +161,13 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         return this.views;
     },
     getActiveView: function() {
-        /// <returns type="Sage.Platform.Mobile.View">The currently active view.</returns>
-        var el = iui.getCurrentPage() || iui.getCurrentDialog();
+        /// <returns type="Sage.Platform.Mobile.View">The currently active view.</returns>        
+        var el = ReUI.getCurrentPage() || ReUI.getCurrentDialog();
         if (el)
             return this.getView(el);
 
         return null;
-    },
-    getPreviousView: function() {
-        /// <returns type="Sage.Platform.Mobile.View">The previously active view.</returns>
-        var el = iui.getPreviousPage();
-        if (el)
-            return this.getView(el);
-
-        return null;
-    },
+    },    
     getView: function(key) {
         /// <returns type="Sage.Platform.Mobile.View">The requested view.</returns>
         /// <param name="key" type="String">

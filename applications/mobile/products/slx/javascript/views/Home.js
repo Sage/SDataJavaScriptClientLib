@@ -1,5 +1,5 @@
 ﻿/// <reference path="../../../ext/ext-core-debug.js"/>
-/// <reference path="../../../iui/iui.js"/>
+/// <reference path="../../../reui/reui.js"/>
 /// <reference path="../../../platform/View.js"/>
 /// <reference path="Application.js"/>
 
@@ -71,7 +71,12 @@ Mobile.SalesLogix.Home = Ext.extend(Sage.Platform.Mobile.View, {
         {
             var user = App.getService().getUserName();
             if (!user || !user.length)
-                iui.showPageById("login_dialog");
+            {
+                var view = App.getView('login_dialog');
+                if (view)
+                    view.show();
+            }
+                //ReUI.show("login_dialog");
         }
     }   
 });

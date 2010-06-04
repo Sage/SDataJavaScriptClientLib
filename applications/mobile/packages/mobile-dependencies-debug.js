@@ -789,702 +789,760 @@ which I will do instead of keeping this documentation like it is.
     
     Simplate.options = options;
     Simplate.encode = encode;
-})();/*
-   Copyright (c) 2007-9, iUI Project Members
-   See LICENSE.txt for licensing terms
-   Version 0.40-dev2
-
-   This is a modified version of iUI v0.40-dev2.  It includes additional features and bug fixes required by
-   the SData Mobile Application Framework.
- */
-
+})();/*!
+* ReUI v1.0
+* Copyright 2010, Michael Morton
+*
+* MIT Licensed - See LICENSE
+*
+* Sections of this code are Copyright (c) 2007-2009, iUI Project Members, and are
+* licensed under the terms of the BSD license (see LICENSE.iUI).
+*/
+ReUI = {};
 
 (function() {
+    var R = ReUI,
+        isIE = /msie/i.test(navigator.userAgent),
+        reForClassCache = {};
 
-var slideSpeed = 20;
-var slideInterval = 0;
+    var reForClass = function(cls) {
+        return reForClassCache[cls] 
+            ? (reForClassCache[cls])
+            : (reForClassCache[cls] = new RegExp('(^|\\s)' + cls + '($|\\s)'));
+    };
 
-var currentPage = null;
-var currentDialog = null;
-var currentWidth = 0;
-var currentHeight = 0;
-var currentHash = location.hash;
-var hashPrefix = "#_";
-var pageHistory = [];
-var newPageCount = 0;
-var checkTimer;
-var hasOrientationEvent = false;
-var portraitVal = "portrait";
-var landscapeVal = "landscape";
+    ReUI.DomHelper = {
+        apply: function (a, b, c) {
+            var a = a || {};
 
-// *************************************************************************************************
+            if (b) for (var n in b) a[n] = b[n];
+            if (c) for (var n in c) a[n] = c[n];
 
-window.iui =
-{
-	animOn: true,	// Slide animation with CSS transition is now enabled by default where supported
-
-    delayInit: false,
-
-	httpHeaders: {
-	    "X-Requested-With" : "XMLHttpRequest"
-	},
-
-    getCurrentPage: function() {
-        return currentPage;
-    }, 
-
-    getPreviousPage: function() {
-        if (pageHistory.length > 2)
-        {
-            return  $(pageHistory[pageHistory.length - 2]); /* top is -1, prev is -2 */
-        }
-        return null;
-    },
-        
-    getCurrentDialog: function() {
-        return currentDialog;
-    },
-
-    getPageHistory: function() {
-        return pageHistory;
-    },
-
-	showPage: function(page, backwards)
-	{
-		if (page)
-		{
-//			if (window.iui_ext)	window.iui_ext.injectEventMethods(page);	// TG
-			
-			if (currentDialog)
-			{
-				currentDialog.removeAttribute("selected");
-				// EVENT blur->currentDialog
-				sendEvent("blur", currentDialog);
-				currentDialog = null;
-			}
-
-			if (hasClass(page, "dialog"))
-			{
-			    // EVENT focus->page
-				sendEvent("focus", page);
-				showDialog(page);
-			}
-			else
-			{
-				sendEvent("load", page);    // 127(stylesheet), 128(script), 129(onload)
-			                                    // 130(onFocus), 133(loadActionButton)
-				var fromPage = currentPage;
-				// EVENT blur->currentPage
-				sendEvent("blur", currentPage);
-				currentPage = page;
-				// EVENT focus->currentPage
-				sendEvent("focus", page);
-
-				if (fromPage)
-				{
-				    if (backwards) sendEvent("unload", fromPage);
-					setTimeout(slidePages, 0, fromPage, page, backwards);
-				}
-				else
-				{
-					updatePage(page, fromPage);
-				}
-					
-			}
-		}
-	},
-
-	showPageById: function(pageId)
-	{
-		var page = $(pageId);
-		if (page)
-		{
-			var index = pageHistory.indexOf(pageId);
-			var backwards = index != -1;
-			if (backwards)
-			{
-				// we're going back, remove history from index on
-				// remember - pageId will be added again in updatePage
-				pageHistory.splice(index);
-			}
-
-			iui.showPage(page, backwards);
-		}
-	},
-	
-	goBack: function()
-	{
-		pageHistory.pop();	// pop current page
-		var pageID = pageHistory.pop();  // pop/get parent
-		var page = $(pageID);
-		iui.showPage(page, true);
-	},
-
-	showPageByHref: function(href, args, method, replace, cb)
-	{
-	  // I don't think we need onerror, because readstate will still go to 4 in that case
-	  function spbhCB(xhr) 
-	  {
-		if (xhr.readyState == 4)
-		{
-		  // Add 'if (xhr.responseText)' to make sure we have something???
-		  var frag = document.createElement("div");
-		  frag.innerHTML = xhr.responseText;
-          // EVENT beforeInsert->body
-          sendEvent("beforeinsert", document.body, {fragment:frag})
-          if (replace)
-		  {
-			  replaceElementWithFrag(replace, frag);
-		  }
-		  else
-		  {
-			  iui.insertPages(frag);
-		  }
-		  if (cb)
-			setTimeout(cb, 1000, true);
-		}
-	  };
-	  iui.ajax(href, args, method, spbhCB);
-	},
-	
-	// Callback function gets a single argument, the XHR
-	ajax: function(url, args, method, cb)
-	{
-        var xhr = new XMLHttpRequest();
-        method = method ? method.toUpperCase() : "GET";
-        if (args && method == "GET")
-        {
-          url =  url + "?" + iui.param(args);
-        }
-        xhr.open(method, url, true);
-        if (cb)
-        {
-        xhr.onreadystatechange = function() { cb(xhr); };
-        }
-        var data = null;
-        if (args && method != "GET")
-        {
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            data = iui.param(args);
-        }
-        for (var header in iui.httpHeaders)
-        {
-            xhr.setRequestHeader(header, iui.httpHeaders[header]);
-        }
-        xhr.send(data);
-	},
-	
-	// Thanks, jQuery
-	//	stripped-down, simplified, object-only version
-	param: function( o )
-	{
-	  var s = [ ];
-	
-	  // Serialize the key/values
-	  for ( var key in o )
-		s[ s.length ] = encodeURIComponent(key) + '=' + encodeURIComponent(o[key]);
-  
-	  // Return the resulting serialization
-	  return s.join("&").replace(/%20/g, "+");
-	},
-
-	insertPages: function(frag)
-	{
-		var nodes = frag.childNodes;
-		var targetPage;
-		for (var i = 0; i < nodes.length; ++i)
-		{
-			var child = nodes[i];
-			if (child.nodeType == 1)
-			{
-				if (!child.id)
-					child.id = "__" + (++newPageCount) + "__";
-
-				var clone = $(child.id);
-				var docNode;
-				if (clone) {
-					clone.parentNode.replaceChild(child, clone);
-				    docNode = $(child.id);
-			    }
-				else
-					docNode = document.body.appendChild(child);
-					
-				sendEvent("afterinsert", document.body, {insertedNode:docNode});   
-
-
-				if (child.getAttribute("selected") == "true" || !targetPage)
-					targetPage = child;
-				
-				--i;
-			}
-		}
-		if (targetPage)
-			iui.showPage(targetPage);
-
-	},
-
-	getSelectedPage: function()
-	{
-		for (var child = document.body.firstChild; child; child = child.nextSibling)
-		{
-			if (child.nodeType == 1 && child.getAttribute("selected") == "true")
-				return child;
-		}	 
-	},
-	isNativeUrl: function(href)
-	{
-		for(var i = 0; i < iui.nativeUrlPatterns.length; i++)
-		{
-			if(href.match(iui.nativeUrlPatterns[i])) return true;
-		}
-		return false;
-	},
-	nativeUrlPatterns: [
-		new RegExp("^http:\/\/maps.google.com\/maps\?"),
-		new RegExp("^mailto:"),
-		new RegExp("^tel:"),
-		new RegExp("^http:\/\/www.youtube.com\/watch\\?v="),
-		new RegExp("^http:\/\/www.youtube.com\/v\/"),
-		new RegExp("^javascript:"),
-
-	],
-	hasClass: function(self, name)
-	{
-		var re = new RegExp("(^|\\s)"+name+"($|\\s)");
-		return re.exec(self.getAttribute("class")) != null;
-	},
-		
-	addClass: function(self, name)
-	{
-	  if (!iui.hasClass(self,name)) self.className += " "+name;
-	},
-		
-	removeClass: function(self, name)
-	{
-	  if (iui.hasClass(self,name)) {
-		  var reg = new RegExp('(\\s|^)'+name+'(\\s|$)');
-		self.className=self.className.replace(reg,' ');
-	  }
-	},
-
-    init: function() {
-        var page = iui.getSelectedPage();
-	    var locPage = getPageFromLoc();    
-		
-	    if (page)
-			    iui.showPage(page);
-	
-	    if (locPage && (locPage != page))
-		    iui.showPage(locPage);
-	
-	    setTimeout(preloadImages, 0);
-	    if (typeof window.onorientationchange == "object")
-	    {
-		    window.onorientationchange=orientChangeHandler;
-		    hasOrientationEvent = true;
-		    setTimeout(orientChangeHandler, 0);
-	    }
-	    setTimeout(checkOrientAndLocation, 0);
-	    checkTimer = setInterval(checkOrientAndLocation, 300);
-    }
-};
-
-// *************************************************************************************************
-
-addEventListener("load", function(event)
-{
-    if (!iui.delayInit) iui.init();
-}, false);
-
-addEventListener("unload", function(event)
-{
-	return;
-}, false);
-	
-addEventListener("click", function(event)
-{
-	var link = findParent(event.target, "a");
-	if (link)
-	{
-		function unselect() { link.removeAttribute("selected"); }
-		
-		if (link.href && link.hash && link.hash != "#" && !link.target)
-		{
-			link.setAttribute("selected", "true");
-			iui.showPage($(link.hash.substr(1)));
-			setTimeout(unselect, 500);
-		}
-		else if (link == $("backButton"))
-		{
-			iui.goBack();
-		}
-		else if (link.getAttribute("type") == "submit")
-		{
-			var form = findParent(link, "form");
-			if (form.target == "_self")
-			{
-			    form.submit();
-			    return;  // allow default
-			}
-			submitForm(form);
-		}
-		else if (link.getAttribute("type") == "cancel")
-		{
-			cancelDialog(findParent(link, "form"));
-		}
-		else if (link.target == "_replace")
-		{
-			link.setAttribute("selected", "progress");
-			iui.showPageByHref(link.href, null, "GET", link, unselect);
-		}
-		else if (iui.isNativeUrl(link.href))
-		{
-			return;
-		}
-		else if (link.target == "_webapp")
-		{
-			location.href = link.href;
-		}
-		else if (!link.target)
-		{
-			link.setAttribute("selected", "progress");
-			iui.showPageByHref(link.href, null, "GET", null, unselect);
-		}
-		else
-			return;
-		
-		event.preventDefault();		   
-	}
-}, true);
-
-addEventListener("click", function(event)
-{
-	var div = findParent(event.target, "div");
-	if (div && hasClass(div, "toggle"))
-	{
-		div.setAttribute("toggled", div.getAttribute("toggled") != "true");
-		event.preventDefault();		   
-	}
-}, true);
-
-function sendEvent(type, node, props, bubble, cancel)
-{
-    if (node)
-    {
-        var event = document.createEvent("UIEvent");
-        event.initEvent(type, bubble || false, cancel || false);  // no bubble, no cancel
-        if (props)
-        {
-            for (i in props)
+            return a;
+        }, 
+        dispatch: function(el, type, bubble, cancel, o) {
+            if (typeof cancel === 'object')
             {
-                event[i] = props[i];
+                var o = cancel;
+                var cancel = true;
+            }
+            else if (typeof bubble === 'object')
+            {
+                var o = bubble;
+                var bubble = true;
+                var cancel = true;    
+            }
+
+            var o = o || {};
+
+            var evt = document.createEvent("UIEvent");
+
+            evt.initEvent(type, bubble === false ? false : true, cancel === false ? false : true);
+
+            this.apply(evt, o);
+        
+            el.dispatchEvent(evt);
+        },
+        bind: isIE 
+            ? function(target, type, fn) {
+                target.attachEvent(type, fn);
+            }
+            : function(target, type, fn, capture) {        
+                target.addEventListener(type, fn, capture);
+            },
+        unbind: isIE
+            ? function(target, type, fn) {
+                target.detachEvent(type, fn);
+            }
+            : function(target, type, fn, capture) {
+                target.removeEventListener(type, fn, capture);
+            },
+        wait: isIE 
+            ? function(fn, delay) {
+                var pass = Array.prototype.slice.call(arguments, 2);
+                setTimeout(function() {
+                    fn.apply(this, pass);
+                }, delay);
+            }
+            : function() {
+                return setTimeout.apply(window, arguments);
+            },
+        clearWait: function() {
+            clearTimeout.apply(window, arguments);
+        },
+        timer: isIE 
+            ? function(fn, delay) {
+                var pass = Array.prototype.slice.call(arguments, 2);
+                setInterval(function() {
+                    fn.apply(this, pass);
+                }, delay);
+            }
+            : function() {
+                return setInterval.apply(window, arguments);
+            },
+        clearTimer: function() {
+            clearInterval.apply(window, arguments);
+        },
+        hasClass: function(el, cls) {
+            return reForClass(cls).test(el.className);
+        },
+        addClass: function(el, cls) {
+            if (this.hasClass(el, cls) == false) el.className += ' ' + cls;            
+        },
+        removeClass: function(el, cls) {
+            if (this.hasClass(el, cls)) el.className = el.className.replace(reForClass(cls), ' ');
+        },
+        get: function(el) {
+            if (typeof el === 'string') return document.getElementById(el);
+
+            return el;
+        },
+        findAncestorByTag: function(node, name) {
+            while (node && (node.nodeType != 1 || node.localName.toLowerCase() != name))
+                node = node.parentNode;
+            return node;
+        },
+        select: function(el) {
+            el.setAttribute('selected', 'true');
+        },
+        unselect: function(el) {
+            el.removeAttribute('selected');
+        },
+        applyStyle: function(el, style) {
+            this.apply(el.style, style);
+        }
+    };
+})();
+
+(function() {  
+    var R = ReUI,
+        D = ReUI.DomHelper,
+        isWebKit = /webkit/i.test(navigator.userAgent);         
+       
+    var resolveFx = function(name) {
+        return R.useCompatibleFx 
+            ? R.registeredFx[name + 'Compatible']
+            : R.registeredFx[name];
+    };
+
+    var onRootClick = function(evt) {  
+        var evt = evt || window.event;            
+        var target = evt.target || evt.srcElement;
+
+        var link = D.findAncestorByTag(target, 'a');
+        if (link) 
+        {                
+            if (link.href && link.hash && link.hash != '#' && !link.target)
+            {
+                D.select(link);
+                    
+                R.show(D.get(link.hash.substr(1)));
+
+                D.wait(D.unselect, 500, link);
+            }
+            else if (link == R.backEl)
+            {
+                R.back();
+            }
+            else if (link.getAttribute('type') == 'cancel')
+            {
+                if (context.dialog) D.unselect(context.dialog);                        
+            }          
+            else if (link.getAttribute('href', 2) === '#' ||
+                     link.getAttribute('href', 2) === null)
+            {       
+                /* do nothing */               
+                /* will not work on all browsers, as some will return the resolved url regardless */
+            }
+            else
+            {
+                return;
+            }
+
+            evt.cancelBubble = true;
+            if (evt.stopPropagation) evt.stopPropagation();
+            if (evt.preventDefault) evt.preventDefault();
+        }
+    };
+
+    var transitionComplete = function(page, o) {
+        if (o.track !== false) 
+        {
+            if (typeof page.id !== 'string' || page.id.length <= 0)
+                page.id = 'liui-' + (context.counter++);
+
+            context.hash = location.hash = R.hashPrefix + page.id;
+
+            context.history.push(page.id);
+        }
+          
+        if (o.update !== false) 
+        {
+            if (R.titleEl)
+            {
+                if (page.title) 
+                    R.titleEl.innerHTML = page.title;
+
+                var titleCls = page.getAttribute('titleCls') || page.getAttribute('ttlclass');
+                if (titleCls)
+                    R.titleEl.className = titleCls;
+            }
+
+            /* only update back button if track is set to true, since there is no history entry for the new page */
+            if (R.backEl && o.track !== false) 
+            {
+                var previous = D.get(context.history[context.history.length - 2]);
+                if (previous && !previous.getAttribute('hideBackButton'))
+                {
+                    R.backEl.style.display = 'inline';
+                    R.backEl.innerHTML = previous.title || R.backText;
+
+                    var backButtonCls = previous.getAttribute('backButtonCls') || previous.getAttribute('bbclass');
+
+                    R.backEl.className = backButtonCls ? 'button ' + backButtonCls : 'button';
+                }
+                else
+                {
+                    R.backEl.style.display = 'none';
+                }
             }
         }
-        node.dispatchEvent(event);
-    }
-}
-
-function getPageFromLoc()
-{
-	var page;
-	var result = location.hash.match(/#_([^\?_]+)/);
-	if (result)
-		page = result[1];
-	if (page)
-		page = $(page);
-	return page;
-}
-
-function orientChangeHandler()
-{
-	var orientation=window.orientation;
-	switch(orientation)
-	{
-	case 0:
-		setOrientation(portraitVal);
-		break;	
-		
-	case 90:
-	case -90: 
-		setOrientation(landscapeVal);
-		break;
-	}
-}
-
-
-function checkOrientAndLocation()
-{
-	if (!hasOrientationEvent)
-	{
-	  if ((window.innerWidth != currentWidth) || (window.innerHeight != currentHeight))
-	  {	  
-		  currentWidth = window.innerWidth;
-		  currentHeight = window.innerHeight;
-		  var orient = (currentWidth < currentHeight) ? portraitVal : landscapeVal;
-		  setOrientation(orient);
-	  }
-	}
-
-	if (location.hash != currentHash)
-	{
-		var pageId = location.hash.substr(hashPrefix.length);
-		iui.showPageById(pageId);
-	}
-}
-
-function setOrientation(orient)
-{
-	document.body.setAttribute("orient", orient);
-//  Set class in addition to orient attribute:
-	if (orient == portraitVal)
-	{
-		iui.removeClass(document.body, landscapeVal);
-		iui.addClass(document.body, portraitVal);
-	}
-	else if (orient == landscapeVal)
-	{
-		iui.removeClass(document.body, portraitVal);
-		iui.addClass(document.body, landscapeVal);
-	}
-	else
-	{
-		iui.removeClass(document.body, portraitVal);
-		iui.removeClass(document.body, landscapeVal);
-	}
-	setTimeout(scrollTo, 100, 0, 1);
-}
-
-function showDialog(page)
-{
-	currentDialog = page;
-	page.setAttribute("selected", "true");
-	
-	if (hasClass(page, "dialog"))
-		showForm(page);
-}
-
-function showForm(form)
-{
+    };  
     
-    // sage: only bind to onsubmit when there is no onsubmit
-    if (typeof form.onsubmit === 'undefined')
-	    form.onsubmit = function(event)
-	    {
-            //  submitForm and preventDefault are called in the click handler
-            //  when the user clicks the submit a.button
-            // 
-		    event.preventDefault();
-		    submitForm(form);
-	    };
-	
-	//form.onclick = function(event)
-	//{
-        // Why is this code needed?  cancelDialog is called from
-        // the click hander.  When will this be called?
+    var transition = function(from, to, o) {            
+        function complete() {
+            context.check = D.timer(checkOrientationAndLocation, R.checkStateEvery);    
+                
+            D.wait(transitionComplete, 0, to, o);                               
+                
+            D.dispatch(from, 'aftertransition', {out: true});            
+            D.dispatch(to, 'aftertransition', {out: false});
+        };
+                      
+        D.clearTimer(context.check);
 
-        // removed: sage        
-		//if (event.target == form && hasClass(form, "dialog"))
-		//	cancelDialog(form);
-	//};
-}
+        D.dispatch(from, 'beforetransition', {out: true});            
+        D.dispatch(to, 'beforetransition', {out: false});
 
-function cancelDialog(form)
-{
-	form.removeAttribute("selected");
-}
+        if (R.disableFx === true)
+        {
+            D.unselect(from);
+            D.select(to);
+            complete();
+            return;
+        }
 
-function updatePage(page, fromPage)
-{
-	if (!page.id)
-		page.id = "__" + (++newPageCount) + "__";
+        if (typeof o.horizontal !== 'boolean')
+        {
+            var toHorizontal = to.getAttribute('horizontal');                
+            var fromHorizontal = from.getAttribute('horizontal');
 
-	location.hash = currentHash = hashPrefix + page.id;
-	pageHistory.push(page.id);
+            if (toHorizontal === 'false' || fromHorizontal === 'false')
+            {
+                o.horizontal = false;
+            }
+        }
+            
+        var dir = o.horizontal !== false
+            ? o.reverse ? 'r' : 'l'
+            : o.reverse ? 'd' : 'u';
 
-	var pageTitle = $("pageTitle");
-	if (page.title)
-		pageTitle.innerHTML = page.title;
-	var ttlClass = page.getAttribute("ttlclass");
-	pageTitle.className = ttlClass ? ttlClass : "";
+        var toFx = to.getAttribute('effect');
+        var fromFx = from.getAttribute('effect');
+        var useFx = fromFx || toFx;
 
-	if (page.localName.toLowerCase() == "form" && !page.target)
-		showForm(page);
-		
-	var backButton = $("backButton");
-	if (backButton)
-	{
-		var prevPage = $(pageHistory[pageHistory.length-2]);
-		if (prevPage && !page.getAttribute("hideBackButton"))
-		{
-			backButton.style.display = "inline";
-			backButton.innerHTML = prevPage.title ? prevPage.title : "Back";
-			var bbClass = prevPage.getAttribute("bbclass");
-			backButton.className = (bbClass) ? 'button ' + bbClass : 'button';
-		}
-		else
-			backButton.style.display = "none";
-	}	 
-}
+        var fx = resolveFx(useFx) || resolveFx(R.defaultFx);
+        if (fx) 
+            fx(from, to, dir, complete);
+    };       
+    
+    var getPageFromHash = function(hash) {
+        if (hash && hash.indexOf(R.hashPrefix) === 0)
+            return D.get(hash.substr(R.hashPrefix.length));
+        return false;
+    };                   
 
-function slidePages(fromPage, toPage, backwards)
-{		 
-	var axis = (backwards ? fromPage : toPage).getAttribute("axis");
+    var checkOrientationAndLocation = function() {
+        if (!context.hasOrientationEvent)
+        {
+            if ((window.innerHeight != context.height) || (window.innerWidth != context.width))
+            {
+                context.height = window.innerHeight;
+                context.width = window.innerWidth;
 
-	clearInterval(checkTimer);
-	
-	sendEvent("beforetransition", fromPage, {out:true}, true);
-	sendEvent("beforetransition", toPage, {out:false}, true);
-	if (canDoSlideAnim() && axis != 'y')
-	{
-	  slide2(fromPage, toPage, backwards, slideDone);
-	}
-	else
-	{
-	  slide1(fromPage, toPage, backwards, axis, slideDone);
-	}
+                setOrientation(context.height < context.width ? 'landscape' : 'portrait');
+            }
+        }
 
-	function slideDone()
-	{
-	  if (!hasClass(toPage, "dialog"))
-		  fromPage.removeAttribute("selected");
-	  checkTimer = setInterval(checkOrientAndLocation, 300);
-	  setTimeout(updatePage, 0, toPage, fromPage);
-	  fromPage.removeEventListener('webkitTransitionEnd', slideDone, false);
-	  sendEvent("aftertransition", fromPage, {out:true}, true);
-      sendEvent("aftertransition", toPage, {out:false}, true);
+        if (context.hash != location.hash)
+        {
+            var el = getPageFromHash(location.hash);            
+            if (el) 
+                R.show(el);                    
+        }         
+    };
 
-	}
-}
+    var orientationChanged = function() {
+        switch (window.orientation) 
+        {                
+            case 90:
+            case -90:
+                setOrientation('landscape');
+                break;
+            default:
+                setOrientation('portrait');
+                break;
+        }
+    };
 
-function canDoSlideAnim()
-{
-  return (iui.animOn) && (typeof WebKitCSSMatrix == "object");
-}
+    var setOrientation = function(value) {
+        R.rootEl.setAttribute('orient', value);
 
-function slide1(fromPage, toPage, backwards, axis, cb)
-{
-	if (axis == "y")
-		(backwards ? fromPage : toPage).style.top = "100%";
-	else
-		toPage.style.left = "100%";
+        if (value == 'portrait') 
+        {
+            D.removeClass(R.rootEl, 'landscape');
+            D.addClass(R.rootEl, 'portrait');
+        }
+        else if (value == 'landscape')
+        {
+            D.removeClass(R.rootEl, 'portrait');
+            D.addClass(R.rootEl, 'landscape');
+        }
+        else
+        {
+            D.removeClass(R.rootEl, 'portrait');
+            D.removeClass(R.rootEl, 'landscape');
+        }
 
-	scrollTo(0, 1);
-	toPage.setAttribute("selected", "true");
-	var percent = 100;
-	slide();
-	var timer = setInterval(slide, slideInterval);
+        D.wait(scrollTo, 100, 0, 1); 
+    };
 
-	function slide()
-	{
-		percent -= slideSpeed;
-		if (percent <= 0)
-		{
-			percent = 0;
-			clearInterval(timer);
-			cb();
-		}
-	
-		if (axis == "y")
-		{
-			backwards
-				? fromPage.style.top = (100-percent) + "%"
-				: toPage.style.top = percent + "%";
-		}
-		else
-		{
-			fromPage.style.left = (backwards ? (100-percent) : (percent-100)) + "%"; 
-			toPage.style.left = (backwards ? -percent : percent) + "%"; 
-		}
-	}
-}
+    var context = {
+        page: false,
+        dialog: false,
+        counter: 0,
+        width: 0,
+        height: 0,
+        check: 0,
+        hasOrientationEvent: false, 
+        history: []
+    };
+    
+    D.apply(ReUI, {
+        autoInit: true,
+        useCompatibleFx: !isWebKit,
+        registeredFx: {},
+        disableFx: false,
+        defaultFx: 'slide',
+        rootEl: false, 
+        titleEl: false,      
+        backEl: false, 
+        hashPrefix: '#_',
+        backText: 'Back',               
+        checkStateEvery: 250,
+        prioritizeLocation: false,         
 
+        init: function() {
+            R.rootEl = R.rootEl || document.body;            
+            R.backEl = R.backEl || D.get('backButton');
+            R.titleEl = R.titleEl || D.get('pageTitle');
 
-function slide2(fromPage, toPage, backwards, cb)
-{
-	toPage.style.webkitTransitionDuration = '0ms'; // Turn off transitions to set toPage start offset
-	// fromStart is always 0% and toEnd is always 0%
-	// iPhone won't take % width on toPage
-	var toStart = 'translateX(' + (backwards ? '-' : '') + window.innerWidth +	'px)';
-	var fromEnd = 'translateX(' + (backwards ? '100%' : '-100%') + ')';
-	toPage.style.webkitTransform = toStart;
-	toPage.setAttribute("selected", "true");
-	toPage.style.webkitTransitionDuration = '';	  // Turn transitions back on
-	function startTrans()
-	{
-		fromPage.style.webkitTransform = fromEnd;
-		toPage.style.webkitTransform = 'translateX(0%)'; //toEnd
-	}
-	fromPage.addEventListener('webkitTransitionEnd', cb, false);
-	setTimeout(startTrans, 0);
-}
+            var selectedEl, hashEl;
+            var el = R.rootEl.firstChild;            
+            for (; el; el = el.nextSibling)
+                if (el.nodeType == 1 && el.getAttribute('selected') == 'true')
+                    selectedEl = el;
 
-function preloadImages()
-{
-	var preloader = document.createElement("div");
-	preloader.id = "preloader";
-	document.body.appendChild(preloader);
-}
+            if (location.hash)
+            {
+                hashEl = getPageFromHash(location.hash);
+            }           
 
-function submitForm(form)
-{
-    iui.addClass(form, "progress");
-    iui.showPageByHref(form.action, encodeForm(form), form.method || "GET", null, clear);
-    function clear() {   iui.removeClass(form, "progress"); }
-}
+            if (R.prioritizeLocation)
+            {
+                if (hashEl)
+                {
+                    if (selectedEl) D.unselect(selectedEl);                    
 
-function encodeForm(form)
-{
-	function encode(inputs)
-	{
-		for (var i = 0; i < inputs.length; ++i)
-		{
-	        if (inputs[i].name)
-		        args[inputs[i].name] = inputs[i].value;
-		}
-	}
+                    R.show(hashEl);
+                }
+                else if (selectedEl)
+                {
+                    R.show(selectedEl);
+                }
+            }
+            else
+            {
+                if (selectedEl)
+                {
+                    R.show(selectedEl);
+                }
+                else if (hashEl)
+                {
+                    R.show(hashEl);
+                }
+            }
+            
+            if (typeof window.onorientationchange === 'object')
+            {
+                window.onorientationchange = orientationChanged;
 
-    var args = {};
-    encode(form.getElementsByTagName("input"));
-    encode(form.getElementsByTagName("textarea"));
-    encode(form.getElementsByTagName("select"));
-    encode(form.getElementsByTagName("button"));
-    return args;	  
-}
+                context.hasOrientationEvent = true;    
+                
+                D.wait(orientationChanged, 0);
+            }
 
-function findParent(node, localName)
-{
-	while (node && (node.nodeType != 1 || node.localName.toLowerCase() != localName))
-		node = node.parentNode;
-	return node;
-}
+            D.wait(checkOrientationAndLocation, 0);
 
-function hasClass(self, name)
-{
-	return iui.hasClass(self,name);
-}
+            context.check = D.timer(checkOrientationAndLocation, R.checkStateEvery);
 
-function replaceElementWithFrag(replace, frag)
-{
-	var page = replace.parentNode;
-	var parent = replace;
-	while (page.parentNode != document.body)
-	{
-		page = page.parentNode;
-		parent = parent.parentNode;
-	}
-	page.removeChild(parent);
+            D.bind(R.rootEl, 'click', onRootClick);
+        },
 
-    var docNode;
-	while (frag.firstChild) {
-		docNode = page.appendChild(frag.firstChild);
-		sendEvent("afterinsert", document.body, {insertedNode:docNode});
-    }
-}
+        registerFx: function(name, compatible, fn) {
+            if (typeof compatible === 'function')
+            {
+                fn = compatible;
+                compatible = false;
+            }
 
-function $(id) { return document.getElementById(id); }
-function ddd() { console.log.apply(console, arguments); }
+            if (compatible)
+                R.registeredFx[name + 'Compatible'] = fn;
+            else
+                R.registeredFx[name] = fn;
+        },
 
+        getCurrentPage: function() {
+            return context.page;
+        },
+
+        getCurrentDialog: function() {
+            return context.dialog;
+        },
+
+        back: function() {
+            history.go(-1);
+        },
+        
+        /// <summary>
+        /// Available Options:
+        ///     horizontal: True if the transition is horizontal, False otherwise.
+        ///     reverse: True if the transition is a reverse transition (right/down), False otherwise.
+        ///     track: False if the transition should not be tracked in history, True otherwise.
+        ///     update: False if the transition should not update title and back button, True otherwise.
+        /// </summary>
+        show: function(page, o) {
+            if (typeof page === 'string') page = D.get(page);          
+
+            var o = D.apply({
+                reverse: false
+            }, o);
+
+            if (o.track !== false)
+            {
+                var index = context.history.indexOf(page.id);
+                if (index != -1)
+                {
+                    o.reverse = true;
+                    context.history.splice(index);
+                }
+            }
+
+            if (context.dialog)
+            {
+                D.unselect(context.dialog);                
+                D.dispatch(context.dialog, 'blur', false);
+
+                context.dialog = false;
+            }  
+
+            if (D.hasClass(page, 'dialog'))
+            {
+                D.dispatch(page, 'focus', false);
+
+                context.dialog = page;
+
+                D.select(page);
+            }
+            else
+            {
+                D.dispatch(page, 'load', false);
+
+                var from = context.page;
+
+                if (context.page) D.dispatch(context.page, 'blur', false);
+
+                context.page = page;
+
+                D.dispatch(page, 'focus', false);
+
+                if (from)
+                {
+                    if (o.reverse) D.dispatch(context.page, 'unload', false);
+
+                    D.wait(transition, 0, from, page, o);
+                }       
+                else
+                {   
+                    D.select(page);
+                                     
+                    transitionComplete(page, o);
+                }
+            }
+        }                    
+    });
+
+    D.bind(window, 'load', function(evt) {
+        if (R.autoInit)
+            R.init();
+    });
 })();
+
+(function() {
+    var R = ReUI,
+        D = ReUI.DomHelper;
+
+    R.registerFx('slide', function(from, to, dir, fn) {              
+        var toStart = {value: '0%', axis: 'X'};
+        var fromStop = {value: '0%', axis: 'X'};            
+
+        switch (dir) 
+        {
+            case 'l': 
+                toStart.value = (window.innerWidth) + 'px';
+                toStart.axis = 'X';
+                fromStop.value = '-100%';
+                fromStop.axis = 'X';
+                break;
+            case 'r':
+                toStart.value = (-1 * window.innerWidth) + 'px';
+                toStart.axis = 'X';
+                fromStop.value = '100%';
+                fromStop.axis = 'X';
+                break;
+            case 'u':
+                toStart.value = (window.innerHeight) + 'px';
+                toStart.axis = 'Y';
+                fromStop.value = '-100%';
+                fromStop.axis = 'Y';
+                break;
+            case 'd':
+                toStart.value = (-1 * window.innerHeight) + 'px';
+                toStart.axis = 'Y';
+                fromStop.value = '100%';
+                fromStop.axis = 'Y';
+                break;
+        };
+      
+        D.applyStyle(to, {
+            'webkitTransitionDuration': '0ms',
+            'webkitTransitionProperty': '-webkit-transform',
+            'webkitTransform': 'translate' + toStart.axis + '(' + toStart.value + ')'
+        });
+            
+        D.select(to);
+
+        D.applyStyle(to, {
+            'webkitTransitionDuration': 'inherit'
+        });
+                
+        D.applyStyle(from, {
+            'webkitTransitionDuration': 'inherit',
+            'webkitTransitionProperty': '-webkit-transform'
+        });
+
+        function complete() {
+            D.unbind(from, 'webkitTransitionEnd', complete, false);
+
+            D.applyStyle(to, {
+                'webkitTransitionProperty': 'inherit'
+            }); 
+            
+            D.applyStyle(from, {
+                'webkitTransitionProperty': 'inherit'
+            });
+
+            if (D.hasClass(to, 'dialog') == false) D.unselect(from);  
+     
+            if (typeof fn === 'function') fn();
+        };
+            
+        D.bind(from, 'webkitTransitionEnd', complete, false);            
+        D.wait(function() {            
+            D.applyStyle(from, {
+                'webkitTransform': 'translate' + fromStop.axis + '(' + fromStop.value + ')'
+            });
+
+            D.applyStyle(to, {
+                'webkitTransform': 'translate' + toStart.axis + '(0%)'
+            });
+        }, 0);            
+    });
+
+    R.registerFx('slide', true, function(from, to, dir, fn) {        
+        var toData = {prop: 'left', dir: 1, value: 0},
+            fromData = {prop: 'left', dir: 1, value: 0};            
+
+        switch (dir) 
+        {
+            case 'l':
+                toData.prop = 'left';
+                toData.dir = -1;
+                toData.value = 100;
+                fromData.prop = 'left';
+                fromData.dir = -1;
+                fromData.value = 0;
+                break;
+            case 'r':
+                toData.prop = 'right';
+                toData.dir = -1;
+                toData.value = 100;
+                fromData.prop = 'right';
+                fromData.dir = -1;
+                fromData.value = 0;
+                break;
+            case 'u':
+                toData.prop = 'top';
+                toData.dir = -1;
+                toData.value = 100;
+                fromData.prop = 'top';
+                fromData.dir = -1;
+                fromData.value = 0;
+                break;
+            case 'd':
+                toData.prop = 'bottom';
+                toData.dir = -1;
+                toData.value = 100;
+                fromData.prop = 'bottom';
+                fromData.dir = -1;
+                fromData.value = 0;
+                break;
+        };
+
+        var speed = R.stepSpeed || 10,
+            interval = R.stepInterval || 0,
+            frames = 100 / speed,
+            count = 1;
+        
+        step();
+
+        D.select(to);
+        
+        var timer = D.timer(step, interval);    
+
+        function step() {            
+            var toStyle = {},
+                fromStyle = {};
+
+            if (count > frames)
+            {
+                D.clearTimer(timer);
+                
+                if (D.hasClass(to, 'dialog') == false) D.unselect(from); 
+
+                toStyle[toData.prop] = 'inherit';                
+                fromStyle[fromData.prop] = 'inherit';
+
+                D.applyStyle(to, toStyle);
+                D.applyStyle(from, fromStyle);
+
+                if (typeof fn === 'function') fn();
+
+                return;
+            }            
+
+            toStyle[toData.prop] = toData.value + (toData.dir * (count * speed)) + '%';
+            fromStyle[fromData.prop] = fromData.value + (fromData.dir * (count * speed)) + '%';
+
+            D.applyStyle(to, toStyle);
+            D.applyStyle(from, fromStyle);
+            
+            count++;
+        };           
+    });
+
+    R.registerFx('flip', function(from, to, dir, fn) {             
+        var toStart = {value: '0deg', axis: 'Y'};
+        var fromStop = {value: '0deg', axis: 'Y'};            
+
+        switch (dir) 
+        {
+            case 'l': 
+                toStart.value = '-180deg';
+                toStart.axis = 'Y';
+                fromStop.value = '180deg';
+                fromStop.axis = 'Y';
+                break;
+            case 'r':
+                toStart.value = '180deg';
+                toStart.axis = 'Y';
+                fromStop.value = '-180deg';
+                fromStop.axis = 'Y';
+                break; 
+            case 'u': 
+                toStart.value = '-180deg';
+                toStart.axis = 'X';
+                fromStop.value = '180deg';
+                fromStop.axis = 'X';
+                break;
+            case 'd':
+                    toStart.value = '180deg';
+                toStart.axis = 'X';
+                fromStop.value = '-180deg';
+                fromStop.axis = 'X';
+                break;                 
+        };
+        
+        D.applyStyle(to, {
+            'webkitTransitionDuration': '0ms',
+            'webkitTransitionProperty': '-webkit-transform',
+            'webkitTransform': 'rotate' + toStart.axis + '(' + toStart.value + ')',
+            'webkitTransformStyle': 'preserve-3d',
+            'webkitBackfaceVisibility': 'hidden'
+        });                   
+            
+        D.select(to);
+
+        D.applyStyle(to, {
+            'webkitTransitionDuration': 'inherit'
+        });
+
+        D.applyStyle(from, {
+            'webkitTransitionDuration': 'inherit',
+            'webkitTransitionProperty': '-webkit-transform',
+            'webkitTransformStyle': 'preserve-3d',
+            'webkitBackfaceVisibility': 'hidden'
+        });
+
+        function complete() {
+            D.unbind(from, 'webkitTransitionEnd', complete, false);
+
+            D.applyStyle(to, {
+                'webkitTransitionProperty': 'inherit'
+            });
+            
+            D.applyStyle(from, {
+                'webkitTransitionProperty': 'inherit'
+            });
+     
+            if (D.hasClass(to, 'dialog') == false) D.unselect(from); 
+                
+            if (typeof fn === 'function') fn();
+        };
+            
+        D.bind(from, 'webkitTransitionEnd', complete, false);            
+        D.wait(function() {
+            D.applyStyle(from, {
+                'webkitTransform': 'rotate' + fromStop.axis + '(' + fromStop.value + ')'
+            });
+          
+            D.applyStyle(to, {
+                'webkitTransform': 'rotate' + toStart.axis + '(0deg)'
+            });
+        }, 0);     
+    });
+})();
+
 /**
  * Version: 1.0 Alpha-1 
  * Build Date: 12-Nov-2007

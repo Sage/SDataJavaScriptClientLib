@@ -47,7 +47,7 @@ Sage.Platform.Mobile.Controls.registered = {
 
 Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {   
     viewTemplate: new Simplate([            
-        '<div id="{%= id %}" title="{%= title %}" class="panel">',  
+        '<div id="{%= id %}" title="{%= title %}" class="panel" effect="flip">',  
         '<fieldset class="loading">',
         '<div class="row"><div class="loading-indicator">{%= loadingText %}</div></div>',
         '</fieldset>',
@@ -113,7 +113,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         // todo: find a better way to handle these notifications
         if (this.canSave)
             App.on('save', function() {
-                if (this.el.getAttribute('selected') == 'true')
+                if (this.isActive())
                     this.save();
             }, this);  
     },      
@@ -258,8 +258,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
                             }
                         });
                             
-                        /* ensures that the browsers back button and the iUI history are in sync */                        
-                        history.go(-1);
+                        ReUI.back();
                     },
                     failure: function(response, o) {
                         this.busy = false;
@@ -272,7 +271,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         } 
         else
         {
-            history.go(-1); /* nothing to save */
+            ReUI.back();
         }
     },
     transitionTo: function() {

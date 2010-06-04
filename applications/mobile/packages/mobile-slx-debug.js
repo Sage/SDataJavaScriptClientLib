@@ -39,7 +39,7 @@ Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {
         
         this.registerToolbar(new Sage.Platform.Mobile.FloatToolbar({
             name: 'fbar' 
-        }));
+        }));        
 
         this.registerView(new Mobile.SalesLogix.LoginDialog());
         this.registerView(new Mobile.SalesLogix.SearchDialog());
@@ -196,7 +196,7 @@ Mobile.SalesLogix.Template = (function() {
         ])
     };
 })();﻿/// <reference path="../../../ext/ext-core-debug.js"/>
-/// <reference path="../../../iui/iui.js"/>
+/// <reference path="../../../reui/reui.js"/>
 /// <reference path="../../../platform/View.js"/>
 /// <reference path="Application.js"/>
 
@@ -268,11 +268,16 @@ Mobile.SalesLogix.Home = Ext.extend(Sage.Platform.Mobile.View, {
         {
             var user = App.getService().getUserName();
             if (!user || !user.length)
-                iui.showPageById("login_dialog");
+            {
+                var view = App.getView('login_dialog');
+                if (view)
+                    view.show();
+            }
+                //ReUI.show("login_dialog");
         }
     }   
 });﻿/// <reference path="../../../ext/ext-core-debug.js"/>
-/// <reference path="../../../iui/iui.js"/>
+/// <reference path="../../../reui/reui.js"/>
 /// <reference path="../../../platform/Application.js"/>
 /// <reference path="../../../../sdata/SDataResourceCollectionRequest.js"/>
 /// <reference path="../../../platform/View.js"/>
@@ -378,7 +383,7 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
         });
     }
 });﻿/// <reference path="../../../ext/ext-core-debug.js"/>
-/// <reference path="../../../iui/iui.js"/>
+/// <reference path="../../../reui/reui.js"/>
 /// <reference path="../../../platform/Application.js"/>
 /// <reference path="../../../platform/View.js"/>
 /// <reference path="Application.js"/>

@@ -55,6 +55,9 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
                 }   
             }, this);        
     },
+    isActive: function() {
+        return (this.el.getAttribute('selected') === 'true');
+    },
     setTitle: function(title) {
         /// <summary>
         ///     Sets the title attribute on the view's main element.  This will be used by iUI during transition
@@ -72,7 +75,7 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
         /// <summary>
         ///     Show's the view using iUI in order to transition to the new element.
         /// </summary>
-        iui.showPage(this.el.dom);
+        ReUI.show(this.el.dom);       
     },
     beforeTransitionTo: function() {
         /// <summary>

@@ -1,6 +1,6 @@
 ﻿body
 {
-
+	height: 100%;
 }
 
 body[orient="landscape"] > form.dialog,
@@ -126,7 +126,7 @@ div.row > a
 
 div.row a[target=_related]
 {
-	background:url(../javascript/iui/default/listArrow.png) center right no-repeat; 	
+	background:url(../javascript/reui/themes/iui/default/listArrow.png) center right no-repeat; 	
 	font-size: inherit;
 }
 
@@ -169,8 +169,8 @@ body > *
 .dialog-busy .blueButton,
 .toolbar-busy .blueButton
 {
-	-webkit-border-image: url(../javascript/iui/default/toolButton.png) 0 5 0 5;
-    -moz-border-image: url(../javascript/iui/default/toolButton.png) 0 5 0 5;
+	-webkit-border-image: url(../javascript/reui/themes/iui/default/toolButton.png) 0 5 0 5;
+    -moz-border-image: url(../javascript/reui/themes/iui/default/toolButton.png) 0 5 0 5;
 }
 
 .dialog-busy .blueButton span,

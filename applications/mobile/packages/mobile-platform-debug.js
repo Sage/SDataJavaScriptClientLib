@@ -70,25 +70,17 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     isOnline: function() {
         return window.navigator.onLine;
     },
-    clearSDataRequestCache: function() {   
+    clearSDataRequestCache: function() { 
         var check = function(k) {
-            if (/^\[sdata\]\:/i.test(k))
-            {
-                window.localStorage.removeItem(k);
-            }
+            return /^\[sdata\]/i.test(k);
         };
-        
-        /* firefox currently does not support standard iteration over storage classes */
+                
         /* todo: find a better way to detect */
-        if (Ext.isGecko) 
+        for (var i = window.localStorage.length - 1; i >= 0 ; i--) 
         {
-            for (var i = 0; i < window.localStorage.length; i++) 
-                check(window.localStorage.key(i));
-        }
-        else
-        {     
-            for (var key in window.localStorage) 
-                check(key);            
+            var key = window.localStorage.key(i);
+            if (check(key))
+                window.localStorage.removeItem(key);
         }
     },
     createCacheKey: function(request) {
@@ -172,21 +164,13 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         return this.views;
     },
     getActiveView: function() {
-        /// <returns type="Sage.Platform.Mobile.View">The currently active view.</returns>
-        var el = iui.getCurrentPage() || iui.getCurrentDialog();
+        /// <returns type="Sage.Platform.Mobile.View">The currently active view.</returns>        
+        var el = ReUI.getCurrentPage() || ReUI.getCurrentDialog();
         if (el)
             return this.getView(el);
 
         return null;
-    },
-    getPreviousView: function() {
-        /// <returns type="Sage.Platform.Mobile.View">The previously active view.</returns>
-        var el = iui.getPreviousPage();
-        if (el)
-            return this.getView(el);
-
-        return null;
-    },
+    },    
     getView: function(key) {
         /// <returns type="Sage.Platform.Mobile.View">The requested view.</returns>
         /// <param name="key" type="String">
@@ -361,6 +345,9 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
                 }   
             }, this);        
     },
+    isActive: function() {
+        return (this.el.getAttribute('selected') === 'true');
+    },
     setTitle: function(title) {
         /// <summary>
         ///     Sets the title attribute on the view's main element.  This will be used by iUI during transition
@@ -378,7 +365,7 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
         /// <summary>
         ///     Show's the view using iUI in order to transition to the new element.
         /// </summary>
-        iui.showPage(this.el.dom);
+        ReUI.show(this.el.dom);       
     },
     beforeTransitionTo: function() {
         /// <summary>
@@ -1068,7 +1055,7 @@ Sage.Platform.Mobile.Controls.registered = {
 
 Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {   
     viewTemplate: new Simplate([            
-        '<div id="{%= id %}" title="{%= title %}" class="panel">',  
+        '<div id="{%= id %}" title="{%= title %}" class="panel" effect="flip">',  
         '<fieldset class="loading">',
         '<div class="row"><div class="loading-indicator">{%= loadingText %}</div></div>',
         '</fieldset>',
@@ -1134,7 +1121,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         // todo: find a better way to handle these notifications
         if (this.canSave)
             App.on('save', function() {
-                if (this.el.getAttribute('selected') == 'true')
+                if (this.isActive())
                     this.save();
             }, this);  
     },      
@@ -1279,8 +1266,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
                             }
                         });
                             
-                        /* ensures that the browsers back button and the iUI history are in sync */                        
-                        history.go(-1);
+                        ReUI.back();
                     },
                     failure: function(response, o) {
                         this.busy = false;
@@ -1293,7 +1279,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         } 
         else
         {
-            history.go(-1); /* nothing to save */
+            ReUI.back();
         }
     },
     transitionTo: function() {

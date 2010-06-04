@@ -1,5 +1,5 @@
 ﻿/// <reference path="../../../ext/ext-core-debug.js"/>
-/// <reference path="../../../iui/iui.js"/>
+/// <reference path="../../../reui/reui.js"/>
 /// <reference path="../../../platform/Application.js"/>
 /// <reference path="../../../../sdata/SDataResourceCollectionRequest.js"/>
 /// <reference path="../../../platform/View.js"/>

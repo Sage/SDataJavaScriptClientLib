@@ -10,16 +10,17 @@
     <link rel="apple-touch-icon-precomposed" href="products/slx/images/icon.png" />
     <link rel="apple-touch-startup-image" href="products/slx/images/loading.png">
 
-    <link type="text/css" rel="stylesheet" href="content/javascript/iui/iui.css" />
-    <link type="text/css" rel="stylesheet" href="content/javascript/iui/default/default-theme.css" />
-    <link type="text/css" rel="stylesheet" href="content/javascript/iui/default/default-panel-list.css" />
+    <link type="text/css" rel="stylesheet" href="content/javascript/reui/themes/iui/iui.css" />
+    <link type="text/css" rel="stylesheet" href="content/javascript/reui/themes/iui/default/default-theme.css" />
+    <link type="text/css" rel="stylesheet" href="content/javascript/reui/themes/iui/default/default-panel-list.css" />
+    
     <link type="text/css" rel="stylesheet" href="content/css/app.css" />        
     <link type="text/css" rel="stylesheet" href="products/slx/css/app.css" />
    
-    <script type="text/javascript" src="content/javascript/ext/ext-core.js"></script>   
-    <script type="text/javascript" src="content/javascript/iui/iui.js"></script>
-    <script type="text/javascript">iui.delayInit = true;</script> 
-    
+    <script type="text/javascript" src="content/javascript/ext/ext-core.js"></script>          
+    <script type="text/javascript" src="content/javascript/reui/reui.js"></script>
+    <script type="text/javascript">ReUI.autoInit = false;</script> 
+        
     <script type="text/javascript" src="packages/sdata-client-debug.js"></script>
 
     <script type="text/javascript" src="content/javascript/datejs/src/core.js"></script>
@@ -59,8 +60,8 @@
 
     <script type="text/javascript">
     Ext.onReady(function() {  
-        App.init(); 
-        iui.init();                    
+        App.init();         
+        ReUI.init();      
     });
     </script>
 </head>

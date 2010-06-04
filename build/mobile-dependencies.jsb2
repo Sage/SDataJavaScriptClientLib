@@ -16,8 +16,8 @@
 			text: 'Simplate.js',
 			path: '../applications/mobile/content/javascript/'
 		},{
-			text: 'iui.js',
-			path: '../applications/mobile/content/javascript/iui/'
+			text: 'reui.js',
+			path: '../applications/mobile/content/javascript/reui/'
 		},{
 			text: 'core-debug.js',
 			path: '../applications/mobile/content/javascript/datejs/src/'
@@ -28,9 +28,9 @@
 		dest: 'src/',
 		filters: ".*[Base64|ObjTree|Simplate]"
 	},{
-		src: '../applications/mobile/content/javascript/iui/',
-		dest: 'src/iui/',
-		filters: ".*[iui\\.js]"
+		src: '../applications/mobile/content/javascript/reui/',
+		dest: 'src/reui/',
+		filters: ".*[reui\\.js]"
 	},{
 		src: '../applications/mobile/content/javascript/datejs/src/',
 		dest: 'src/datejs/',
