@@ -2,7 +2,7 @@
  * 
  */
 ﻿/// <reference path="../ext/ext-core-debug.js"/>
-/// <reference path="../iui/iui.js"/>
+/// <reference path="../reui/reui.js"/>
 /// <reference path="../../../packages/sdata-client-debug.js"/>
 /// <reference path="Format.js"/>
 /// <reference path="Utility.js"/>
@@ -56,7 +56,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
                 else
                     this.viewTransitionTo(view);
             }
-        }, this);  
+        }, this);          
                 
         if (this.service && this.enableCaching)
         {
@@ -230,64 +230,68 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     }
 });
 
-/* DOM event extensions */
-/* not quite ready for prime time yet */
-//(function(){   
-//    var hold; 
-//    var touch;
-//    var prevent;
-//    var dispatch = function(el, type, bubble, cancel) {
-//        var evt = document.createEvent("UIEvent");
+Ext.onReady(function(){
+    var isApple = /(iphone|ipad|ipod)/i.test(navigator.userAgent),
+        isMobile = (typeof window.orientation !== 'undefined'),
+        root = Ext.get(document.documentElement),
+        minSwipeLength = 100.0,
+        maxSwipeTime = 0.5,
+        minLongClickTime = 1.0,
+        startAt,
+        startTime;    
+    
+    var touchMove = function(evt, el, o) {
+        /* for general swipe, we do not need mouse move */
+    };  
+    var touchStart = function(evt, el, o) {        
+        startAt = evt.getXY();
+        startTime = (new Date()).getTime();
+    };    
+    var touchEnd = function(evt, el, o) {   
+        var endAt = evt.getXY(),
+            endTime = (new Date()).getTime();
 
-//        evt.initEvent(type, bubble, cancel);
-//        
-//        el.dispatchEvent(evt);
-//    };
-//    var handleTouchStart = function(evt, el, o) {
-//        hold = setTimeout(dispatch.createDelegate(this, [el, 'hold', true, true]), 1500);
-//        touch = (new Date()).getTime();
-//    };
-//    var handleTouchEnd = function(evt, el, o) {
-//        clearTimeout(hold);
+        var duration = (endTime - startTime) / 1000.0,
+            direction = {x: endAt[0] - startAt[0], y: endAt[1] - startAt[1]},
+            length = Math.sqrt(direction.x * direction.x + direction.y * direction.y),        
+            normalized = {x: direction.x / length, y: direction.y / length},
+            dotProd = normalized.x * 0.0 + normalized.y * 1.0;            
 
-//        var duration = (new Date()).getTime() - touch;
-//        if (duration > 1000) 
-//        {            
-//            prevent = true;
+        if (duration <= maxSwipeTime && length >= minSwipeLength)
+        {
+            evt.stopEvent();     
 
-//            evt.stopEvent();
+            var direction;
+            if (dotProd >= 0.71)
+                direction = 'down';            
+            else if (dotProd <= -0.71)            
+                direction = 'up';            
+            else if (normalized.x < 0.0)
+                direction = 'left';
+            else
+                direction = 'right';
 
-//            dispatch.call(this, el, 'clicklong', true, true);            
-//        }
-//    };
-//    var handleClick = function(evt) {
-//        if (prevent)
-//        {          	        
-//            if (evt.preventBubble) evt.preventBubble();
-//            if (evt.preventDefault) evt.preventDefault();
-//	        if (evt.stopPropagation) evt.stopPropagation();                        
-//            if (evt.stopImmediatePropagation) evt.stopImmediatePropagation();
+            ReUI.DomHelper.dispatch(el, 'swipe', {direction: direction});        
+        }        
+        else if (duration >= minLongClickTime)
+        {
+            evt.stopEvent();
 
-//            prevent = false;
+            ReUI.DomHelper.dispatch(el, 'clicklong');
+        }
+    };
 
-//            return false;
-//        } 
-//    }; 
-
-//    if (typeof window.orientation === 'undefined')
-//    {    
-//        Ext.getBody().on('mousedown', handleTouchStart);
-//        Ext.getBody().on('mouseup', handleTouchEnd);
-//    } 
-//    else
-//    {
-//        Ext.getBody().on('touchstart', handleTouchStart);
-//        Ext.getBody().on('touchend', handleTouchEnd);
-//    }
-
-//    /* todo: this will not work on IE, not that anything else will either, on current versions */    
-//    Ext.getBody().dom.addEventListener('click', handleClick, true); /* we want to capture click */
-//})();
+    if (!isMobile)
+    {    
+        root.on('mousedown', touchStart);
+        root.on('mouseup', touchEnd);
+    } 
+    else
+    {
+        root.on('touchstart', touchStart);
+        root.on('touchend', touchEnd);
+    }
+});
 ﻿/// <reference path="../ext/ext-core-debug.js"/>
 /// <reference path="../iui/iui-sage.js"/>
 /// <reference path="../Simplate.js"/>
