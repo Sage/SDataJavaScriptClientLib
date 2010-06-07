@@ -184,6 +184,8 @@ ReUI = {};
 
             context.history.push(page.id);
         }
+
+        context.transitioning = false;
           
         if (o.update !== false) 
         {
@@ -219,7 +221,7 @@ ReUI = {};
     };  
     
     var transition = function(from, to, o) {            
-        function complete() {
+        function complete() {            
             context.check = D.timer(checkOrientationAndLocation, R.checkStateEvery);    
                 
             D.wait(transitionComplete, 0, to, o);                               
@@ -227,7 +229,9 @@ ReUI = {};
             D.dispatch(from, 'aftertransition', {out: true});            
             D.dispatch(to, 'aftertransition', {out: false});
         };
-                      
+        
+        context.transitioning = true;
+
         D.clearTimer(context.check);
 
         D.dispatch(from, 'beforetransition', {out: true});            
@@ -329,6 +333,7 @@ ReUI = {};
     var context = {
         page: false,
         dialog: false,
+        transitioning: false,
         counter: 0,
         width: 0,
         height: 0,
@@ -441,6 +446,8 @@ ReUI = {};
         ///     update: False if the transition should not update title and back button, True otherwise.
         /// </summary>
         show: function(page, o) {
+            if (context.transitioning) return; /* todo: should we queue the transition? */
+
             if (typeof page === 'string') page = D.get(page);          
 
             var o = D.apply({

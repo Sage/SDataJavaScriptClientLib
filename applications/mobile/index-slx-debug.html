@@ -61,7 +61,11 @@
     <script type="text/javascript">
     Ext.onReady(function() {  
         App.init();         
-        ReUI.init();         
+        ReUI.init();      
+
+        Ext.getBody().on('swipe', function(evt, el, o) {
+            console.log('%s: %s', evt.browserEvent.direction, el.id);
+        });     
     });
     </script>
 </head>

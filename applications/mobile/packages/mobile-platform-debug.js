@@ -233,10 +233,12 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
 Ext.onReady(function(){
     var isApple = /(iphone|ipad|ipod)/i.test(navigator.userAgent),
         isMobile = (typeof window.orientation !== 'undefined'),
+        onlyHorizontalSwipe = true,
         root = Ext.get(document.documentElement),
         minSwipeLength = 100.0,
         maxSwipeTime = 0.5,
         minLongClickTime = 1.0,
+        maxLongClickLength = 5.0,
         startAt,
         startTime;    
     
@@ -259,21 +261,37 @@ Ext.onReady(function(){
 
         if (duration <= maxSwipeTime && length >= minSwipeLength)
         {
-            evt.stopEvent();     
-
-            var direction;
-            if (dotProd >= 0.71)
-                direction = 'down';            
-            else if (dotProd <= -0.71)            
-                direction = 'up';            
-            else if (normalized.x < 0.0)
-                direction = 'left';
+            var swipe;
+            if (!onlyHorizontalSwipe)
+            {
+                evt.stopEvent();     
+                
+                if (dotProd >= 0.71)
+                    swipe = 'down';            
+                else if (dotProd <= -0.71)            
+                    swipe = 'up';            
+                else if (normalized.x < 0.0)
+                    swipe = 'left';
+                else
+                    swipe = 'right';
+            } 
             else
-                direction = 'right';
+            {
+                if (dotProd < 0.71 && dotProd > -0.71)
+                {
+                    evt.stopEvent();   
 
-            ReUI.DomHelper.dispatch(el, 'swipe', {direction: direction});        
+                    if (normalized.x < 0.0)
+                        swipe = 'left';
+                    else
+                        swipe = 'right';
+                }
+            }
+
+            if (swipe)
+                ReUI.DomHelper.dispatch(el, 'swipe', {direction: swipe});        
         }        
-        else if (duration >= minLongClickTime)
+        else if (duration >= minLongClickTime && length <= maxLongClickLength)
         {
             evt.stopEvent();
 
@@ -806,6 +824,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     init: function() {  
         Sage.Platform.Mobile.Detail.superclass.init.call(this);
 
+        /*
         this.el
             .on('click', function(evt, el, o) {                
                 var source = Ext.get(el);
@@ -818,6 +837,18 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
                     this.navigateToRelated(target || source, evt);                    
                 }
             }, this);
+        */
+        this.el
+            .on('click', function(evt, el, o) {
+                    evt.stopEvent();
+
+                    var el = Ext.fly(el);
+                    var where = el.getAttribute('where', 'm');                
+                    var key = el.getAttribute('key', 'm');   
+                    var id = el.dom.hash.substring(1);
+
+                    this.navigateToRelated(id, key, where);   
+            }, this, {delegate: 'a[target="_related"]'});
         
         // todo: find a better way to handle these notifications
         App.on('refresh', function(o) {
@@ -838,11 +869,9 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         if (view)
             view.show(this.entry);
     },
-    navigateToRelated: function(el, evt) {    
+    navigateToRelated: function(id, key, where) {    
         var context = false;            
-        var where = el.getAttribute('where', 'm');                
-        var key = el.getAttribute('key', 'm');        
-
+        
         if (key)
             context = {
                 'key': key
@@ -854,7 +883,6 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
                     
         if (context) 
         {            
-            var id = el.dom.hash.substring(1);   
             var view = App.getView(id);
             if (view)
                 view.show(context);
@@ -869,7 +897,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
 
         return request;
     },    
-    processLayout: function(layout, options, entry)
+    processLayout: function(layout, options, entry, el)
     {
         var sections = [];
         var content = [];
@@ -938,13 +966,13 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
 
         content.push(this.sectionEndTemplate.apply(options));
 
-        Ext.DomHelper.append(this.el, content.join(''));
+        Ext.DomHelper.append(el || this.el, content.join(''));
 
         for (var i = 0; i < sections.length; i++)
         {
             var current = sections[i];  
             
-            this.processLayout(current['as'], current['options'], entry);  
+            this.processLayout(current['as'], current['options'], entry, el);  
         }        
     },    
     requestFailure: function(response, o) {

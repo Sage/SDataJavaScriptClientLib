@@ -230,10 +230,12 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
 Ext.onReady(function(){
     var isApple = /(iphone|ipad|ipod)/i.test(navigator.userAgent),
         isMobile = (typeof window.orientation !== 'undefined'),
+        onlyHorizontalSwipe = true,
         root = Ext.get(document.documentElement),
         minSwipeLength = 100.0,
         maxSwipeTime = 0.5,
         minLongClickTime = 1.0,
+        maxLongClickLength = 5.0,
         startAt,
         startTime;    
     
@@ -256,21 +258,37 @@ Ext.onReady(function(){
 
         if (duration <= maxSwipeTime && length >= minSwipeLength)
         {
-            evt.stopEvent();     
-
-            var direction;
-            if (dotProd >= 0.71)
-                direction = 'down';            
-            else if (dotProd <= -0.71)            
-                direction = 'up';            
-            else if (normalized.x < 0.0)
-                direction = 'left';
+            var swipe;
+            if (!onlyHorizontalSwipe)
+            {
+                evt.stopEvent();     
+                
+                if (dotProd >= 0.71)
+                    swipe = 'down';            
+                else if (dotProd <= -0.71)            
+                    swipe = 'up';            
+                else if (normalized.x < 0.0)
+                    swipe = 'left';
+                else
+                    swipe = 'right';
+            } 
             else
-                direction = 'right';
+            {
+                if (dotProd < 0.71 && dotProd > -0.71)
+                {
+                    evt.stopEvent();   
 
-            ReUI.DomHelper.dispatch(el, 'swipe', {direction: direction});        
+                    if (normalized.x < 0.0)
+                        swipe = 'left';
+                    else
+                        swipe = 'right';
+                }
+            }
+
+            if (swipe)
+                ReUI.DomHelper.dispatch(el, 'swipe', {direction: swipe});        
         }        
-        else if (duration >= minLongClickTime)
+        else if (duration >= minLongClickTime && length <= maxLongClickLength)
         {
             evt.stopEvent();
 
