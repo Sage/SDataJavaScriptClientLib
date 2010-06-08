@@ -21,7 +21,7 @@ Sage.Platform.Mobile.ListDetail = Ext.extend(Sage.Platform.Mobile.ListDetail, {
             id: 'generic_detail',
             title: this.titleText,
             expose: false,
-            editor: false,            
+            editor: false,       
             tools: {
                 tbar: [{
                     name: 'edit',
@@ -32,18 +32,33 @@ Sage.Platform.Mobile.ListDetail = Ext.extend(Sage.Platform.Mobile.ListDetail, {
                     scope: this                
                 }]
             }        
-        });        
-
-        this.frames = [];
-        this.frameContext = {
-            current: 0,
-            next: 1,
-            prev: 2
-        };
+        });                
+        
+        /* 
+        state: {
+            position: 0
+            data: { 
+                current: {},
+                next: {},
+                previous: {}
+            },
+            request: {
+                0: false,
+                1: false,
+                2: false
+            },
+            frames: {
+                current: 1,
+                next: 2,
+                previous: 0
+            }
+        }
+        */            
     },
     render: function() {
         Sage.Platform.Mobile.ListDetail.superclass.render.call(this);
 
+        this.frames = {};
         this.frames[0] = Ext.get(this.id + '_0');
         this.frames[1] = Ext.get(this.id + '_1');
         this.frames[2] = Ext.get(this.id + '_2');
@@ -54,18 +69,16 @@ Sage.Platform.Mobile.ListDetail = Ext.extend(Sage.Platform.Mobile.ListDetail, {
         Sage.Platform.Mobile.ListDetail.superclass.init.call(this);
 
         this.el
-            .on('click', function(evt, el, o) {                
-                var source = Ext.get(el);
-                var target;
-
-                if (source.is('a[target="_related"]') || (target = source.up('a[target="_related"]')))
-                {
+            .on('click', function(evt, el, o) {
                     evt.stopEvent();
 
-                    this.navigateToRelated(target || source, evt);                    
-                }
-            }, this);
-        
+                    var el = Ext.fly(el);
+                    var view = el.dom.hash.substring(1);
+                    var key = el.getAttribute('key', 'm');                       
+                    var where = el.getAttribute('where', 'm');                                    
+
+                    this.navigateToRelated(view, key, where);   
+            }, this, {delegate: 'a[target="_related"]'})        
         
         /*
         App.on('refresh', function(o) {
@@ -78,20 +91,36 @@ Sage.Platform.Mobile.ListDetail = Ext.extend(Sage.Platform.Mobile.ListDetail, {
             }
         }, this);  
         */
-    },        
+    },     
     createRequest: function() {
-        var request = new Sage.SData.Client.SDataSingleResourceRequest(this.getService())
-            .setResourceSelector(String.format("'{0}'", this.context.key)); 
+        /// <summary>
+        ///     Creates SDataResourceCollectionRequest instance and sets a number of known properties.        
+        /// </summary>
+        /// <returns type="Sage.SData.Client.SDataResourceCollectionRequest">An SDataResourceCollectionRequest instance.<returns>
+        var request = new Sage.SData.Client.SDataResourceCollectionRequest(this.getService());
 
         if (this.resourceKind) 
-            request.setResourceKind(this.resourceKind);
+            request.setResourceKind(this.resourceKind)
+
+        var where = [];
+        var expr;
+        if (this.context && (expr = this.expandExpression(this.context.where)))
+            where.push(expr);
+
+        if (this.query)
+            where.push(this.query);
+
+        if (where.length > 0)
+            request.setQueryArgs({
+                'where': where.join(' and ')
+            });  
 
         return request;
-    },     
+    },               
     requestFailure: function(response, o) {
        
     },
-    requestData: function() {
+    requestData: function(slot) { /* i.e. next, prev, current */
         var request = this.createRequest();        
         request.read({  
             success: function(entry) {   
@@ -113,7 +142,7 @@ Sage.Platform.Mobile.ListDetail = Ext.extend(Sage.Platform.Mobile.ListDetail, {
     show: function(o) {
         if (o)
         {
-            if (o.key) 
+            if (o.position) 
                 this.newContext = o;
 
             if (o.descriptor)
@@ -122,9 +151,38 @@ Sage.Platform.Mobile.ListDetail = Ext.extend(Sage.Platform.Mobile.ListDetail, {
 
         Sage.Platform.Mobile.ListDetail.superclass.show.call(this);                     
     },  
-    isNewContext: function() {
-        return (!this.context || (this.context && this.context.key != this.newContext.key));
-    }, 
+    expandExpression: function(expression) {
+        /// <summary>
+        ///     Expands the passed expression if it is a function.
+        /// </summary>
+        /// <param name="expression" type="String">
+        ///     1: function - Called on this object and must return a string.
+        ///     2: string - Returned directly.
+        /// </param>
+        if (typeof expression === 'function') 
+            return expression.call(this);
+        else
+            return expression;
+    },
+    hasContext: function() {
+        /// <summary> 
+        ///     Indicates whether or not the view has a context.
+        /// </summary>
+        /// <returns type="Boolean">True if there is a current, or new, context; False otherwise.</returns>
+        return (this.context || this.newContext);
+    },         
+    isNewContext: function() {   
+        /// <summary>
+        ///     Indicates whether or not the view has a new context.
+        /// </summary>
+        /// <returns type="Boolean">True if there is a new context; False otherwise.</returns>
+        if (!this.context) return true;
+
+        if (this.expandExpression(this.context.where) != this.expandExpression(this.newContext.where)) return true;
+        if (this.expandExpression(this.context.position) != this.expandExpression(this.newContext.position)) return true;       
+         
+        return false;
+    },
     beforeTransitionTo: function() {
         Sage.Platform.Mobile.ListDetail.superclass.beforeTransitionTo.call(this);
 
@@ -147,17 +205,32 @@ Sage.Platform.Mobile.ListDetail = Ext.extend(Sage.Platform.Mobile.ListDetail, {
         }   
     },
     clear: function(frame) {
-        if (typeof frame === 'number' && this.frames[frame])
+        if (typeof frame !== 'undefined' && this.frames[frame])
         {         
             this.frames[frame].update(this.contentTemplate.apply(this));
         }
         else
         {
             var content =  this.contentTemplate.apply(this);
-            for (var i = 0; i < this.frames.length; i++)
+            for (var frame in this.frames)
                 this.frames[frame].update(content);
 
             this.context = false;
+            this.state = {
+                position: false,
+                data: { 
+                    current: null,
+                    next: null,
+                    previous: null
+                },
+                request: {
+                },
+                frames: {
+                    current: 1,
+                    next: 2,
+                    previous: 0
+                }
+            };
         }                      
     }      
 });

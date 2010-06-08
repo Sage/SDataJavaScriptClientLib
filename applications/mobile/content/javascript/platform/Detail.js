@@ -76,31 +76,17 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     },
     init: function() {  
         Sage.Platform.Mobile.Detail.superclass.init.call(this);
-
-        /*
-        this.el
-            .on('click', function(evt, el, o) {                
-                var source = Ext.get(el);
-                var target;
-
-                if (source.is('a[target="_related"]') || (target = source.up('a[target="_related"]')))
-                {
-                    evt.stopEvent();
-
-                    this.navigateToRelated(target || source, evt);                    
-                }
-            }, this);
-        */
+        
         this.el
             .on('click', function(evt, el, o) {
                     evt.stopEvent();
 
                     var el = Ext.fly(el);
-                    var where = el.getAttribute('where', 'm');                
-                    var key = el.getAttribute('key', 'm');   
-                    var id = el.dom.hash.substring(1);
+                    var view = el.dom.hash.substring(1);
+                    var key = el.getAttribute('key', 'm');                       
+                    var where = el.getAttribute('where', 'm');                                    
 
-                    this.navigateToRelated(id, key, where);   
+                    this.navigateToRelated(view, key, where);   
             }, this, {delegate: 'a[target="_related"]'});
         
         // todo: find a better way to handle these notifications
@@ -122,7 +108,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         if (view)
             view.show(this.entry);
     },
-    navigateToRelated: function(id, key, where) {    
+    navigateToRelated: function(view, key, where) {    
         var context = false;            
         
         if (key)
@@ -136,9 +122,9 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
                     
         if (context) 
         {            
-            var view = App.getView(id);
-            if (view)
-                view.show(context);
+            var v = App.getView(view);
+            if (v)
+                v.show(context);
         }                                              
     },    
     createRequest: function() {
