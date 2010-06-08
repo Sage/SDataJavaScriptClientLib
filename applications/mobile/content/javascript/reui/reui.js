@@ -69,7 +69,7 @@ ReUI = {};
         wait: isIE 
             ? function(fn, delay) {
                 var pass = Array.prototype.slice.call(arguments, 2);
-                setTimeout(function() {
+                return setTimeout(function() {
                     fn.apply(this, pass);
                 }, delay);
             }
@@ -82,7 +82,7 @@ ReUI = {};
         timer: isIE 
             ? function(fn, delay) {
                 var pass = Array.prototype.slice.call(arguments, 2);
-                setInterval(function() {
+                return setInterval(function() {
                     fn.apply(this, pass);
                 }, delay);
             }
@@ -334,6 +334,7 @@ ReUI = {};
         page: false,
         dialog: false,
         transitioning: false,
+        initialized: false,
         counter: 0,
         width: 0,
         height: 0,
@@ -357,6 +358,11 @@ ReUI = {};
         prioritizeLocation: false,         
 
         init: function() {
+            if (context.initialized) 
+                return;
+
+            context.initialized = true;
+
             R.rootEl = R.rootEl || document.body;            
             R.backEl = R.backEl || D.get('backButton');
             R.titleEl = R.titleEl || D.get('pageTitle');
