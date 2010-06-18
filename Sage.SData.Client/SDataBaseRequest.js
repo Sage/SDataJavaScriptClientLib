@@ -13,11 +13,12 @@ Sage.SData.Client.SDataBaseRequest = Ext.extend(Ext.util.Observable, {
 
         if (this.service) 
         {            
+            this.uri.setVersion(this.service.getVersion());
             this.uri.setIncludeContent(this.service.getIncludeContent());
             this.uri.setServer(this.service.getVirtualDirectory() ? this.service.getVirtualDirectory() : 'sdata');
             this.uri.setScheme(this.service.getProtocol());
             this.uri.setHost(this.service.getServerName());
-            this.uri.setPort(this.service.getPort());                        
+            this.uri.setPort(this.service.getPort());                                    
         }
     },
     getService: function() {

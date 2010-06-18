@@ -25,7 +25,8 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
         Ext.apply(this, o, {
             id: 'view',
             title: '',
-            canSearch: false
+            canSearch: false,
+            serviceName: false
         });        
 
         this.loaded = false;
@@ -101,7 +102,7 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
         /// <summary>
         ///     Returns the primary SDataService instance for the view.  
         /// </summary>
-        /// <returns type="Sage.SData.Client.SDataService">The SDataService instance.</returns>
-        return App.getService();
+        /// <returns type="Sage.SData.Client.SDataService">The SDataService instance.</returns>        
+        return App.getService(this.serviceName); /* if false is passed, the default service will be returned */
     }  
 });

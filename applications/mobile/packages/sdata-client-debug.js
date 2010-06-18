@@ -16,11 +16,12 @@ Sage.SData.Client.SDataBaseRequest = Ext.extend(Ext.util.Observable, {
 
         if (this.service) 
         {            
+            this.uri.setVersion(this.service.getVersion());
             this.uri.setIncludeContent(this.service.getIncludeContent());
             this.uri.setServer(this.service.getVirtualDirectory() ? this.service.getVirtualDirectory() : 'sdata');
             this.uri.setScheme(this.service.getProtocol());
             this.uri.setHost(this.service.getServerName());
-            this.uri.setPort(this.service.getPort());                        
+            this.uri.setPort(this.service.getPort());                                    
         }
     },
     getService: function() {
@@ -258,8 +259,22 @@ Sage.SData.Client.SDataUri = Ext.extend(Ext.util.Observable, {
         this.pathSegments = [];
         this.startIndex = false;
         this.count = false;
+        this.version = {
+            major: 1,
+            minor: 0
+        };
 
         Ext.apply(this, uri);                                     
+    },
+    getVersion: function() {
+        return this.version;
+    },
+    setVersion: function(val) {
+        this.version = Ext.apply({ 
+            major: 0, 
+            minor: 0 
+        }, val);
+        return this;
     },
     getScheme: function() {   
         /// <returns type="String">The scheme component of the URI.</returns>          
@@ -368,10 +383,16 @@ Sage.SData.Client.SDataUri = Ext.extend(Ext.util.Observable, {
         return this;
     },
     getIncludeContent: function() {
-        return this.queryArgs[Sage.SData.Client.SDataUri.QueryArgNames.IncludeContent] == 'true';
+        if (this.version.major >= 1)        
+            return this.queryArgs[Sage.SData.Client.SDataUri.QueryArgNames.IncludeContent] == 'true';
+        else
+            return this.queryArgs[Sage.SData.Client.SDataUri.QueryArgNames.LegacyIncludeContent] == 'true';
     },
     setIncludeContent: function(val) {
-        this.queryArgs[Sage.SData.Client.SDataUri.QueryArgNames.IncludeContent] = val ? 'true' : 'false';
+        if (this.version.major >= 1)
+            this.queryArgs[Sage.SData.Client.SDataUri.QueryArgNames.IncludeContent] = val ? 'true' : 'false';
+        else
+            this.queryArgs[Sage.SData.Client.SDataUri.QueryArgNames.LegacyIncludeContent] = val ? 'true' : 'false';
         return this;
     },
     appendPath: function(val) {
@@ -494,6 +515,7 @@ Ext.apply(Sage.SData.Client.SDataUri, {
         Format: 'format',
         Include: 'include',
         IncludeContent: '_includeContent',
+        LegacyIncludeContent: 'includeContent',
         IncludeSchema: 'includeSchema',
         Language: 'language',
         OrderBy: 'orderby',
@@ -538,6 +560,13 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
             'requestcomplete',
             'requestexception'
         );   
+    },
+    getVersion: function() {
+        return this.uri.getVersion();
+    },
+    setVersion: function(val) {
+        this.uri.setVersion(val);
+        return this;
     },
     getUri: function() {
         /// <returns type="Sage.SData.Client.SDataUri" />
@@ -671,11 +700,14 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
             return;
         }
 
-        Ext.Ajax.request(o);
-    },    
+        return Ext.Ajax.request(o);
+    },  
+    abortRequest: function(id) {
+        Ext.Ajax.abort(id);
+    },  
     readFeed: function(request, options) {  
         /// <param name="request" type="Sage.SData.Client.SDataResourceCollectionRequest">request object</param>          
-        this.executeRequest(request, options, {
+        return this.executeRequest(request, options, {
             headers: {
                 'Accept': 'application/atom+xml;type=feed,*/*'
             }
@@ -692,7 +724,7 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
             }
         }, options);
 
-        this.executeRequest(request, o, {
+        return this.executeRequest(request, o, {
             headers: {
                 'Accept': 'application/atom+xml;type=entry,*/*'
             }
@@ -705,7 +737,7 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
 
         var body = xml.writeXML(this.formatEntry(entry));
 
-        this.executeRequest(request, Ext.apply({}, {
+        return this.executeRequest(request, Ext.apply({}, {
             success: function(feed) {
                 var entry = feed['$resources'][0] || false;                 
 
@@ -732,8 +764,9 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
         applyTo = applyTo || {};
 
         applyTo['$name'] = name;
-        applyTo['$key'] = entity['@sdata:key'];
-        applyTo['$url'] = entity['@sdata:uri'];        
+        applyTo['$key'] = entity['@sdata:key'];        
+        applyTo['$url'] = entity['@sdata:uri'];
+        applyTo['$uuid'] = entity['@sdata:uuid'];        
         
         var prefix = ns + ':'; 
 

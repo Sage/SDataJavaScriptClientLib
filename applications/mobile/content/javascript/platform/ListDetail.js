@@ -8,11 +8,10 @@ Ext.namespace('Sage.Platform.Mobile');
 
 Sage.Platform.Mobile.ListDetail = Ext.extend(Sage.Platform.Mobile.ListDetail, {   
     viewTemplate: new Simplate([            
-        '<div id="{%= id %}" title="{%= title %}" class="panel">',    
-        '<div id="{%= id %}_0"></div>',
-        '<div id="{%= id %}_1"></div>',
-        '<div id="{%= id %}_2"></div>',                 
-        '</div>'
+        '<div id="{%= id %}_2" title="{%= title %}" class="panel"></div>',
+        '<div id="{%= id %}_1" title="{%= title %}" class="panel"></div>',
+        '<div id="{%= id %}_0" title="{%= title %}" class="panel"></div>' 
+        /* ext will return the last element when appended to the dom; this.el will refer to '_0' */
     ]),   
     constructor: function(o) {
         Sage.Platform.Mobile.ListDetail.superclass.constructor.call(this);        
@@ -35,22 +34,22 @@ Sage.Platform.Mobile.ListDetail = Ext.extend(Sage.Platform.Mobile.ListDetail, {
         });                
         
         /* 
-        state: {
-            position: 0
-            data: { 
-                current: {},
-                next: {},
-                previous: {}
+        state: {            
+            position: 0,
+            next: {
+                data: {},
+                request: null,
+                frame: 2
             },
-            request: {
-                0: false,
-                1: false,
-                2: false
+            prev: {
+                data: {},                
+                request: null,
+                frame: 1
             },
-            frames: {
-                current: 1,
-                next: 2,
-                previous: 0
+            current: {
+                data: {},
+                request: null,
+                frame: 0
             }
         }
         */            
@@ -121,7 +120,32 @@ Sage.Platform.Mobile.ListDetail = Ext.extend(Sage.Platform.Mobile.ListDetail, {
        
     },
     requestData: function(slot) { /* i.e. next, prev, current */
-        var request = this.createRequest();        
+        var request = this.createRequest();      
+
+        if (this.state[slot].request)
+        {
+            
+        }
+        
+        if (slot === true)
+        {
+            request
+                .setCount(3)
+                .setStartIndex(this.context.position - 1);
+        }
+        else
+        {
+            request
+                .setCount(1)
+                .setStartIndex(
+                    slot == 'next'
+                        ? this.state.position + 1
+                        : slot == 'prev'
+                            ? this.state.position - 1
+                            : this.state.position
+                );            
+        }
+          
         request.read({  
             success: function(entry) {   
                 this.el
@@ -217,18 +241,21 @@ Sage.Platform.Mobile.ListDetail = Ext.extend(Sage.Platform.Mobile.ListDetail, {
 
             this.context = false;
             this.state = {
-                position: false,
-                data: { 
-                    current: null,
-                    next: null,
-                    previous: null
+                position: 0,
+                next: {
+                    data: false,
+                    request: false,
+                    frame: 2
                 },
-                request: {
+                prev: {
+                    data: false,                
+                    request: false,
+                    frame: 1
                 },
-                frames: {
-                    current: 1,
-                    next: 2,
-                    previous: 0
+                current: {
+                    data: false,
+                    request: false,
+                    frame: 0
                 }
             };
         }                      

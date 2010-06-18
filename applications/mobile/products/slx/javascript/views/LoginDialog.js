@@ -84,6 +84,8 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
                 }
                 else {
                     App.context['user'] = feed['$resources'][0]['$key'];
+                    
+                    // todo: add successful login eventing                    
 
                     this.el.dom.removeAttribute('selected');
                 }

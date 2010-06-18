@@ -8,6 +8,9 @@ Ext.namespace('Sage.Platform.Mobile');
 Ext.USE_NATIVE_JSON = true;
 
 Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
+    defaultServerName: window.location.hostname,    
+    defaultPort: window.location.port && window.location.port != 80 ? window.location.port : false,
+    defaultProtocol: /https/i.test(window.location.protocol) ? 'https' : false,
     constructor: function() {
         /// <field name="initialized" type="Boolean">True if the application has been initialized; False otherwise.</field>
         /// <field name="context" type="Object">A general store for global context data.</field>
@@ -19,7 +22,9 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         this.initialized = false;
         this.enableCaching = false;        
         this.context = {};
-        this.views = {};    
+        this.views = {};   
+        this.services = {};
+        this.defaultService = false; 
         this.bars = {};    
         this.addEvents(
             'registered',
@@ -54,13 +59,10 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
             }
         }, this);          
                 
-        if (this.service && this.enableCaching)
+        if (this.enableCaching)
         {
             if (this.isOnline())
                 this.clearSDataRequestCache();
-
-            this.service.on('beforerequest', this.loadSDataRequest, this);
-            this.service.on('requestcomplete', this.cacheSDataRequest, this);
         }      
     },   
     isOnline: function() {
@@ -107,19 +109,6 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         /// <summary>
         ///     Initializes this application as well as the toolbar and all currently registered views.
         /// </summary>        
-        this.service = new Sage.SData.Client.SDataService()        
-            .setServerName(this.serverName)            
-            .setVirtualDirectory(this.virtualDirectory)
-            .setApplicationName(this.applicationName)
-            .setContractName(this.contractName)
-            .setIncludeContent(false);
-
-        if (this.port !== false)
-            this.service.setPort(this.port);
-
-        if (this.protocol !== false)
-            this.service.setProtocol(this.protocol);
-
         this.setup();
 
         for (var n in this.bars) 
@@ -130,6 +119,53 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
 
         this.initialized = true;
     },
+    registerService: function(name, s, o) {
+        var o = o || {};
+
+        if (s instanceof Sage.SData.Client.SDataService)        
+            var service = s;
+        else
+        {
+            var service = new Sage.SData.Client.SDataService();
+            
+            if (s.version)
+                service.setVersion(s.version);
+
+            service        
+                .setServerName(s.serverName)            
+                .setVirtualDirectory(s.virtualDirectory)
+                .setApplicationName(s.applicationName)
+                .setContractName(s.contractName)
+                .setIncludeContent(typeof s.includeContent === 'boolean' ? s.includeContent : false);
+
+            if (s.port)
+                service.setPort(s.port);
+
+            if (s.protocol)
+                service.setProtocol(s.protocol);
+
+            if (s.userName)
+                service.setUserName(s.userName);
+
+            if (s.password)
+                service.setPassword(s.password);            
+        }
+
+        this.services[name] = service;
+        
+        if (this.enableCaching && o.offline)
+        {
+            service.on('beforerequest', this.loadSDataRequest, this);
+            service.on('requestcomplete', this.cacheSDataRequest, this);
+        }        
+
+        if (o.isDefault || !this.defaultService)
+        {
+            this.defaultService = service;
+        }
+
+        return this;
+    },    
     registerView: function(view) {
         /// <summary>
         ///     Registers a view with the application.  If the application has already been 
@@ -141,6 +177,8 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         if (this.initialized) view.init();
 
         this.fireEvent('registered', view);
+
+        return this;
     },
     registerToolbar: function(name, tbar)
     {
@@ -153,6 +191,8 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         this.bars[name] = tbar;
 
         if (this.initialized) tbar.init();
+
+        return this;
     },
     getViews: function() {
         /// <returns elementType="Sage.Platform.Mobile.View">An array containing the currently registered views.</returns>
@@ -184,9 +224,12 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         }
         return null;
     },
-    getService: function() {
+    getService: function(name) {
         /// <returns type="Sage.SData.Client.SDataService">The application's SData service instance.</returns>
-        return this.service;
+        if (typeof name === 'string' && this.services[name]) 
+            return this.services[name];
+
+        return this.defaultService;
     },
     setTitle: function(title) {
         /// <summary>Sets the applications current title.</summary>

@@ -25,6 +25,13 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
             'requestexception'
         );   
     },
+    getVersion: function() {
+        return this.uri.getVersion();
+    },
+    setVersion: function(val) {
+        this.uri.setVersion(val);
+        return this;
+    },
     getUri: function() {
         /// <returns type="Sage.SData.Client.SDataUri" />
         return this.uri;
@@ -221,8 +228,9 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
         applyTo = applyTo || {};
 
         applyTo['$name'] = name;
-        applyTo['$key'] = entity['@sdata:key'];
-        applyTo['$url'] = entity['@sdata:uri'];        
+        applyTo['$key'] = entity['@sdata:key'];        
+        applyTo['$url'] = entity['@sdata:uri'];
+        applyTo['$uuid'] = entity['@sdata:uuid'];        
         
         var prefix = ns + ':'; 
 

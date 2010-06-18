@@ -4,30 +4,42 @@
 
 Ext.namespace("Mobile.SalesLogix");
 
-Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {
-    defaultServerName: window.location.hostname,
+Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {    
     defaultVirtualDirectory: 'sdata',
     defaultApplicationName: 'slx',
     defaultContractName: 'dynamic',
-    defaultPort: window.location.port && window.location.port != 80 ? window.location.port : false,
-    defaultProtocol: /https/i.test(window.location.protocol) ? 'https' : false,
     titleText: 'Mobile Demo',
     constructor: function (o) {
         Mobile.SalesLogix.Application.superclass.constructor.call(this);
 
         Ext.apply(this, o, {
             enableCaching: true,
-            context: {},
+            context: {}
+        });              
+    },
+    setup: function () {
+        Mobile.SalesLogix.Application.superclass.setup.apply(this, arguments);
+
+        this.registerService('slx', {
             serverName: this.defaultServerName,
             virtualDirectory: this.defaultVirtualDirectory,
             applicationName: this.defaultApplicationName,
             contractName: this.defaultContractName,
             port: this.defaultPort,
             protocol: this.defaultProtocol
-        });
-    },
-    setup: function () {
-        Mobile.SalesLogix.Application.superclass.setup.apply(this, arguments);
+        }, { isDefault: true, offline: true });
+
+        this.registerService('sage50', {
+            serverName: 'ec2-67-202-57-59.compute-1.amazonaws.com',
+            virtualDirectory: 'sage50',
+            applicationName: 'accounts50',
+            contractName: 'gcrm',
+            port: this.defaultPort,
+            protocol: this.defaultProtocol,
+            userName: 'manager',
+            password: '',
+            version: { major: 0, minor: 9 }
+        }, { offline: true });
 
         this.registerToolbar(new Sage.Platform.Mobile.MainToolbar({
             name: 'tbar',
@@ -59,6 +71,8 @@ Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {
             id: 'opportunity_related',
             expose: false
         }));
+
+        this.registerView(new Mobile.GCRM.TradingAccount.List());
 
         /*
         this.registerView(new Mobile.SalesLogix.Activity.List({

@@ -16,8 +16,22 @@ Sage.SData.Client.SDataUri = Ext.extend(Ext.util.Observable, {
         this.pathSegments = [];
         this.startIndex = false;
         this.count = false;
+        this.version = {
+            major: 1,
+            minor: 0
+        };
 
         Ext.apply(this, uri);                                     
+    },
+    getVersion: function() {
+        return this.version;
+    },
+    setVersion: function(val) {
+        this.version = Ext.apply({ 
+            major: 0, 
+            minor: 0 
+        }, val);
+        return this;
     },
     getScheme: function() {   
         /// <returns type="String">The scheme component of the URI.</returns>          
@@ -126,10 +140,16 @@ Sage.SData.Client.SDataUri = Ext.extend(Ext.util.Observable, {
         return this;
     },
     getIncludeContent: function() {
-        return this.queryArgs[Sage.SData.Client.SDataUri.QueryArgNames.IncludeContent] == 'true';
+        if (this.version.major >= 1)        
+            return this.queryArgs[Sage.SData.Client.SDataUri.QueryArgNames.IncludeContent] == 'true';
+        else
+            return this.queryArgs[Sage.SData.Client.SDataUri.QueryArgNames.LegacyIncludeContent] == 'true';
     },
     setIncludeContent: function(val) {
-        this.queryArgs[Sage.SData.Client.SDataUri.QueryArgNames.IncludeContent] = val ? 'true' : 'false';
+        if (this.version.major >= 1)
+            this.queryArgs[Sage.SData.Client.SDataUri.QueryArgNames.IncludeContent] = val ? 'true' : 'false';
+        else
+            this.queryArgs[Sage.SData.Client.SDataUri.QueryArgNames.LegacyIncludeContent] = val ? 'true' : 'false';
         return this;
     },
     appendPath: function(val) {
@@ -252,6 +272,7 @@ Ext.apply(Sage.SData.Client.SDataUri, {
         Format: 'format',
         Include: 'include',
         IncludeContent: '_includeContent',
+        LegacyIncludeContent: 'includeContent',
         IncludeSchema: 'includeSchema',
         Language: 'language',
         OrderBy: 'orderby',
