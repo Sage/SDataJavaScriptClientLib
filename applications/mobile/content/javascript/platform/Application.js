@@ -19,9 +19,8 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         this.initialized = false;
         this.enableCaching = false;        
         this.context = {};
-        this.views = [];    
+        this.views = {};    
         this.bars = {};    
-        this.viewsById = {};
         this.addEvents(
             'registered',
             'beforeviewtransitionaway',
@@ -126,8 +125,8 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         for (var n in this.bars) 
             this.bars[n].init();
 
-        for (var i = 0; i < this.views.length; i++) 
-            this.views[i].init();
+        for (var n in this.views)
+            this.views[n].init();        
 
         this.initialized = true;
     },
@@ -137,8 +136,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         ///     initialized, the view is immediately initialized as well.
         /// </summary>
         /// <param name="view" type="Sage.Platform.Mobile.View">The view to be registered.</param>
-        this.views.push(view);
-        this.viewsById[view.id] = view;
+        this.views[view.id] = view;
 
         if (this.initialized) view.init();
 
@@ -158,7 +156,9 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     },
     getViews: function() {
         /// <returns elementType="Sage.Platform.Mobile.View">An array containing the currently registered views.</returns>
-        return this.views;
+        var r = [];
+        for (var n in this.views) r.push(this.views[n]);
+        return r;
     },
     getActiveView: function() {
         /// <returns type="Sage.Platform.Mobile.View">The currently active view.</returns>        
@@ -177,10 +177,10 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         if (key)
         {
             if (typeof key === 'string')
-                return this.viewsById[key];
+                return this.views[key];
             
             if (typeof key === 'object' && typeof key.id === 'string')
-                return this.viewsById[key.id];                
+                return this.views[key.id];                
         }
         return null;
     },

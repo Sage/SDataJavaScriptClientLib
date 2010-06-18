@@ -157,11 +157,14 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
             return;
         }
 
-        Ext.Ajax.request(o);
-    },    
+        return Ext.Ajax.request(o);
+    },  
+    abortRequest: function(id) {
+        Ext.Ajax.abort(id);
+    },  
     readFeed: function(request, options) {  
         /// <param name="request" type="Sage.SData.Client.SDataResourceCollectionRequest">request object</param>          
-        this.executeRequest(request, options, {
+        return this.executeRequest(request, options, {
             headers: {
                 'Accept': 'application/atom+xml;type=feed,*/*'
             }
@@ -178,7 +181,7 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
             }
         }, options);
 
-        this.executeRequest(request, o, {
+        return this.executeRequest(request, o, {
             headers: {
                 'Accept': 'application/atom+xml;type=entry,*/*'
             }
@@ -191,7 +194,7 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
 
         var body = xml.writeXML(this.formatEntry(entry));
 
-        this.executeRequest(request, Ext.apply({}, {
+        return this.executeRequest(request, Ext.apply({}, {
             success: function(feed) {
                 var entry = feed['$resources'][0] || false;                 
 
