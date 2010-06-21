@@ -130,18 +130,11 @@ Sage.SData.Client.SDataApplicationRequest = Ext.extend(Sage.SData.Client.SDataBa
         return this;
     },
     getResourceKind: function() {
-        return this.resourceKind;
+        return this.uri.getCollectionType();
     },
     setResourceKind: function(val) {
-        this.resourceKind = val;
+        this.uri.setCollectionType(val);
         return this;
-    },
-    buildUrl: function(uri) {
-        /// <param name="uri" type="Sage.SData.Client.SDataUri" />
-
-        Sage.SData.Client.SDataApplicationRequest.superclass.buildUrl.apply(this, arguments);
-
-        uri.appendPath(this.getResourceKind());
     }
 });
 ﻿/// <reference path="../dependencies/ext/ext-core-debug.js"/>
@@ -184,9 +177,7 @@ Ext.namespace("Sage.SData.Client");
 
 Sage.SData.Client.SDataSingleResourceRequest = Ext.extend(Sage.SData.Client.SDataApplicationRequest, {   
     constructor: function() {        
-        Sage.SData.Client.SDataSingleResourceRequest.superclass.constructor.apply(this, arguments);
-        
-        this.resourceSelector = false;                                                   
+        Sage.SData.Client.SDataSingleResourceRequest.superclass.constructor.apply(this, arguments);                                                 
     },       
     read: function(options) {
         return this.service.readEntry(this, options);
@@ -195,18 +186,11 @@ Sage.SData.Client.SDataSingleResourceRequest = Ext.extend(Sage.SData.Client.SDat
         return this.service.updateEntry(this, entry, options);
     },
     getResourceSelector: function() {
-        return this.resourceSelector;
+        return this.uri.getCollectionPredicate();
     },
-    setResourceSelector: function(val) {
-        this.resourceSelector = val;
+    setResourceSelector: function(val) {        
+        this.uri.setCollectionPredicate(val);
         return this;
-    },
-    buildUrl: function(uri) {
-        /// <param name="uri" type="Sage.SData.Client.SDataUri" />
-
-        Sage.SData.Client.SDataSingleResourceRequest.superclass.buildUrl.apply(this, arguments);
-
-        if (this.resourceSelector) uri.setCollectionPredicate(this.resourceSelector);
     }
 });﻿/// <reference path="../dependencies/ext/ext-core-debug.js"/>
 /// <reference path="../dependencies/ObjTree.js"/>
@@ -358,10 +342,15 @@ Sage.SData.Client.SDataUri = Ext.extend(Ext.util.Observable, {
             ? this.pathSegments[i]
             : false;
     },
-    setPathSegment: function(i, val) {
-        this.pathSegments[i] = typeof val === 'string'
-            ? {text: val}
-            : val;
+    setPathSegment: function(i, segment, predicate) {
+        if (typeof segment === 'string')
+        {
+            var segment = {
+                'text': segment
+            };        
+            if (predicate) segment['predicate'] = predicate;
+        }
+        this.pathSegments[i] = Ext.apply(this.pathSegments[i] || {}, segment);        
         return this;
     },      
     getStartIndex: function() {
@@ -429,13 +418,15 @@ Sage.SData.Client.SDataUri = Ext.extend(Ext.util.Observable, {
                        
         for (var i = 0; i < segments.length; i++) 
         {
-            if (typeof segments[i] === 'undefined') continue;
+            var segment = segments[i];
+
+            if (typeof segment === 'undefined') continue;
 
             // need to check predicate for beginning and end parenthesis and strip them
-            if (segments[i]['predicate'])
-                path.push(encodeURIComponent(segments[i]['text'] + '(' + segments[i]['predicate'] + ')'));
+            if (segment['predicate'])
+                path.push(encodeURIComponent(segment['text'] + '(' + segment['predicate'] + ')'));
             else
-                path.push(encodeURIComponent(segments[i]['text']));
+                path.push(encodeURIComponent(segment['text']));
         }
 
         url.push(path.join(Sage.SData.Client.SDataUri.PathSegmentPrefix));
@@ -491,10 +482,9 @@ Sage.SData.Client.SDataUri = Ext.extend(Ext.util.Observable, {
             : false           
     },
     setCollectionPredicate: function(val) {
-        var segment = this.getPathSegment(Sage.SData.Client.SDataUri.CollectionTypePathIndex);
-        if (segment)
-            segment['predicate'] = val;
-        return this;
+        return this.setPathSegment(Sage.SData.Client.SDataUri.CollectionTypePathIndex, {
+            predicate: val
+        });
     }
 });
 
@@ -532,6 +522,7 @@ Ext.apply(Sage.SData.Client.SDataUri, {
     ContractTypePathIndex: 1,
     CompanyDatasetPathIndex: 2,
     CollectionTypePathIndex: 3,
+    ResourcePropertyIndex: 4,
     ServiceMethodSegment: '$service'
 });
 ﻿/// <reference path="../dependencies/ext/ext-core-debug.js"/>
@@ -545,7 +536,7 @@ Ext.apply(Sage.SData.Client.SDataUri, {
 Ext.namespace("Sage.SData.Client");
 
 Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {  
-    constructor: function() {
+    constructor: function(o) {
         /// <field name="uri" type="Sage.SData.Client.SDataUri" />
 
         Sage.SData.Client.SDataService.superclass.constructor.apply(this, arguments);
@@ -553,7 +544,23 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
         this.uri = new Sage.SData.Client.SDataUri();
         this.userAgent = 'Sage';
         this.username = false;
-        this.password = '';    
+        this.password = '';
+        
+        if (o) 
+        {
+            if (o.version) this.uri.setVersion(o.version);
+            if (o.serverName) this.uri.setHost(o.serverName);
+            if (o.virtualDirectory) this.uri.setServer(o.virtualDirectory);
+            if (o.applicationName) this.uri.setProduct(o.applicationName);
+            if (o.contractName) this.uri.setContract(o.contractName);
+            if (o.port) this.uri.setPort(o.port);
+            if (o.protocol) this.uri.setScheme(o.protocol);
+
+            if (typeof o.includeContent === 'boolean') this.uri.setIncludeContent(o.includeContent);
+
+            if (o.userName) this.username = o.userName;
+            if (o.password) this.password = o.password;            
+        }    
         
         this.addEvents(
             'beforerequest',

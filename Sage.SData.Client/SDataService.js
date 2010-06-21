@@ -9,7 +9,7 @@
 Ext.namespace("Sage.SData.Client");
 
 Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {  
-    constructor: function() {
+    constructor: function(o) {
         /// <field name="uri" type="Sage.SData.Client.SDataUri" />
 
         Sage.SData.Client.SDataService.superclass.constructor.apply(this, arguments);
@@ -17,7 +17,23 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
         this.uri = new Sage.SData.Client.SDataUri();
         this.userAgent = 'Sage';
         this.username = false;
-        this.password = '';    
+        this.password = '';
+        
+        if (o) 
+        {
+            if (o.version) this.uri.setVersion(o.version);
+            if (o.serverName) this.uri.setHost(o.serverName);
+            if (o.virtualDirectory) this.uri.setServer(o.virtualDirectory);
+            if (o.applicationName) this.uri.setProduct(o.applicationName);
+            if (o.contractName) this.uri.setContract(o.contractName);
+            if (o.port) this.uri.setPort(o.port);
+            if (o.protocol) this.uri.setScheme(o.protocol);
+
+            if (typeof o.includeContent === 'boolean') this.uri.setIncludeContent(o.includeContent);
+
+            if (o.userName) this.username = o.userName;
+            if (o.password) this.password = o.password;            
+        }    
         
         this.addEvents(
             'beforerequest',

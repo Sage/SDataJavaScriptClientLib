@@ -115,10 +115,15 @@ Sage.SData.Client.SDataUri = Ext.extend(Ext.util.Observable, {
             ? this.pathSegments[i]
             : false;
     },
-    setPathSegment: function(i, val) {
-        this.pathSegments[i] = typeof val === 'string'
-            ? {text: val}
-            : val;
+    setPathSegment: function(i, segment, predicate) {
+        if (typeof segment === 'string')
+        {
+            var segment = {
+                'text': segment
+            };        
+            if (predicate) segment['predicate'] = predicate;
+        }
+        this.pathSegments[i] = Ext.apply(this.pathSegments[i] || {}, segment);        
         return this;
     },      
     getStartIndex: function() {
@@ -186,13 +191,15 @@ Sage.SData.Client.SDataUri = Ext.extend(Ext.util.Observable, {
                        
         for (var i = 0; i < segments.length; i++) 
         {
-            if (typeof segments[i] === 'undefined') continue;
+            var segment = segments[i];
+
+            if (typeof segment === 'undefined') continue;
 
             // need to check predicate for beginning and end parenthesis and strip them
-            if (segments[i]['predicate'])
-                path.push(encodeURIComponent(segments[i]['text'] + '(' + segments[i]['predicate'] + ')'));
+            if (segment['predicate'])
+                path.push(encodeURIComponent(segment['text'] + '(' + segment['predicate'] + ')'));
             else
-                path.push(encodeURIComponent(segments[i]['text']));
+                path.push(encodeURIComponent(segment['text']));
         }
 
         url.push(path.join(Sage.SData.Client.SDataUri.PathSegmentPrefix));
@@ -248,10 +255,9 @@ Sage.SData.Client.SDataUri = Ext.extend(Ext.util.Observable, {
             : false           
     },
     setCollectionPredicate: function(val) {
-        var segment = this.getPathSegment(Sage.SData.Client.SDataUri.CollectionTypePathIndex);
-        if (segment)
-            segment['predicate'] = val;
-        return this;
+        return this.setPathSegment(Sage.SData.Client.SDataUri.CollectionTypePathIndex, {
+            predicate: val
+        });
     }
 });
 
@@ -289,5 +295,6 @@ Ext.apply(Sage.SData.Client.SDataUri, {
     ContractTypePathIndex: 1,
     CompanyDatasetPathIndex: 2,
     CollectionTypePathIndex: 3,
+    ResourcePropertyIndex: 4,
     ServiceMethodSegment: '$service'
 });

@@ -44,6 +44,15 @@ Mobile.SalesLogix.Account.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
                     label: 'Opportunities',
                     icon: 'products/slx/images/Opportunity_List_24x24.gif'
                 }
+            ]},
+            {options: {title: 'ERP', list: true}, as: [
+                {
+                    view: 'gcrm_salesinvoice_related',
+                    resourceKind: 'tradingAccounts',
+                    resourcePredicate: this.formatRelatedQuery.createDelegate(this, ["'{0}'", 'GlobalSyncID'], true),
+                    label: 'Sales Invoices',
+                    icon: 'products/slx/images/Opportunity_List_24x24.gif'
+                }
             ]}
         ];
     },
@@ -68,7 +77,8 @@ Mobile.SalesLogix.Account.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
                     'Owner/OwnerDescription',
                     'Status',
                     'CreateDate',
-                    'CreateUser'
+                    'CreateUser',
+                    'GlobalSyncID'
                 ].join(',')                  
             });     
         

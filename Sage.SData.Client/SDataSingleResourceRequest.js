@@ -8,9 +8,7 @@ Ext.namespace("Sage.SData.Client");
 
 Sage.SData.Client.SDataSingleResourceRequest = Ext.extend(Sage.SData.Client.SDataApplicationRequest, {   
     constructor: function() {        
-        Sage.SData.Client.SDataSingleResourceRequest.superclass.constructor.apply(this, arguments);
-        
-        this.resourceSelector = false;                                                   
+        Sage.SData.Client.SDataSingleResourceRequest.superclass.constructor.apply(this, arguments);                                                 
     },       
     read: function(options) {
         return this.service.readEntry(this, options);
@@ -19,17 +17,10 @@ Sage.SData.Client.SDataSingleResourceRequest = Ext.extend(Sage.SData.Client.SDat
         return this.service.updateEntry(this, entry, options);
     },
     getResourceSelector: function() {
-        return this.resourceSelector;
+        return this.uri.getCollectionPredicate();
     },
-    setResourceSelector: function(val) {
-        this.resourceSelector = val;
+    setResourceSelector: function(val) {        
+        this.uri.setCollectionPredicate(val);
         return this;
-    },
-    buildUrl: function(uri) {
-        /// <param name="uri" type="Sage.SData.Client.SDataUri" />
-
-        Sage.SData.Client.SDataSingleResourceRequest.superclass.buildUrl.apply(this, arguments);
-
-        if (this.resourceSelector) uri.setCollectionPredicate(this.resourceSelector);
     }
 });

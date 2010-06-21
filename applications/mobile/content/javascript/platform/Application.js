@@ -124,32 +124,8 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
 
         if (s instanceof Sage.SData.Client.SDataService)        
             var service = s;
-        else
-        {
-            var service = new Sage.SData.Client.SDataService();
-            
-            if (s.version)
-                service.setVersion(s.version);
-
-            service        
-                .setServerName(s.serverName)            
-                .setVirtualDirectory(s.virtualDirectory)
-                .setApplicationName(s.applicationName)
-                .setContractName(s.contractName)
-                .setIncludeContent(typeof s.includeContent === 'boolean' ? s.includeContent : false);
-
-            if (s.port)
-                service.setPort(s.port);
-
-            if (s.protocol)
-                service.setProtocol(s.protocol);
-
-            if (s.userName)
-                service.setUserName(s.userName);
-
-            if (s.password)
-                service.setPassword(s.password);            
-        }
+        else        
+            var service = new Sage.SData.Client.SDataService(s);                
 
         this.services[name] = service;
         
@@ -165,7 +141,10 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         }
 
         return this;
-    },    
+    },  
+    hasService: function(name) {
+        return (typeof this.services[name] !== 'undefined');
+    },  
     registerView: function(view) {
         /// <summary>
         ///     Registers a view with the application.  If the application has already been 

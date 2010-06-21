@@ -143,12 +143,31 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             .setStartIndex(startIndex); 
 
         if (this.resourceKind) 
-            request.setResourceKind(this.resourceKind)
+            request.setResourceKind(this.resourceKind);
+
+        if (this.resourceProperty)
+            request
+                .getUri()
+                .setPathSegment(Sage.SData.Client.SDataUri.ResourcePropertyIndex, this.resourceProperty);
 
         var where = [];
-        var expr;
-        if (this.context && (expr = this.expandExpression(this.context.where)))
-            where.push(expr);
+
+        if (this.context)
+        {
+            var resourceKindExpr = this.expandExpression(this.context.resourceKind);
+            if (resourceKindExpr)
+                request.setResourceKind(resourceKindExpr);        
+
+            var resourcePredicateExpr = this.expandExpression(this.context.resourcePredicate);
+            if (resourcePredicateExpr)
+                request
+                    .getUri()
+                    .setCollectionPredicate(resourcePredicateExpr);
+
+            var whereExpr = this.expandExpression(this.context.where);
+            if (whereExpr)
+                where.push(whereExpr);
+        }                           
 
         if (this.query)
             where.push(this.query);
@@ -286,9 +305,18 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         ///     Indicates whether or not the view has a new context.
         /// </summary>
         /// <returns type="Boolean">True if there is a new context; False otherwise.</returns>
-        if (!this.context) return true;
-         
-        return (this.expandExpression(this.context.where) != this.expandExpression(this.newContext.where))
+        if (this.context)
+        {
+            if (this.expandExpression(this.context.where) != this.expandExpression(this.newContext.where)) return true;
+            if (this.expandExpression(this.context.resourceKind) != this.expandExpression(this.newContext.resourceKind)) return true;
+            if (this.expandExpression(this.context.resourcePredicate) != this.expandExpression(this.newContext.resourcePredicate)) return true;
+
+            return false;
+        }        
+        else
+        {
+            return true;
+        }
     },
     beforeTransitionTo: function() {
         Sage.Platform.Mobile.List.superclass.beforeTransitionTo.call(this);

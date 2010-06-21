@@ -37,7 +37,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     ]),
     relatedTemplate: new Simplate([
         '<li>',
-        '<a href="#{%= view %}" target="_related" m:where="{%= where %}">',
+        '<a href="#{%= view %}" target="_related" m:context="{%= context %}">', //FIX ME
         '{% if ($["icon"]) { %}',
         '<img src="{%= $["icon"] %}" alt="icon" class="icon" />',
         '{% } %}',
@@ -78,48 +78,49 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         Sage.Platform.Mobile.Detail.superclass.init.call(this);
         
         this.el
-            .on('click', function(evt, el, o) {
-                    evt.stopEvent();
-
-                    var el = Ext.fly(el);
-                    var view = el.dom.hash.substring(1);
-                    var key = el.getAttribute('key', 'm');                       
-                    var where = el.getAttribute('where', 'm');                                    
-
-                    this.navigateToRelated(view, key, where);   
-            }, this, {delegate: 'a[target="_related"]'});
+            .on('click', this.onClick, this, {delegate: 'a[target="_related"]'});
         
         // todo: find a better way to handle these notifications
-        App.on('refresh', function(o) {
-            if (this.context && o.key === this.context.key)
-            {
-                if (o.data && o.data['$descriptor']) 
-                    this.setTitle(o.data['$descriptor']);
-
-                this.clear();                
-            }
-        }, this);  
+        App.on('refresh', this.onRefresh, this);  
     },
-    formatRelatedQuery: function(entry, fmt) {
-        return String.format(fmt, entry['$key']);        
+    onRefresh: function(o) {
+        if (this.context && o.key === this.context.key)
+        {
+            if (o.data && o.data['$descriptor']) 
+                this.setTitle(o.data['$descriptor']);
+
+            this.clear();                
+        }
+    },
+    onClick: function(evt, el, o) {
+        evt.stopEvent();
+
+        var el = Ext.fly(el);
+        var view = el.dom.hash.substring(1);
+
+        var key = el.getAttribute('key', 'm');                       
+        var context = Ext.util.JSON.decode(el.getAttribute('context', 'm'));                                    
+
+        this.navigateToRelated(view, key || context);   
+    },
+    formatRelatedQuery: function(entry, fmt, property) {
+        var property = property || '$key';
+
+        return String.format(fmt, entry[property]);        
     },
     navigateToEdit: function() {
         var view = App.getView(this.editor);
         if (view)
             view.show(this.entry);
     },
-    navigateToRelated: function(view, key, where) {    
-        var context = false;            
+    navigateToRelated: function(view, o) {    
+        if (typeof o === 'string')
+            var context = {
+                key: o
+            };
+        else
+            var context = o;
         
-        if (key)
-            context = {
-                'key': key
-            };        
-        else if (where)                  
-            context = {
-                'where': where
-            };        
-                    
         if (context) 
         {            
             var v = App.getView(view);
@@ -155,11 +156,24 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
             else if (current['view'] && current['property'] !== true)
             {
                 var related = Ext.apply({}, current);
+                var context = {};
                 
                 if (related['where'])
-                    related['where'] = typeof related['where'] === 'function' 
-                        ? Sage.Platform.Mobile.Format.encode(related['where'](entry))
-                        : Sage.Platform.Mobile.Format.encode(related['where']);
+                    context['where'] = typeof related['where'] === 'function' 
+                        ? related['where'](entry)
+                        : related['where'];       
+                        
+                if (related['resourceKind'])
+                    context['resourceKind'] = typeof related['resourceKind'] === 'function' 
+                        ? related['resourceKind'](entry)
+                        : related['resourceKind']; 
+                        
+                if (related['resourcePredicate'])
+                    context['resourcePredicate'] = typeof related['resourcePredicate'] === 'function' 
+                        ? related['resourcePredicate'](entry)
+                        : related['resourcePredicate'];
+                        
+                related["context"] = Sage.Platform.Mobile.Format.encode(Ext.util.JSON.encode(context));        
                 
                 content.push(this.relatedTemplate.apply(related));                                    
                 continue;

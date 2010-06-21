@@ -38,17 +38,10 @@ Sage.SData.Client.SDataApplicationRequest = Ext.extend(Sage.SData.Client.SDataBa
         return this;
     },
     getResourceKind: function() {
-        return this.resourceKind;
+        return this.uri.getCollectionType();
     },
     setResourceKind: function(val) {
-        this.resourceKind = val;
+        this.uri.setCollectionType(val);
         return this;
-    },
-    buildUrl: function(uri) {
-        /// <param name="uri" type="Sage.SData.Client.SDataUri" />
-
-        Sage.SData.Client.SDataApplicationRequest.superclass.buildUrl.apply(this, arguments);
-
-        uri.appendPath(this.getResourceKind());
     }
 });
