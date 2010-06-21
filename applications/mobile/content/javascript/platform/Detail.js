@@ -95,7 +95,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     onClick: function(evt, el, o) {
         evt.stopEvent();
 
-        var el = Ext.fly(el);
+        var el = Ext.get(el);
         var view = el.dom.hash.substring(1);
 
         var key = el.getAttribute('key', 'm');                       
@@ -129,8 +129,14 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         }                                              
     },    
     createRequest: function() {
-        var request = new Sage.SData.Client.SDataSingleResourceRequest(this.getService())
-            .setResourceSelector(String.format("'{0}'", this.context.key)); 
+        var request = new Sage.SData.Client.SDataSingleResourceRequest(this.getService());
+
+        /* test for complex selector */
+        /* todo: more robust test required? */
+        if (/(\s+)/.test(this.context.key))
+            request.setResourceSelector(this.context.key);
+        else
+            request.setResourceSelector(String.format("'{0}'", this.context.key)); 
 
         if (this.resourceKind) 
             request.setResourceKind(this.resourceKind);
@@ -157,6 +163,11 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
             {
                 var related = Ext.apply({}, current);
                 var context = {};
+
+                if (related['key'])
+                    context['key'] = typeof related['key'] === 'function' 
+                        ? related['key'](entry)
+                        : related['key']; 
                 
                 if (related['where'])
                     context['where'] = typeof related['where'] === 'function' 

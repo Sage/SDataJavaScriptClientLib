@@ -17,8 +17,8 @@
         virtualDirectory: 'sage50',
         applicationName: 'accounts50',
         contractName: 'gcrm',
-        port: this.defaultPort,
-        protocol: this.defaultProtocol,
+        port: 80,
+        protocol: /https/i.test(window.location.protocol) ? 'https' : false,
         userName: 'manager',
         password: '',
         version: { major: 0, minor: 9 }

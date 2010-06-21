@@ -10,7 +10,7 @@ Ext.namespace("Mobile.GCRM.TradingAccount");
 Mobile.GCRM.TradingAccount.List = Ext.extend(Sage.Platform.Mobile.List, {        
     itemTemplate: new Simplate([
         '<li>',
-        '<a href="#gcrm_tradingaccount_detail" target="_detail" m:uuid="{%= $uuid %}" m:descriptor="{%: $["name"] %}">',
+        '<a href="#gcrm_tradingaccount_detail" target="_detail" m:key="{%= $["$key"] || $["$uuid"] %}" m:descriptor="{%: $["name"] %}">',
         '<h3>{%= $["name"] %}</h3>',
         '<h4>{%= $["reference"] %} - {%= $["status"] %}</h4>',
         '</a>',
@@ -22,7 +22,6 @@ Mobile.GCRM.TradingAccount.List = Ext.extend(Sage.Platform.Mobile.List, {
         Ext.apply(this, o, {
             id: 'trading_account_list',
             title: 'Trading Accounts',
-            serviceName: 'erp',
             resourceKind: 'tradingAccounts',            
             pageSize: 10,
             icon: 'products/slx/images/Accounts_24x24.gif'

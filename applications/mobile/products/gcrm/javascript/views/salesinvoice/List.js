@@ -10,8 +10,8 @@ Ext.namespace("Mobile.GCRM.SalesInvoice");
 Mobile.GCRM.SalesInvoice.List = Ext.extend(Sage.Platform.Mobile.List, {        
     itemTemplate: new Simplate([
         '<li>',
-        '<a href="#gcrm_salesinvoice_detail" target="_detail" m:uuid="{%= $uuid %}">',
-        '<h3>{%= $["dueDate"] %}</h3>',
+        '<a href="#gcrm_salesinvoice_detail" target="_detail" m:key="{%= $["$key"] || $["$uuid"] %}" m:descriptor="{%= $["type"] %}">',
+        '<h3>{%= $["type"] %} ({%= $["dueDate"] %})</h3>',
         '<h4>{%= $["netTotal"] %} - {%= $["currency"] %}</h4>',
         '</a>',
         '</li>'
@@ -22,13 +22,13 @@ Mobile.GCRM.SalesInvoice.List = Ext.extend(Sage.Platform.Mobile.List, {
         Ext.apply(this, o, {
             id: 'gcrm_salesinvoice_list',
             title: 'ERP - Sales Invoices',
-            serviceName: 'erp',
             resourceKind: 'salesInvoices',            
             pageSize: 10,
             icon: 'products/slx/images/Accounts_24x24.gif',
             tools: {}
         });        
     },  
+    /* todo: find out why search queries do not work */
     formatSearchQuery: function(query) {
         return String.format('name like "%{0}%"', query);
     },
@@ -38,7 +38,7 @@ Mobile.GCRM.SalesInvoice.List = Ext.extend(Sage.Platform.Mobile.List, {
         request
             .setQueryArgs({
                 'orderby': 'dueDate asc',
-                'select': 'dueDate,netTotal,currency'                
+                'select': 'type,status,dueDate,netTotal,currency'                
             });
 
         return request;

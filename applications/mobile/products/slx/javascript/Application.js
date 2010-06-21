@@ -51,9 +51,19 @@ Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {
             expose: false
         }));
 
-        this.registerView(new Mobile.GCRM.TradingAccount.List());
+        this.registerView(new Mobile.GCRM.TradingAccount.List({
+            serviceName: 'erp'
+        }));
+        this.registerView(new Mobile.GCRM.TradingAccount.Detail({
+            serviceName: 'erp'
+        }));
+
+        this.registerView(new Mobile.GCRM.SalesInvoice.Detail({
+            serviceName: 'erp'
+        }));
         this.registerView(new Mobile.GCRM.SalesInvoice.List({
             id: 'gcrm_salesinvoice_related',
+            serviceName: 'erp',
             expose: false,
             resourceProperty: 'salesInvoices'
         }));

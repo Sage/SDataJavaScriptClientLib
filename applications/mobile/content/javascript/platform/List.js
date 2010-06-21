@@ -15,8 +15,8 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     ]),
     itemTemplate: new Simplate([
         '<li>',
-        '<a href="#" target="_detail" m:key="{%= $key %}">',
-        '<h3>{%= $descriptor %}</h3>',
+        '<a href="#" target="_detail" m:key="{%= $["$key"] || $["$uuid"] %}">',
+        '<h3>{%= $["$descriptor"] %}</h3>',
         '</a>',
         '</li>'
     ]),    
@@ -68,22 +68,35 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     init: function() {     
         Sage.Platform.Mobile.List.superclass.init.call(this);      
 
-        this.el
-            .on('click', function(evt, el, o) {                                
-                var source = Ext.get(el);
-                var target;
+        this.el.on('click', this.onClick, this);                      
 
-                if (source.is('.more') || (source.up('.more')))                
-                    this.more(evt);
-                else if (source.is('a[target="_detail"]') || (target = source.up('a[target="_detail"]')))
-                    this.navigateToDetail(target || source, evt);
+        App.on('refresh', this.onRefresh, this); 
+    },
+    onClick: function(evt, el, o) {
+        evt.stopEvent();
 
-            }, this, { preventDefault: true, stopPropagation: true });                      
+        var el = Ext.get(el);
+        if (el.is('.more') || el.up('.more'))     
+        {           
+            this.more();
+            return;
+        }        
+        
+        var link = el;
+        if (link.is('a[target="_detail"]') || (link = link.up('a[target="_detail"]')))
+        {
+            var view = link.dom.hash.substring(1);
 
-        App.on('refresh', function(o) {
-            if (this.resourceKind && o.resourceKind === this.resourceKind)
+            var key = link.getAttribute("key", "m");              
+            var descriptor = link.getAttribute("descriptor", "m");  
+
+            this.navigateToDetail(view, key, descriptor);
+            return;
+        }        
+    },
+    onRefresh: function(o) {
+        if (this.resourceKind && o.resourceKind === this.resourceKind)
                 this.clear();
-        }, this); 
     },
     showSearchDialog: function() {
         /// <summary>
@@ -179,22 +192,17 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
         return request;
     },
-    navigateToDetail: function(el) {
+    navigateToDetail: function(view, key, descriptor) {
         /// <summary>
         ///     Navigates to the requested detail view.
         /// </summary>
         /// <param name="el" type="Ext.Element">The element that initiated the navigation.</param>
-        if (el) 
-        {
-            var id = el.dom.hash.substring(1);
-            var key = el.getAttribute("key", "m");  
-            var descriptor = el.getAttribute("descriptor", "m");         
-
-            App.getView(id).show({
+        var v = App.getView(view);
+        if (v)
+            v.show({
                 descriptor: descriptor,
                 key: key
-            });
-        }
+            });        
     },
     processFeed: function(feed) {
         /// <summary>
