@@ -45,11 +45,27 @@
 		},{
 			text: 'List.js',
 			path: '../applications/mobile/products/slx/javascript/views/opportunity/'
+		},{
+			text: 'List.js',
+			path: '../applications/mobile/products/gcrm/javascript/views/salesinvoice/'
+		},{
+			text: 'Detail.js',
+			path: '../applications/mobile/products/gcrm/javascript/views/salesinvoice/'
+		},{
+			text: 'List.js',
+			path: '../applications/mobile/products/gcrm/javascript/views/tradingaccount/'
+		},{
+			text: 'Detail.js',
+			path: '../applications/mobile/products/gcrm/javascript/views/tradingaccount/'
 		}]
 	}],
 	resources: [{
 		src: '../applications/mobile/products/slx/javascript/',
 		dest: 'src/',
+		filters: ".*\\.js"
+	},{
+		src: '../applications/mobile/products/gcrm/javascript/views',
+		dest: 'src/gcrm',
 		filters: ".*\\.js"
 	}]
 }

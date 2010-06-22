@@ -913,4 +913,199 @@ Mobile.SalesLogix.Opportunity.List = Ext.extend(Sage.Platform.Mobile.List, {
 
         return request;
     }
+});﻿/// <reference path="../../../../ext/ext-core-debug.js"/>
+/// <reference path="../../../../Simplate.js"/>
+/// <reference path="../../../../sdata/SDataResourceCollectionRequest.js"/>
+/// <reference path="../../../../sdata/SDataService.js"/>
+/// <reference path="../../../../platform/View.js"/>
+/// <reference path="../../../../platform/List.js"/>
+
+Ext.namespace("Mobile.GCRM.SalesInvoice");
+
+Mobile.GCRM.SalesInvoice.List = Ext.extend(Sage.Platform.Mobile.List, {        
+    itemTemplate: new Simplate([
+        '<li>',
+        '<a href="#gcrm_salesinvoice_detail" target="_detail" m:key="{%= $["$key"] || $["$uuid"] %}" m:descriptor="{%= $["type"] %}">',
+        '<h3>{%= $["type"] %} ({%= $["dueDate"] %})</h3>',
+        '<h4>{%= $["netTotal"] %} - {%= $["currency"] %}</h4>',
+        '</a>',
+        '</li>'
+    ]),  
+    constructor: function(o) {
+        Mobile.GCRM.SalesInvoice.List.superclass.constructor.call(this);        
+        
+        Ext.apply(this, o, {
+            id: 'gcrm_salesinvoice_list',
+            title: 'Sales Invoices',
+            resourceKind: 'salesInvoices',            
+            pageSize: 10,
+            icon: 'products/slx/images/Accounts_24x24.gif',
+            tools: {}
+        });        
+    },  
+    /* todo: find out why search queries do not work */
+    formatSearchQuery: function(query) {
+        return String.format('name like "%{0}%"', query);
+    },
+    createRequest: function() {
+        var request = Mobile.GCRM.SalesInvoice.List.superclass.createRequest.call(this);
+
+        request
+            .setQueryArgs({
+                'orderby': 'dueDate asc',
+                'select': 'type,status,dueDate,netTotal,currency'                
+            });
+
+        return request;
+    }
+});﻿/// <reference path="../../../../ext/ext-core-debug.js"/>
+/// <reference path="../../../../Simplate.js"/>
+/// <reference path="../../../../sdata/SDataSingleResourceRequest.js"/>
+/// <reference path="../../../../sdata/SDataService.js"/>
+/// <reference path="../../../../platform/View.js"/>
+/// <reference path="../../../../platform/Detail.js"/>
+/// <reference path="../../Format.js"/>
+
+Ext.namespace("Mobile.GCRM.SalesInvoice");
+
+Mobile.GCRM.SalesInvoice.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {       
+    constructor: function(o) {
+        Mobile.GCRM.SalesInvoice.Detail.superclass.constructor.call(this);        
+        
+        Ext.apply(this, o, {
+            id: 'gcrm_salesinvoice_detail',
+            title: 'Sales Invoice',
+            resourceKind: 'salesInvoices'
+        });
+
+        this.layout = [
+            {name: 'type', label: 'type'},
+            {name: 'status', label: 'status'},
+            {name: 'dueDate', label: 'due'},
+            {name: 'netTotal', label: 'total'},
+            {name: 'currency', label: 'currency'}
+        ];
+    },
+    init: function() {     
+        Mobile.GCRM.SalesInvoice.Detail.superclass.init.call(this);   
+    },
+    createRequest: function() {
+        var request = Mobile.GCRM.SalesInvoice.Detail.superclass.createRequest.call(this);
+        
+        request                     
+            .setQueryArgs({                
+                'select': [
+                    'type',
+                    'status',
+                    'dueDate',
+                    'netTotal',
+                    'currency'     
+                ].join(',')                  
+            });     
+        
+        return request;                   
+    } 
+});﻿/// <reference path="../../../../ext/ext-core-debug.js"/>
+/// <reference path="../../../../Simplate.js"/>
+/// <reference path="../../../../sdata/SDataResourceCollectionRequest.js"/>
+/// <reference path="../../../../sdata/SDataService.js"/>
+/// <reference path="../../../../platform/View.js"/>
+/// <reference path="../../../../platform/List.js"/>
+
+Ext.namespace("Mobile.GCRM.TradingAccount");
+
+Mobile.GCRM.TradingAccount.List = Ext.extend(Sage.Platform.Mobile.List, {        
+    itemTemplate: new Simplate([
+        '<li>',
+        '<a href="#gcrm_tradingaccount_detail" target="_detail" m:key="{%= $["$key"] || $["$uuid"] %}" m:descriptor="{%: $["name"] %}">',
+        '<h3>{%= $["name"] %}</h3>',
+        '<h4>{%= $["reference"] %} - {%= $["status"] %}</h4>',
+        '</a>',
+        '</li>'
+    ]),  
+    constructor: function(o) {
+        Mobile.GCRM.TradingAccount.List.superclass.constructor.call(this);        
+        
+        Ext.apply(this, o, {
+            id: 'trading_account_list',
+            title: 'Trading Accounts',
+            resourceKind: 'tradingAccounts',            
+            pageSize: 10,
+            icon: 'products/slx/images/Accounts_24x24.gif',
+            tools: {}
+        });        
+    },  
+    formatSearchQuery: function(query) {
+        return String.format('name like "%{0}%"', query);
+    },
+    createRequest: function() {
+        var request = Mobile.GCRM.TradingAccount.List.superclass.createRequest.call(this);
+
+        request
+            .setQueryArgs({
+                'orderby': 'name',
+                'select': 'name,reference,status'                
+            });
+
+        return request;
+    }
+});﻿/// <reference path="../../../../ext/ext-core-debug.js"/>
+/// <reference path="../../../../Simplate.js"/>
+/// <reference path="../../../../sdata/SDataSingleResourceRequest.js"/>
+/// <reference path="../../../../sdata/SDataService.js"/>
+/// <reference path="../../../../platform/View.js"/>
+/// <reference path="../../../../platform/Detail.js"/>
+/// <reference path="../../Format.js"/>
+
+Ext.namespace("Mobile.GCRM.TradingAccount");
+
+Mobile.GCRM.TradingAccount.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {       
+    constructor: function(o) {
+        Mobile.GCRM.TradingAccount.Detail.superclass.constructor.call(this);        
+        
+        Ext.apply(this, o, {
+            id: 'gcrm_tradingaccount_detail',
+            title: 'Trading Account',            
+            resourceKind: 'tradingAccounts'
+        });
+
+        this.layout = [
+            {name: 'name', label: 'name'},
+            {name: 'status', label: 'status'},
+            {name: 'website', label: 'web', renderer: Sage.Platform.Mobile.Format.link},
+            {name: 'financeBalance', label: 'balance'},
+            {name: 'financeLimit', label: 'limit'},
+            {name: 'lastInvoiceDate', label: 'last inv'},
+            {name: 'lastPaymentDate', label: 'last pay'},
+            {options: {title: 'CRM Related Items', list: true}, as: [
+                {
+                    view: 'account_related', 
+                    where: this.formatRelatedQuery.createDelegate(this, ["GlobalSyncID eq '{0}'", '$uuid'], true), 
+                    label: 'Account(s)',
+                    icon: 'products/slx/images/Accounts_24x24.gif'
+                }
+            ]}
+        ];
+    },
+    init: function() {     
+        Mobile.GCRM.TradingAccount.Detail.superclass.init.call(this);   
+    },
+    createRequest: function() {
+        var request = Mobile.GCRM.TradingAccount.Detail.superclass.createRequest.call(this);
+        
+        request                     
+            .setQueryArgs({                
+                'select': [
+                    'name',
+                    'status',
+                    'website',
+                    'financeBalance',
+                    'financeLimit',
+                    'lastInvoiceDate',
+                    'lastPaymentDate'
+                ].join(',')                  
+            });     
+        
+        return request;                   
+    } 
 });

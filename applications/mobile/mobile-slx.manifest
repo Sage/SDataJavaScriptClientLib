@@ -1,5 +1,5 @@
 ﻿CACHE MANIFEST
-# version 12
+# version 16
 CACHE:
 index-slx.html
 content/css/app.css
@@ -19,6 +19,14 @@ products/slx/images/Contacts_24x24.gif
 products/slx/images/Opportunity_List_24x24.gif
 products/slx/images/Note_32x32.gif
 products/slx/images/Whats_New_3D_Files_32x32.gif
+products/slx/images/associate_16x16.gif
+products/slx/images/meter-empty.png
+products/slx/images/meter-full-1.png
+products/slx/images/meter-full-2.png
+products/slx/images/meter-full-3.png
+products/slx/images/meter-full-4.png
+products/slx/images/meter-full-5.png
+products/slx/images/meter-full-6.png
 content/javascript/ext/ext-core.js
 content/javascript/reui/themes/iui/iui.css
 content/javascript/reui/themes/iui/default/backButton.png
@@ -49,6 +57,7 @@ packages/mobile-dependencies.js
 packages/mobile-platform.js
 packages/mobile-slx.js
 packages/sdata-client.js
+products/slx/environment/cloud-integration.js
 NETWORK:
 ../sdata/
 

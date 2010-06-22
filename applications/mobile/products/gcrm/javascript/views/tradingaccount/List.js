@@ -24,7 +24,8 @@ Mobile.GCRM.TradingAccount.List = Ext.extend(Sage.Platform.Mobile.List, {
             title: 'Trading Accounts',
             resourceKind: 'tradingAccounts',            
             pageSize: 10,
-            icon: 'products/slx/images/Accounts_24x24.gif'
+            icon: 'products/slx/images/Accounts_24x24.gif',
+            tools: {}
         });        
     },  
     formatSearchQuery: function(query) {
