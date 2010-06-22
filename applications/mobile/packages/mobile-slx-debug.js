@@ -7,31 +7,22 @@
 
 Ext.namespace("Mobile.SalesLogix");
 
-Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {
-    defaultServerName: window.location.hostname,
+Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {    
     defaultVirtualDirectory: 'sdata',
     defaultApplicationName: 'slx',
     defaultContractName: 'dynamic',
-    defaultPort: window.location.port && window.location.port != 80 ? window.location.port : false,
-    defaultProtocol: /https/i.test(window.location.protocol) ? 'https' : false,
     titleText: 'Mobile Demo',
     constructor: function (o) {
         Mobile.SalesLogix.Application.superclass.constructor.call(this);
 
         Ext.apply(this, o, {
             enableCaching: true,
-            context: {},
-            serverName: this.defaultServerName,
-            virtualDirectory: this.defaultVirtualDirectory,
-            applicationName: this.defaultApplicationName,
-            contractName: this.defaultContractName,
-            port: this.defaultPort,
-            protocol: this.defaultProtocol
-        });
+            context: {}
+        });              
     },
     setup: function () {
         Mobile.SalesLogix.Application.superclass.setup.apply(this, arguments);
-
+       
         this.registerToolbar(new Sage.Platform.Mobile.MainToolbar({
             name: 'tbar',
             title: this.titleText
@@ -48,6 +39,10 @@ Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {
         this.registerView(new Mobile.SalesLogix.Account.List());
         this.registerView(new Mobile.SalesLogix.Account.Detail());
         this.registerView(new Mobile.SalesLogix.Account.Edit());
+        this.registerView(new Mobile.SalesLogix.Account.List({
+            id: 'account_related',
+            expose: false
+        }));
 
         this.registerView(new Mobile.SalesLogix.Contact.List());
         this.registerView(new Mobile.SalesLogix.Contact.Detail());
@@ -61,6 +56,23 @@ Mobile.SalesLogix.Application = Ext.extend(Sage.Platform.Mobile.Application, {
         this.registerView(new Mobile.SalesLogix.Opportunity.List({
             id: 'opportunity_related',
             expose: false
+        }));
+
+        this.registerView(new Mobile.GCRM.TradingAccount.List({
+            serviceName: 'erp'
+        }));
+        this.registerView(new Mobile.GCRM.TradingAccount.Detail({
+            serviceName: 'erp'
+        }));
+
+        this.registerView(new Mobile.GCRM.SalesInvoice.Detail({
+            serviceName: 'erp'
+        }));
+        this.registerView(new Mobile.GCRM.SalesInvoice.List({
+            id: 'gcrm_salesinvoice_related',
+            serviceName: 'erp',
+            expose: false,
+            resourceProperty: 'salesInvoices'
         }));
 
         /*
@@ -362,6 +374,8 @@ Mobile.SalesLogix.LoginDialog = Ext.extend(Sage.Platform.Mobile.View, {
                 }
                 else {
                     App.context['user'] = feed['$resources'][0]['$key'];
+                    
+                    // todo: add successful login eventing                    
 
                     this.el.dom.removeAttribute('selected');
                 }
@@ -515,6 +529,15 @@ Mobile.SalesLogix.Account.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
                     label: 'Opportunities',
                     icon: 'products/slx/images/Opportunity_List_24x24.gif'
                 }
+            ]}, 
+            {options: {title: 'ERP Related Items', list: true}, as: [
+                {
+                    view: 'gcrm_salesinvoice_related',
+                    resourceKind: 'tradingAccounts',
+                    resourcePredicate: this.formatRelatedQuery.createDelegate(this, ["'{0}'", 'GlobalSyncID'], true),
+                    label: 'Sales Invoices',
+                    icon: 'products/slx/images/Opportunity_List_24x24.gif'
+                }
             ]}
         ];
     },
@@ -539,7 +562,8 @@ Mobile.SalesLogix.Account.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
                     'Owner/OwnerDescription',
                     'Status',
                     'CreateDate',
-                    'CreateUser'
+                    'CreateUser',
+                    'GlobalSyncID'
                 ].join(',')                  
             });     
         
@@ -606,10 +630,10 @@ Ext.namespace("Mobile.SalesLogix.Account");
 
 Mobile.SalesLogix.Account.List = Ext.extend(Sage.Platform.Mobile.List, {   
     itemTemplate: new Simplate([
-        '<li>',
+        '<li class="{%= $["GlobalSyncID"] ? "is-linked" : "" %}">',
         '<a href="#account_detail" target="_detail" m:key="{%= $key %}" m:descriptor="{%: $descriptor %}">',
-        '<h3>{%= $["AccountName"] %}</h3>',
-        '<h4>{%= $["Address"] ? $["Address"]["City"] : "" %}</h4>',
+        '<h3>{%: $["AccountName"] %}</h3>',
+        '<h4>{%: $["Address"] ? $["Address"]["City"] : "" %}</h4>',
         '</a>',
         '</li>'
     ]),    
@@ -651,7 +675,7 @@ Mobile.SalesLogix.Account.List = Ext.extend(Sage.Platform.Mobile.List, {
             .setQueryArgs({
                 'include': 'Address',
                 'orderby': 'AccountName',
-                'select': 'AccountName,Address/City'                
+                'select': 'AccountName,Address/City,GlobalSyncID'                
             });
 
         return request;
@@ -850,10 +874,12 @@ Ext.namespace("Mobile.SalesLogix.Opportunity");
 
 Mobile.SalesLogix.Opportunity.List = Ext.extend(Sage.Platform.Mobile.List, {   
     itemTemplate: new Simplate([
-        '<li>',
+        '<li class="o-stage o-stage-{%= ($["Stage"] || "1").charAt(0) %}">', /* quick method since there are only six stages */        
         '<a href="#opportunity_detail" target="_detail" m:key="{%= $key %}" m:descriptor="{%: $descriptor %}">',
+        '<div>',
         '<h3>{%= $["Description"] %}</h3>',
-        '<h4>{%= $["Account"]["AccountName"] %}</h4>',
+        '<h4>{%= $["Account"]["AccountName"] %}</h4>',        
+        '</div>',
         '</a>',
         '</li>'
     ]),       
@@ -882,7 +908,7 @@ Mobile.SalesLogix.Opportunity.List = Ext.extend(Sage.Platform.Mobile.List, {
             .setQueryArgs({
                 'include': 'Account',
                 'orderby': 'Description',
-                'select': 'Description,Account/AccountName'                             
+                'select': 'Description,Account/AccountName,Stage'                             
             });
 
         return request;

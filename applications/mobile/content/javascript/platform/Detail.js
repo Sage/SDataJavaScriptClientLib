@@ -32,12 +32,12 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     relatedPropertyTemplate: new Simplate([
         '<div class="row">',
         '<label>{%= label %}</label>',       
-        '<a href="#{%= view %}" target="_related" m:key="{%= key %}">{%= value %}</a>',
+        '<a href="#{%= view %}" target="_related" m:key="{%= key %}" m:descriptor="{%: value %}">{%: value %}</a>',
         '</div>'
     ]),
     relatedTemplate: new Simplate([
         '<li>',
-        '<a href="#{%= view %}" target="_related" m:context="{%= context %}">', //FIX ME
+        '<a href="#{%= view %}" target="_related" m:context="{%= context %}">', 
         '{% if ($["icon"]) { %}',
         '<img src="{%= $["icon"] %}" alt="icon" class="icon" />',
         '{% } %}',
@@ -77,8 +77,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     init: function() {  
         Sage.Platform.Mobile.Detail.superclass.init.call(this);
         
-        this.el
-            .on('click', this.onClick, this, {delegate: 'a[target="_related"]'});
+        this.el.on('click', this.onClick, this, {delegate: 'a[target="_related"]'});
         
         // todo: find a better way to handle these notifications
         App.on('refresh', this.onRefresh, this);  
@@ -98,10 +97,10 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         var el = Ext.get(el);
         var view = el.dom.hash.substring(1);
 
-        var key = el.getAttribute('key', 'm');                       
-        var context = Ext.util.JSON.decode(el.getAttribute('context', 'm'));                                    
-
-        this.navigateToRelated(view, key || context);   
+        var value = el.getAttribute('key', 'm') || Ext.util.JSON.decode(el.getAttribute('context', 'm'));
+        var descriptor = el.getAttribute('descriptor', 'm');
+        
+        this.navigateToRelated(view, value, descriptor);   
     },
     formatRelatedQuery: function(entry, fmt, property) {
         var property = property || '$key';
@@ -113,10 +112,11 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         if (view)
             view.show(this.entry);
     },
-    navigateToRelated: function(view, o) {    
+    navigateToRelated: function(view, o, descriptor) {    
         if (typeof o === 'string')
             var context = {
-                key: o
+                key: o,
+                descriptor: descriptor
             };
         else
             var context = o;
@@ -184,6 +184,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
                         ? related['resourcePredicate'](entry)
                         : related['resourcePredicate'];
                         
+                // todo: find a better way of storing this information.  this method is flexible at least.
                 related["context"] = Sage.Platform.Mobile.Format.encode(Ext.util.JSON.encode(context));        
                 
                 content.push(this.relatedTemplate.apply(related));                                    
@@ -252,8 +253,10 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
 
                 this.entry = entry;
                 
-                if (this.entry)                  
+                if (this.entry)         
+                {               
                     this.processLayout(this.layout, {title: this.detailsText}, this.entry);
+                }
             },
             failure: function(response, o) {
                 this.requestFailure(response, o);

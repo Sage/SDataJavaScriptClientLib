@@ -11,6 +11,9 @@ Ext.namespace('Sage.Platform.Mobile');
 Ext.USE_NATIVE_JSON = true;
 
 Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
+    defaultServerName: window.location.hostname,    
+    defaultPort: window.location.port && window.location.port != 80 ? window.location.port : false,
+    defaultProtocol: /https/i.test(window.location.protocol) ? 'https' : false,
     constructor: function() {
         /// <field name="initialized" type="Boolean">True if the application has been initialized; False otherwise.</field>
         /// <field name="context" type="Object">A general store for global context data.</field>
@@ -22,9 +25,10 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         this.initialized = false;
         this.enableCaching = false;        
         this.context = {};
-        this.views = [];    
+        this.views = {};   
+        this.services = {};
+        this.defaultService = false; 
         this.bars = {};    
-        this.viewsById = {};
         this.addEvents(
             'registered',
             'beforeviewtransitionaway',
@@ -58,13 +62,10 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
             }
         }, this);          
                 
-        if (this.service && this.enableCaching)
+        if (this.enableCaching)
         {
             if (this.isOnline())
                 this.clearSDataRequestCache();
-
-            this.service.on('beforerequest', this.loadSDataRequest, this);
-            this.service.on('requestcomplete', this.cacheSDataRequest, this);
         }      
     },   
     isOnline: function() {
@@ -111,41 +112,55 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         /// <summary>
         ///     Initializes this application as well as the toolbar and all currently registered views.
         /// </summary>        
-        this.service = new Sage.SData.Client.SDataService()        
-            .setServerName(this.serverName)            
-            .setVirtualDirectory(this.virtualDirectory)
-            .setApplicationName(this.applicationName)
-            .setContractName(this.contractName)
-            .setIncludeContent(false);
-
-        if (this.port !== false)
-            this.service.setPort(this.port);
-
-        if (this.protocol !== false)
-            this.service.setProtocol(this.protocol);
-
         this.setup();
 
         for (var n in this.bars) 
             this.bars[n].init();
 
-        for (var i = 0; i < this.views.length; i++) 
-            this.views[i].init();
+        for (var n in this.views)
+            this.views[n].init();        
 
         this.initialized = true;
     },
+    registerService: function(name, s, o) {
+        var o = o || {};
+
+        if (s instanceof Sage.SData.Client.SDataService)        
+            var service = s;
+        else        
+            var service = new Sage.SData.Client.SDataService(s);                
+
+        this.services[name] = service;
+        
+        if (this.enableCaching && o.offline)
+        {
+            service.on('beforerequest', this.loadSDataRequest, this);
+            service.on('requestcomplete', this.cacheSDataRequest, this);
+        }        
+
+        if (o.isDefault || !this.defaultService)
+        {
+            this.defaultService = service;
+        }
+
+        return this;
+    },  
+    hasService: function(name) {
+        return (typeof this.services[name] !== 'undefined');
+    },  
     registerView: function(view) {
         /// <summary>
         ///     Registers a view with the application.  If the application has already been 
         ///     initialized, the view is immediately initialized as well.
         /// </summary>
         /// <param name="view" type="Sage.Platform.Mobile.View">The view to be registered.</param>
-        this.views.push(view);
-        this.viewsById[view.id] = view;
+        this.views[view.id] = view;
 
         if (this.initialized) view.init();
 
         this.fireEvent('registered', view);
+
+        return this;
     },
     registerToolbar: function(name, tbar)
     {
@@ -158,10 +173,14 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         this.bars[name] = tbar;
 
         if (this.initialized) tbar.init();
+
+        return this;
     },
     getViews: function() {
         /// <returns elementType="Sage.Platform.Mobile.View">An array containing the currently registered views.</returns>
-        return this.views;
+        var r = [];
+        for (var n in this.views) r.push(this.views[n]);
+        return r;
     },
     getActiveView: function() {
         /// <returns type="Sage.Platform.Mobile.View">The currently active view.</returns>        
@@ -180,16 +199,19 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         if (key)
         {
             if (typeof key === 'string')
-                return this.viewsById[key];
+                return this.views[key];
             
             if (typeof key === 'object' && typeof key.id === 'string')
-                return this.viewsById[key.id];                
+                return this.views[key.id];                
         }
         return null;
     },
-    getService: function() {
+    getService: function(name) {
         /// <returns type="Sage.SData.Client.SDataService">The application's SData service instance.</returns>
-        return this.service;
+        if (typeof name === 'string' && this.services[name]) 
+            return this.services[name];
+
+        return this.defaultService;
     },
     setTitle: function(title) {
         /// <summary>Sets the applications current title.</summary>
@@ -337,7 +359,8 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
         Ext.apply(this, o, {
             id: 'view',
             title: '',
-            canSearch: false
+            canSearch: false,
+            serviceName: false
         });        
 
         this.loaded = false;
@@ -413,8 +436,8 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
         /// <summary>
         ///     Returns the primary SDataService instance for the view.  
         /// </summary>
-        /// <returns type="Sage.SData.Client.SDataService">The SDataService instance.</returns>
-        return App.getService();
+        /// <returns type="Sage.SData.Client.SDataService">The SDataService instance.</returns>        
+        return App.getService(this.serviceName); /* if false is passed, the default service will be returned */
     }  
 });﻿/// <reference path="../ext/ext-core-debug.js"/>
 /// <reference path="Application.js"/>
@@ -433,8 +456,8 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     ]),
     itemTemplate: new Simplate([
         '<li>',
-        '<a href="#" target="_detail" m:key="{%= $key %}">',
-        '<h3>{%= $descriptor %}</h3>',
+        '<a href="#" target="_detail" m:key="{%= $["$key"] || $["$uuid"] %}">',
+        '<h3>{%= $["$descriptor"] %}</h3>',
         '</a>',
         '</li>'
     ]),    
@@ -486,22 +509,35 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     init: function() {     
         Sage.Platform.Mobile.List.superclass.init.call(this);      
 
-        this.el
-            .on('click', function(evt, el, o) {                                
-                var source = Ext.get(el);
-                var target;
+        this.el.on('click', this.onClick, this);                      
 
-                if (source.is('.more') || (source.up('.more')))                
-                    this.more(evt);
-                else if (source.is('a[target="_detail"]') || (target = source.up('a[target="_detail"]')))
-                    this.navigateToDetail(target || source, evt);
+        App.on('refresh', this.onRefresh, this); 
+    },
+    onClick: function(evt, el, o) {
+        evt.stopEvent();
 
-            }, this, { preventDefault: true, stopPropagation: true });                      
+        var el = Ext.get(el);
+        if (el.is('.more') || el.up('.more'))     
+        {           
+            this.more();
+            return;
+        }        
+        
+        var link = el;
+        if (link.is('a[target="_detail"]') || (link = link.up('a[target="_detail"]')))
+        {
+            var view = link.dom.hash.substring(1);
 
-        App.on('refresh', function(o) {
-            if (this.resourceKind && o.resourceKind === this.resourceKind)
+            var key = link.getAttribute("key", "m");              
+            var descriptor = link.getAttribute("descriptor", "m");  
+
+            this.navigateToDetail(view, key, descriptor);
+            return;
+        }        
+    },
+    onRefresh: function(o) {
+        if (this.resourceKind && o.resourceKind === this.resourceKind)
                 this.clear();
-        }, this); 
     },
     showSearchDialog: function() {
         /// <summary>
@@ -561,12 +597,31 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             .setStartIndex(startIndex); 
 
         if (this.resourceKind) 
-            request.setResourceKind(this.resourceKind)
+            request.setResourceKind(this.resourceKind);
+
+        if (this.resourceProperty)
+            request
+                .getUri()
+                .setPathSegment(Sage.SData.Client.SDataUri.ResourcePropertyIndex, this.resourceProperty);
 
         var where = [];
-        var expr;
-        if (this.context && (expr = this.expandExpression(this.context.where)))
-            where.push(expr);
+
+        if (this.context)
+        {
+            var resourceKindExpr = this.expandExpression(this.context.resourceKind);
+            if (resourceKindExpr)
+                request.setResourceKind(resourceKindExpr);        
+
+            var resourcePredicateExpr = this.expandExpression(this.context.resourcePredicate);
+            if (resourcePredicateExpr)
+                request
+                    .getUri()
+                    .setCollectionPredicate(resourcePredicateExpr);
+
+            var whereExpr = this.expandExpression(this.context.where);
+            if (whereExpr)
+                where.push(whereExpr);
+        }                           
 
         if (this.query)
             where.push(this.query);
@@ -578,22 +633,17 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
         return request;
     },
-    navigateToDetail: function(el) {
+    navigateToDetail: function(view, key, descriptor) {
         /// <summary>
         ///     Navigates to the requested detail view.
         /// </summary>
         /// <param name="el" type="Ext.Element">The element that initiated the navigation.</param>
-        if (el) 
-        {
-            var id = el.dom.hash.substring(1);
-            var key = el.getAttribute("key", "m");  
-            var descriptor = el.getAttribute("descriptor", "m");         
-
-            App.getView(id).show({
+        var v = App.getView(view);
+        if (v)
+            v.show({
                 descriptor: descriptor,
                 key: key
-            });
-        }
+            });        
     },
     processFeed: function(feed) {
         /// <summary>
@@ -704,9 +754,18 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         ///     Indicates whether or not the view has a new context.
         /// </summary>
         /// <returns type="Boolean">True if there is a new context; False otherwise.</returns>
-        if (!this.context) return true;
-         
-        return (this.expandExpression(this.context.where) != this.expandExpression(this.newContext.where))
+        if (this.context)
+        {
+            if (this.expandExpression(this.context.where) != this.expandExpression(this.newContext.where)) return true;
+            if (this.expandExpression(this.context.resourceKind) != this.expandExpression(this.newContext.resourceKind)) return true;
+            if (this.expandExpression(this.context.resourcePredicate) != this.expandExpression(this.newContext.resourcePredicate)) return true;
+
+            return false;
+        }        
+        else
+        {
+            return true;
+        }
     },
     beforeTransitionTo: function() {
         Sage.Platform.Mobile.List.superclass.beforeTransitionTo.call(this);
@@ -779,12 +838,12 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     relatedPropertyTemplate: new Simplate([
         '<div class="row">',
         '<label>{%= label %}</label>',       
-        '<a href="#{%= view %}" target="_related" m:key="{%= key %}">{%= value %}</a>',
+        '<a href="#{%= view %}" target="_related" m:key="{%= key %}" m:descriptor="{%: value %}">{%: value %}</a>',
         '</div>'
     ]),
     relatedTemplate: new Simplate([
         '<li>',
-        '<a href="#{%= view %}" target="_related" m:where="{%= where %}">',
+        '<a href="#{%= view %}" target="_related" m:context="{%= context %}">', 
         '{% if ($["icon"]) { %}',
         '<img src="{%= $["icon"] %}" alt="icon" class="icon" />',
         '{% } %}',
@@ -823,74 +882,67 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     },
     init: function() {  
         Sage.Platform.Mobile.Detail.superclass.init.call(this);
-
-        /*
-        this.el
-            .on('click', function(evt, el, o) {                
-                var source = Ext.get(el);
-                var target;
-
-                if (source.is('a[target="_related"]') || (target = source.up('a[target="_related"]')))
-                {
-                    evt.stopEvent();
-
-                    this.navigateToRelated(target || source, evt);                    
-                }
-            }, this);
-        */
-        this.el
-            .on('click', function(evt, el, o) {
-                    evt.stopEvent();
-
-                    var el = Ext.fly(el);
-                    var where = el.getAttribute('where', 'm');                
-                    var key = el.getAttribute('key', 'm');   
-                    var id = el.dom.hash.substring(1);
-
-                    this.navigateToRelated(id, key, where);   
-            }, this, {delegate: 'a[target="_related"]'});
+        
+        this.el.on('click', this.onClick, this, {delegate: 'a[target="_related"]'});
         
         // todo: find a better way to handle these notifications
-        App.on('refresh', function(o) {
-            if (this.context && o.key === this.context.key)
-            {
-                if (o.data && o.data['$descriptor']) 
-                    this.setTitle(o.data['$descriptor']);
-
-                this.clear();                
-            }
-        }, this);  
+        App.on('refresh', this.onRefresh, this);  
     },
-    formatRelatedQuery: function(entry, fmt) {
-        return String.format(fmt, entry['$key']);        
+    onRefresh: function(o) {
+        if (this.context && o.key === this.context.key)
+        {
+            if (o.data && o.data['$descriptor']) 
+                this.setTitle(o.data['$descriptor']);
+
+            this.clear();                
+        }
+    },
+    onClick: function(evt, el, o) {
+        evt.stopEvent();
+
+        var el = Ext.get(el);
+        var view = el.dom.hash.substring(1);
+
+        var value = el.getAttribute('key', 'm') || Ext.util.JSON.decode(el.getAttribute('context', 'm'));
+        var descriptor = el.getAttribute('descriptor', 'm');
+        
+        this.navigateToRelated(view, value, descriptor);   
+    },
+    formatRelatedQuery: function(entry, fmt, property) {
+        var property = property || '$key';
+
+        return String.format(fmt, entry[property]);        
     },
     navigateToEdit: function() {
         var view = App.getView(this.editor);
         if (view)
             view.show(this.entry);
     },
-    navigateToRelated: function(id, key, where) {    
-        var context = false;            
+    navigateToRelated: function(view, o, descriptor) {    
+        if (typeof o === 'string')
+            var context = {
+                key: o,
+                descriptor: descriptor
+            };
+        else
+            var context = o;
         
-        if (key)
-            context = {
-                'key': key
-            };        
-        else if (where)                  
-            context = {
-                'where': where
-            };        
-                    
         if (context) 
         {            
-            var view = App.getView(id);
-            if (view)
-                view.show(context);
+            var v = App.getView(view);
+            if (v)
+                v.show(context);
         }                                              
     },    
     createRequest: function() {
-        var request = new Sage.SData.Client.SDataSingleResourceRequest(this.getService())
-            .setResourceSelector(String.format("'{0}'", this.context.key)); 
+        var request = new Sage.SData.Client.SDataSingleResourceRequest(this.getService());
+
+        /* test for complex selector */
+        /* todo: more robust test required? */
+        if (/(\s+)/.test(this.context.key))
+            request.setResourceSelector(this.context.key);
+        else
+            request.setResourceSelector(String.format("'{0}'", this.context.key)); 
 
         if (this.resourceKind) 
             request.setResourceKind(this.resourceKind);
@@ -916,11 +968,30 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
             else if (current['view'] && current['property'] !== true)
             {
                 var related = Ext.apply({}, current);
+                var context = {};
+
+                if (related['key'])
+                    context['key'] = typeof related['key'] === 'function' 
+                        ? related['key'](entry)
+                        : related['key']; 
                 
                 if (related['where'])
-                    related['where'] = typeof related['where'] === 'function' 
-                        ? Sage.Platform.Mobile.Format.encode(related['where'](entry))
-                        : Sage.Platform.Mobile.Format.encode(related['where']);
+                    context['where'] = typeof related['where'] === 'function' 
+                        ? related['where'](entry)
+                        : related['where'];       
+                        
+                if (related['resourceKind'])
+                    context['resourceKind'] = typeof related['resourceKind'] === 'function' 
+                        ? related['resourceKind'](entry)
+                        : related['resourceKind']; 
+                        
+                if (related['resourcePredicate'])
+                    context['resourcePredicate'] = typeof related['resourcePredicate'] === 'function' 
+                        ? related['resourcePredicate'](entry)
+                        : related['resourcePredicate'];
+                        
+                // todo: find a better way of storing this information.  this method is flexible at least.
+                related["context"] = Sage.Platform.Mobile.Format.encode(Ext.util.JSON.encode(context));        
                 
                 content.push(this.relatedTemplate.apply(related));                                    
                 continue;
@@ -988,8 +1059,10 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
 
                 this.entry = entry;
                 
-                if (this.entry)                  
+                if (this.entry)         
+                {               
                     this.processLayout(this.layout, {title: this.detailsText}, this.entry);
+                }
             },
             failure: function(response, o) {
                 this.requestFailure(response, o);
@@ -1151,12 +1224,12 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         this.bodyEl.show();
 
         // todo: find a better way to handle these notifications
-        if (this.canSave)
-            App.on('save', function() {
-                if (this.isActive())
-                    this.save();
-            }, this);  
+        if (this.canSave) App.on('save', this.onSave, this);  
     },      
+    onSave: function() {
+        if (this.isActive())
+            this.save();
+    },
     createRequest: function() {
        
     },    

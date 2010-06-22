@@ -14,7 +14,7 @@ Mobile.GCRM.SalesInvoice.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
         
         Ext.apply(this, o, {
             id: 'gcrm_salesinvoice_detail',
-            title: 'ERP - Sales Invoice',
+            title: 'Sales Invoice',
             resourceKind: 'salesInvoices'
         });
 

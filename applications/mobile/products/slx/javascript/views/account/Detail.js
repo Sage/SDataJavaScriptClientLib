@@ -44,8 +44,8 @@ Mobile.SalesLogix.Account.Detail = Ext.extend(Sage.Platform.Mobile.Detail, {
                     label: 'Opportunities',
                     icon: 'products/slx/images/Opportunity_List_24x24.gif'
                 }
-            ]},
-            {options: {title: 'ERP', list: true}, as: [
+            ]}, 
+            {options: {title: 'ERP Related Items', list: true}, as: [
                 {
                     view: 'gcrm_salesinvoice_related',
                     resourceKind: 'tradingAccounts',

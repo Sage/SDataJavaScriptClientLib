@@ -111,12 +111,12 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         this.bodyEl.show();
 
         // todo: find a better way to handle these notifications
-        if (this.canSave)
-            App.on('save', function() {
-                if (this.isActive())
-                    this.save();
-            }, this);  
+        if (this.canSave) App.on('save', this.onSave, this);  
     },      
+    onSave: function() {
+        if (this.isActive())
+            this.save();
+    },
     createRequest: function() {
        
     },    

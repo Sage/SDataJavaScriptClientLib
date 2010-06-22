@@ -21,7 +21,7 @@ Mobile.GCRM.SalesInvoice.List = Ext.extend(Sage.Platform.Mobile.List, {
         
         Ext.apply(this, o, {
             id: 'gcrm_salesinvoice_list',
-            title: 'ERP - Sales Invoices',
+            title: 'Sales Invoices',
             resourceKind: 'salesInvoices',            
             pageSize: 10,
             icon: 'products/slx/images/Accounts_24x24.gif',
