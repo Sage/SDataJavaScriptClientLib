@@ -1,8 +1,8 @@
 /*!
  * 
  */
-﻿/// <reference path="../dependencies/ext/ext-core-debug.js"/>
-/// <reference path="../dependencies/ObjTree.js"/>
+﻿/// <reference path="../libraries/ext/ext-core-debug.js"/>
+/// <reference path="../libraries/ObjTree.js"/>
 /// <reference path="SDataUri.js"/>
 
 Ext.namespace("Sage.SData.Client");
@@ -90,8 +90,8 @@ Sage.SData.Client.SDataBaseRequest = Ext.extend(Ext.util.Observable, {
     }
 });
 
-﻿/// <reference path="../dependencies/ext/ext-core-debug.js"/>
-/// <reference path="../dependencies/ObjTree.js"/>
+﻿/// <reference path="../libraries/ext/ext-core-debug.js"/>
+/// <reference path="../libraries/ObjTree.js"/>
 /// <reference path="SDataUri.js"/>
 /// <reference path="SDataBaseRequest.js"/>
 
@@ -137,8 +137,8 @@ Sage.SData.Client.SDataApplicationRequest = Ext.extend(Sage.SData.Client.SDataBa
         return this;
     }
 });
-﻿/// <reference path="../dependencies/ext/ext-core-debug.js"/>
-/// <reference path="../dependencies/ObjTree.js"/>
+﻿/// <reference path="../libraries/ext/ext-core-debug.js"/>
+/// <reference path="../libraries/ObjTree.js"/>
 /// <reference path="SDataUri.js"/>
 /// <reference path="SDataBaseRequest.js"/>
 /// <reference path="SDataApplicationRequest.js"/>
@@ -167,8 +167,8 @@ Sage.SData.Client.SDataResourceCollectionRequest = Ext.extend(Sage.SData.Client.
         return this.service.readFeed(this, options);
     } 
 });
-﻿/// <reference path="../dependencies/ext/ext-core-debug.js"/>
-/// <reference path="../dependencies/ObjTree.js"/>
+﻿/// <reference path="../libraries/ext/ext-core-debug.js"/>
+/// <reference path="../libraries/ObjTree.js"/>
 /// <reference path="SDataUri.js"/>
 /// <reference path="SDataBaseRequest.js"/>
 /// <reference path="SDataApplicationRequest.js"/>
@@ -192,8 +192,8 @@ Sage.SData.Client.SDataSingleResourceRequest = Ext.extend(Sage.SData.Client.SDat
         this.uri.setCollectionPredicate(val);
         return this;
     }
-});﻿/// <reference path="../dependencies/ext/ext-core-debug.js"/>
-/// <reference path="../dependencies/ObjTree.js"/>
+});﻿/// <reference path="../libraries/ext/ext-core-debug.js"/>
+/// <reference path="../libraries/ObjTree.js"/>
 /// <reference path="SDataUri.js"/>
 /// <reference path="SDataBaseRequest.js"/>
 
@@ -225,7 +225,7 @@ Sage.SData.Client.SDataSystemRequest = Ext.extend(Sage.SData.Client.SDataBaseReq
         return this.service.readFeed(this, options);
     } 
 });
-﻿/// <reference path="../dependencies/ext/ext-core-debug.js"/>
+﻿/// <reference path="../libraries/ext/ext-core-debug.js"/>
 
 Ext.namespace("Sage.SData.Client");
 
@@ -525,9 +525,9 @@ Ext.apply(Sage.SData.Client.SDataUri, {
     ResourcePropertyIndex: 4,
     ServiceMethodSegment: '$service'
 });
-﻿/// <reference path="../dependencies/ext/ext-core-debug.js"/>
-/// <reference path="../dependencies/ObjTree.js"/>
-/// <reference path="../dependencies/Base64.js"/>
+﻿/// <reference path="../libraries/ext/ext-core-debug.js"/>
+/// <reference path="../libraries/ObjTree.js"/>
+/// <reference path="../libraries/Base64.js"/>
 /// <reference path="SDataBaseRequest.js"/>
 /// <reference path="SDataApplicationRequest.js"/>
 /// <reference path="SDataResourceCollectionRequest.js"/>

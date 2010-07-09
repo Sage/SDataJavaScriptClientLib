@@ -1,11 +1,12 @@
-This repository contains the following:
+Information
+-----------
+This repository contains a JavaScript library for consuming [SData](http://sdata.sage.com).
 
-* A JavaScript library for consuming [SData](http://sdata.sage.com).
-* A framework for developing mobile applications driven by SData.
-* A set of customizations for the mobile framework pertaining to SalesLogix.
+Downloading
+-----------
+* `minified`: http://github.com/SageScottsdalePlatform/SDataJavaScriptClientLib/blob/master/deploy/sdata-client.js
+* `debug`: http://github.com/SageScottsdalePlatform/SDataJavaScriptClientLib/blob/master/deploy/sdata-client-debug.js
 
-<b>Note:</b> As of 5/18/10, the SalesLogix demo application will only work with the "Augusta" build of SalesLogix provided in the Cloud for Sage Insights attendees. It will also be compatible with the next SalesLogix release.
-
-Check out the Wiki for an overview of the SData JavaScript Client Library and corresponding applications: [Wiki Link](https://github.com/SageScottsdalePlatform/SDataJavaScriptClientLib/wikis)
-
-Looking into adding project management through [Pivotal Tracker](http://www.pivotaltracker.com/projects/83955)
+Source
+------
+More information soon.
