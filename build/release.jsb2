@@ -1,37 +1,37 @@
 {
 	projectName: 'SData JavaScript Client',
 	licenseText: '',
-	deployDir: 'sdata-client/',
+	deployDir: 'deploy/',
 	pkgs: [{
 		name: 'SData JavaScript Client',
 		file: 'sdata-client.js',
 		isDebug: true,
 		fileIncludes: [{
 			text: 'SDataBaseRequest.js',
-			path: '../Sage.SData.Client/'
+			path: '../src/'
 		},{
 			text: 'SDataApplicationRequest.js',
-			path: '../Sage.SData.Client/'
+			path: '../src/'
 		},{
 			text: 'SDataResourceCollectionRequest.js',
-			path: '../Sage.SData.Client/'
+			path: '../src/'
 		},{
 			text: 'SDataSingleResourceRequest.js',
-			path: '../Sage.SData.Client/'
+			path: '../src/'
 		},{
 			text: 'SDataSystemRequest.js',
-			path: '../Sage.SData.Client/'
+			path: '../src/'
 		},{
 			text: 'SDataUri.js',
-			path: '../Sage.SData.Client/'
+			path: '../src/'
 		},{
 			text: 'SDataService.js',
-			path: '../Sage.SData.Client/'
+			path: '../src/'
 		}]
 	}],
 	resources: [{
-		src: '../Sage.SData.Client/',
-		dest: 'src/',
+		src: '../src',
+		dest: 'src',
 		filters: ".*\\.js"
 	}]
 }
