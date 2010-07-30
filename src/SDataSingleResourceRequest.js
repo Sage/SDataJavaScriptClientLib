@@ -16,6 +16,9 @@ Sage.SData.Client.SDataSingleResourceRequest = Ext.extend(Sage.SData.Client.SDat
     update: function(entry, options) {
         return this.service.updateEntry(this, entry, options);
     },
+    create: function(entry, options) {
+        return this.service.createEntry(this, entry, options);
+    },
     getResourceSelector: function() {
         return this.uri.getCollectionPredicate();
     },

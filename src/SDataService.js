@@ -210,6 +210,28 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
             }
         });
     },
+    createEntry: function(request, entry, options) {
+        var xml = new XML.ObjTree();
+        xml.attr_prefix = '@';
+
+        var body = xml.writeXML(this.formatEntry(entry));
+
+        return this.executeRequest(request, Ext.apply({}, {
+            success: function(feed) {
+                var entry = feed['$resources'][0] || false;                 
+
+                if (options.success)                 
+                    options.success.call(options.scope || this, entry);                                
+            }
+        }, options), {
+            method: 'POST',
+            xmlData: body,
+            headers: {
+                'Content-Type': 'application/atom+xml;type=entry',
+                'Accept': 'application/atom+xml;type=entry,*/*'
+            }
+        });
+    },
     updateEntry: function(request, entry, options) {
         /// <param name="request" type="Sage.SData.Client.SDataSingleResourceRequest">request object</param>
         var xml = new XML.ObjTree();
@@ -280,8 +302,8 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
     formatEntity: function(ns, entity, applyTo) {
         applyTo = applyTo || {};
 
-        applyTo['@sdata:key'] = entity['$key'];
-        applyTo['@sdata:uri'] = entity['$url'];
+        if (entity['$key']) applyTo['@sdata:key'] = entity['$key'];
+        if (entity['$url']) applyTo['@sdata:uri'] = entity['$url'];
 
         // note: not using namespaces at this time
 
@@ -338,7 +360,8 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
         result['@xmlns:http'] = 'http://schemas.sage.com/sdata/http/2008/1';
         result['@xmlns'] = 'http://www.w3.org/2005/Atom';
 
-        result['http:etag'] = entry['$etag'];
+        if (entry['$etag']) result['http:etag'] = entry['$etag'];
+
         result['sdata:payload'] = {};
         result['sdata:payload'][entry['$name']] = {
             '@xmlns': 'http://schemas.sage.com/dynamic/2007'

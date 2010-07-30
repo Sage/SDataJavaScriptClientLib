@@ -22,6 +22,9 @@
 			text: 'SDataSystemRequest.js',
 			path: '../src/'
 		},{
+			text: 'SDataTemplateResourceRequest.js',
+			path: '../src/'	
+		},{
 			text: 'SDataUri.js',
 			path: '../src/'
 		},{

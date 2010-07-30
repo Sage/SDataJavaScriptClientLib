@@ -296,5 +296,6 @@ Ext.apply(Sage.SData.Client.SDataUri, {
     CompanyDatasetPathIndex: 2,
     CollectionTypePathIndex: 3,
     ResourcePropertyIndex: 4,
-    ServiceMethodSegment: '$service'
+    ServiceMethodSegment: '$service',
+    TemplateSegment: '$template'
 });
