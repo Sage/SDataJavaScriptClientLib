@@ -64,8 +64,8 @@ Sage.SData.Client.SDataBaseRequest = Ext.extend(Ext.util.Observable, {
     getQueryArgs: function() { 
         return this.uri.getQueryArgs();
     },
-    setQueryArgs: function(val) {
-        this.uri.setQueryArgs(val);
+    setQueryArgs: function(val, replace) {
+        this.uri.setQueryArgs(val, replace);
         return this;
     },
     getQueryArg: function(key) {
@@ -74,7 +74,7 @@ Sage.SData.Client.SDataBaseRequest = Ext.extend(Ext.util.Observable, {
     setQueryArg: function(key, val) {
         this.uri.setQueryArg(key, val);
         return this;
-    },
+    },    
     buildUrl: function(uri) {
 
     },

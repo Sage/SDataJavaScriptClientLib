@@ -28,3 +28,4 @@ deploy/src/
 [Rr]elease*/
 _ReSharper*/
 [Tt]est[Rr]esult*
+.idea/

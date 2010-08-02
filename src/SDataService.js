@@ -1,4 +1,4 @@
-﻿/// <reference path="../libraries/ext/ext-core-debug.js"/>
+/// <reference path="../libraries/ext/ext-core-debug.js"/>
 /// <reference path="../libraries/ObjTree.js"/>
 /// <reference path="../libraries/Base64.js"/>
 /// <reference path="SDataBaseRequest.js"/>
@@ -20,7 +20,7 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
         this.password = '';
         
         if (o) 
-        {
+        {            
             if (o.version) this.uri.setVersion(o.version);
             if (o.serverName) this.uri.setHost(o.serverName);
             if (o.virtualDirectory) this.uri.setServer(o.virtualDirectory);
@@ -32,7 +32,8 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
             if (typeof o.includeContent === 'boolean') this.uri.setIncludeContent(o.includeContent);
 
             if (o.userName) this.username = o.userName;
-            if (o.password) this.password = o.password;            
+            if (o.password) this.password = o.password; 
+            if (o.json) this.json = true;        
         }    
         
         this.addEvents(
@@ -40,6 +41,17 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
             'requestcomplete',
             'requestexception'
         );   
+    },
+    isJsonEnabled: function() {
+        return this.json;
+    },
+    enableJson: function() {
+        this.json = true;
+        return this;
+    },  
+    disableJson: function() {
+        this.json = false;
+        return this;
     },
     getVersion: function() {
         return this.uri.getVersion();
@@ -145,14 +157,14 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
         return headers;        
     },        
     executeRequest: function(request, options, ajax) {
+        /// <param name="request" type="Sage.SData.Client.SDataBaseRequest">request object</param>          
         var o = Ext.apply({
             headers: {},
             method: 'GET'
         }, {
-            url: request.toString(),
             scope: this,
             success: function(response, opt) {                
-                var feed = this.processFeed(response.responseText);
+                var feed = this.processFeed(response);
 
                 this.fireEvent('requestcomplete', request, opt, feed);
 
@@ -168,6 +180,11 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
         }, ajax);
 
         Ext.apply(o.headers, this.createHeadersForRequest(request));
+
+        // todo: temporary fix for SalesLogix Dynamic Adapter only supporting json selector in format parameter
+        if (this.json) request.setQueryArg('format', 'json');        
+
+        o.url = request.toString();
 
         this.fireEvent('beforerequest', request, o);
 
@@ -189,7 +206,9 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
         /// <param name="request" type="Sage.SData.Client.SDataResourceCollectionRequest">request object</param>          
         return this.executeRequest(request, options, {
             headers: {
-                'Accept': 'application/atom+xml;type=feed,*/*'
+                'Accept': this.json 
+                    ? 'application/json' 
+                    : 'application/atom+xml;type=feed,*/*'
             }
         });
     },   
@@ -206,55 +225,94 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
 
         return this.executeRequest(request, o, {
             headers: {
-                'Accept': 'application/atom+xml;type=entry,*/*'
+                'Accept': this.json 
+                    ? 'application/json'
+                    : 'application/atom+xml;type=entry,*/*'
             }
         });
     },
-    createEntry: function(request, entry, options) {
-        var xml = new XML.ObjTree();
-        xml.attr_prefix = '@';
-
-        var body = xml.writeXML(this.formatEntry(entry));
-
-        return this.executeRequest(request, Ext.apply({}, {
+    createEntry: function(request, entry, options) {       
+        var o = Ext.apply({}, {
             success: function(feed) {
-                var entry = feed['$resources'][0] || false;                 
+                var entry = feed['$resources'][0] || false;
 
-                if (options.success)                 
-                    options.success.call(options.scope || this, entry);                                
-            }
-        }, options), {
-            method: 'POST',
-            xmlData: body,
-            headers: {
-                'Content-Type': 'application/atom+xml;type=entry',
-                'Accept': 'application/atom+xml;type=entry,*/*'
-            }
+                if (options.success)
+                    options.success.call(options.scope || this, entry);
+            },
+            scope: this
+        }, options);
+
+        var ajax = Ext.apply({}, {
+            method: 'POST'
         });
+
+        if (this.isJsonEnabled())
+        {
+            Ext.apply(ajax, {
+                jsonData: entry,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        }
+        else
+        {
+            var xml = new XML.ObjTree();
+            xml.attr_prefix = '@';
+
+            Ext.apply(ajax, {
+                xmlData: xml.writeXML(this.formatEntry(entry)),
+                headers: {
+                    'Content-Type': 'application/atom+xml;type=entry',
+                    'Accept': 'application/atom+xml;type=entry,*/*'
+                }
+            });
+        }
+
+        return this.executeRequest(request, o, ajax);
     },
     updateEntry: function(request, entry, options) {
         /// <param name="request" type="Sage.SData.Client.SDataSingleResourceRequest">request object</param>
-        var xml = new XML.ObjTree();
-        xml.attr_prefix = '@';
-
-        var body = xml.writeXML(this.formatEntry(entry));
-
-        return this.executeRequest(request, Ext.apply({}, {
+        var o = Ext.apply({}, {
             success: function(feed) {
-                var entry = feed['$resources'][0] || false;                 
+                var entry = feed['$resources'][0] || false;
 
-                if (options.success)                 
-                    options.success.call(options.scope || this, entry);                                
-            }
-        }, options), {
-            method: 'PUT',
-            xmlData: body,
-            headers: {
-                'Content-Type': 'application/atom+xml;type=entry',
-                'Accept': 'application/atom+xml;type=entry,*/*',
-                'If-Match': entry['$etag']
-            }
+                if (options.success)
+                    options.success.call(options.scope || this, entry);
+            },
+            scope: this
+        }, options);
+
+        var ajax = Ext.apply({}, {
+            method: 'PUT'
         });
+
+        if (this.isJsonEnabled())
+        {
+            Ext.apply(ajax, {
+                jsonData: entry,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'If-Match': entry['$etag']
+                }
+            });
+        }
+        else
+        {
+            var xml = new XML.ObjTree();
+            xml.attr_prefix = '@';
+
+            Ext.apply(ajax, {
+                xmlData: xml.writeXML(this.formatEntry(entry)),
+                headers: {
+                    'Content-Type': 'application/atom+xml;type=entry',
+                    'Accept': 'application/atom+xml;type=entry,*/*',
+                    'If-Match': entry['$etag']
+                }
+            });
+        }
+
+        return this.executeRequest(request, o, ajax);
     },
     parseFeedXml: function(text) {
         var xml = new XML.ObjTree();
@@ -403,19 +461,41 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
 
         return result;
     },
-    processFeed: function(text) {
-        var doc = this.parseFeedXml(text);
+    processFeed: function(response) {
+        var contentType = response.getResponseHeader('Content-Type');
+        if ((contentType === 'application/json') || (!contentType && this.isJsonEnabled()))
+        {
+            var doc = Ext.util.JSON.decode(response.responseText);
 
-        // depending on the User-Agent the SIF will either send back a feed, or a single entry
-        if (doc.hasOwnProperty('feed'))
-            return this.convertFeed(doc['feed']);
-        else if (doc.hasOwnProperty('entry'))
-            return {
-                '$resources': [
-                    this.convertEntry(doc['entry'])
-                ]
-            };
+            // doing this for parity with below, since with JSON, SData will always
+            // adhere to the format, regardless of the User-Agent.
+            if (doc.hasOwnProperty('$resources'))
+            {
+                return doc;
+            }
+            else
+            {
+                return {
+                    '$resources': [doc]
+                };
+            }
+        }
         else
-            return false;
+        {
+            var doc = this.parseFeedXml(response.responseText);
+
+            // depending on the User-Agent the SIF will either send back a feed, or a single entry
+            // todo: is this the right way to handle this? should there be better detection?
+            if (doc.hasOwnProperty('feed'))
+                return this.convertFeed(doc['feed']);
+            else if (doc.hasOwnProperty('entry'))
+                return {
+                    '$resources': [
+                        this.convertEntry(doc['entry'])
+                    ]
+                };
+            else
+                return false;
+        }
     }
 });
