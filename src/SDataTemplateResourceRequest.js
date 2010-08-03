@@ -1,4 +1,4 @@
-﻿/// <reference path="../libraries/ext/ext-core-debug.js"/>
+/// <reference path="../libraries/ext/ext-core-debug.js"/>
 /// <reference path="../libraries/ObjTree.js"/>
 /// <reference path="SDataUri.js"/>
 /// <reference path="SDataBaseRequest.js"/>
