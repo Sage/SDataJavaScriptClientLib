@@ -1014,7 +1014,9 @@ Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {
         return result;
     },
     processFeed: function(response) {
-        var contentType = response.getResponseHeader('Content-Type');
+        var contentType = typeof response.getResponseHeader === 'function'
+            ? response.getResponseHeader('Content-Type')
+            : false;
         if ((contentType === 'application/json') || (!contentType && this.isJsonEnabled()))
         {
             var doc = Ext.util.JSON.decode(response.responseText);
