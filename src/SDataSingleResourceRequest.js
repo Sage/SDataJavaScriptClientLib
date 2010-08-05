@@ -4,9 +4,7 @@
 /// <reference path="SDataBaseRequest.js"/>
 /// <reference path="SDataApplicationRequest.js"/>
 
-Ext.namespace("Sage.SData.Client");
-
-Sage.SData.Client.SDataSingleResourceRequest = Ext.extend(Sage.SData.Client.SDataApplicationRequest, {   
+Sage.SData.Client.SDataSingleResourceRequest = Sage.SData.Client.SDataApplicationRequest.extend({
     constructor: function() {        
         Sage.SData.Client.SDataSingleResourceRequest.superclass.constructor.apply(this, arguments);                                                 
     },       

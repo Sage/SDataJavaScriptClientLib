@@ -3,9 +3,7 @@
 /// <reference path="SDataUri.js"/>
 /// <reference path="SDataBaseRequest.js"/>
 
-Ext.namespace("Sage.SData.Client");
-
-Sage.SData.Client.SDataApplicationRequest = Ext.extend(Sage.SData.Client.SDataBaseRequest, {   
+Sage.SData.Client.SDataApplicationRequest = Sage.SData.Client.SDataBaseRequest.extend({
     constructor: function() {        
         Sage.SData.Client.SDataApplicationRequest.superclass.constructor.apply(this, arguments);          
         

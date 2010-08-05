@@ -7,6 +7,9 @@
 		file: 'sdata-client.js',
 		isDebug: true,
 		fileIncludes: [{
+		    text: 'SData.js',
+		    path: '../src/'
+		},{
 			text: 'SDataBaseRequest.js',
 			path: '../src/'
 		},{

@@ -6,9 +6,7 @@
 /// <reference path="SDataResourceCollectionRequest.js"/>
 /// <reference path="SDataUri.js"/>
 
-Ext.namespace("Sage.SData.Client");
-
-Sage.SData.Client.SDataService = Ext.extend(Ext.util.Observable, {  
+Sage.SData.Client.SDataService = Sage.SData.Client.Class.define({  
     constructor: function(o) {
         /// <field name="uri" type="Sage.SData.Client.SDataUri" />
 

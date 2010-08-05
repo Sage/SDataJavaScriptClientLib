@@ -1,8 +1,6 @@
 /// <reference path="../libraries/ext/ext-core-debug.js"/>
 
-Ext.namespace("Sage.SData.Client");
-
-Sage.SData.Client.SDataUri = Ext.extend(Ext.util.Observable, {   
+Sage.SData.Client.SDataUri = Sage.SData.Client.Class.define({
     constructor: function(uri) {
         /// <field name="scheme" type="String"></field>        
 

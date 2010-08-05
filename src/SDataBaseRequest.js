@@ -2,9 +2,7 @@
 /// <reference path="../libraries/ObjTree.js"/>
 /// <reference path="SDataUri.js"/>
 
-Ext.namespace("Sage.SData.Client");
-
-Sage.SData.Client.SDataBaseRequest = Ext.extend(Ext.util.Observable, {   
+Sage.SData.Client.SDataBaseRequest = Sage.SData.Client.Class.define({   
     constructor: function(service) {        
         Sage.SData.Client.SDataBaseRequest.superclass.constructor.call(this);                                        
 
