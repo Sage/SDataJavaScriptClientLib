@@ -3,29 +3,36 @@
 /// <reference path="SDataUri.js"/>
 /// <reference path="SDataBaseRequest.js"/>
 
-Sage.SData.Client.SDataSystemRequest = Sage.SData.Client.SDataBaseRequest.extend({
-    constructor: function() {        
-        Sage.SData.Client.SDataSystemRequest.superclass.constructor.apply(this, arguments);          
-        
-        this.category = false;
-    },    
-    getCategory: function() {
-        return this.category;
-    },
-    setCategory: function(val) {
-        this.category = val;
-        return this;
-    },
-    buildUrl: function(uri) {
-        /// <param name="uri" type="Sage.SData.Client.SDataUri" />
+if (Sage)
+{
+    (function(S){
+        var C = S.namespace('SData.Client');
 
-        Sage.SData.Client.SDataSystemRequest.superclass.buildUrl.apply(this, arguments);
+        C.SDataSystemRequest = C.SDataBaseRequest.extend({
+            constructor: function() {
+                this.base.apply(this, arguments);
 
-        uri.appendPath('$system');
+                this.category = false;
+            },
+            getCategory: function() {
+                return this.category;
+            },
+            setCategory: function(val) {
+                this.category = val;
+                return this;
+            },
+            buildUrl: function(uri) {
+                /// <param name="uri" type="Sage.SData.Client.SDataUri" />
 
-        if (this.category) uri.appendPath(this.category);
-    },
-    read: function(options) {
-        return this.service.readFeed(this, options);
-    } 
-});
+                this.base.apply(this, arguments);
+
+                uri.appendPath('$system');
+
+                if (this.category) uri.appendPath(this.category);
+            },
+            read: function(options) {
+                return this.service.readFeed(this, options);
+            }
+        });
+    })(Sage);
+}

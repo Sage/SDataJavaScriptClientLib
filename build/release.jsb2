@@ -7,7 +7,7 @@
 		file: 'sdata-client.js',
 		isDebug: true,
 		fileIncludes: [{
-		    text: 'SData.js',
+		    text: 'SDataAjax.js',
 		    path: '../src/'
 		},{
 			text: 'SDataBaseRequest.js',
@@ -34,10 +34,44 @@
 			text: 'SDataService.js',
 			path: '../src/'
 		}]
+	},{
+		name: 'SData JavaScript Client Dependencies',
+		file: 'sdata-client-dependencies.js',
+		isDebug: true,
+		fileIncludes: [{
+			text: 'Base64.js',
+			path: '../libraries/'
+		},{
+			text: 'ObjTree.js',
+			path: '../libraries/'
+		},{
+			text: 'sage.js',
+			path: '../libraries/sage/'
+		},{
+			text: 'class.js',
+			path: '../libraries/sage/'
+		},{
+			text: 'deferred.js',
+			path: '../libraries/sage/'
+		},{
+			text: 'event.js',
+			path: '../libraries/sage/'
+		},{
+			text: 'evented.js',
+			path: '../libraries/sage/'
+		}]
 	}],
 	resources: [{
 		src: '../src',
 		dest: 'src',
+		filters: ".*\\.js"
+	},{
+	    src: '../libraries',
+		dest: 'src/libraries',
+		filters: ".*[Base64|ObjTree|json2]"
+	},{
+	    src: '../libraries/sage',
+		dest: 'src/libraries/sage',
 		filters: ".*\\.js"
 	}]
 }
