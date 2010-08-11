@@ -242,8 +242,7 @@ if (Sage)
 
                         if (options.success)
                             options.success.call(options.scope || this, entry);
-                    },
-                    scope: this
+                    }
                 }, options);
 
                 var ajax = S.apply({}, {
@@ -283,8 +282,7 @@ if (Sage)
 
                         if (options.success)
                             options.success.call(options.scope || this, entry);
-                    },
-                    scope: this
+                    }
                 }, options);
 
                 var ajax = S.apply({}, {
