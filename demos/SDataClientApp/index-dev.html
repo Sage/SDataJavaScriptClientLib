@@ -43,6 +43,11 @@
     <div id="viewport">
         <div dojoType="dijit.layout.BorderContainer" design="headline" gutters="false" liveSplitters="true" id="layout" style="visibility: hidden;">
             <div dojoType="dijit.layout.TabContainer" region="center">
+                <div dojoType="dijit.layout.BorderContainer" title="Service Config" style="height: 100%;">
+                    <div dojoType="dijit.layout.ContentPane" region="top" splitter="false" style="height: 100px">top</div>
+                    <div dojoType="Demo.ServiceConfig" region="center" splitter="true">center</div>
+                    <div dojoType="dijit.layout.ContentPane" region="bottom" splitter="true">bottom</div>
+                </div>
                 <div dojoType="dijit.layout.BorderContainer" title="Request" style="height: 100%;">
                     <div dojoType="dijit.layout.ContentPane" region="top" splitter="false" style="height: 100px">top</div>
                     <div dojoType="dijit.layout.ContentPane" region="center" splitter="true">center</div>
@@ -54,10 +59,12 @@
     </div>
     <script type="text/javascript">
     djConfig = {
+        baseUrl: './',
         parseOnLoad: false,
         debug: false,
         modulePaths: {
-            'Sage': "../src/dojo/Sage"
+            'Sage': 'src/dojo/Sage',
+            'Demo': 'src/dojo/Demo'
         }
     };
     </script>
@@ -65,6 +72,18 @@
     <!--
     <script type="text/javascript" src="libraries/dojo/dojo.js"></script>
     -->
+    <script type="text/javascript">
+    dojo.require("dojo.parser");
+    dojo.require('dijit.layout.ContentPane');
+    dojo.require('dijit.layout.BorderContainer');
+    dojo.require('dijit.layout.AccordionContainer');
+    dojo.require('dijit.layout.TabContainer');
+
+    dojo.require('Sage.Data.SDataStore');
+
+    dojo.require('Demo.ServiceConfig');
+    </script>
+
     <script type="text/javascript" src="../../libraries/sage/sage.js"></script>
     <script type="text/javascript" src="../../libraries/sage/class.js"></script>
     <script type="text/javascript" src="../../libraries/sage/deferred.js"></script>
@@ -80,13 +99,10 @@
     <script type="text/javascript" src="../../src/SDataTemplateResourceRequest.js"></script>
     <script type="text/javascript" src="../../libraries/ObjTree.js"></script>
     <script type="text/javascript" src="../../libraries/Base64.js"></script>
-    <script type="text/javascript">
-    dojo.require("dojo.parser");
-    dojo.require("dijit.layout.ContentPane");
-    dojo.require("dijit.layout.BorderContainer");
-    dojo.require("dijit.layout.AccordionContainer");
-    dojo.require("dijit.layout.TabContainer");
+    
+    <script type="text/javascript" src="libraries/Simplate.js"></script>
 
+    <script type="text/javascript">
     dojo.addOnLoad(function() {
         dojo.parser.parse(dojo.byId('viewport'));
 
