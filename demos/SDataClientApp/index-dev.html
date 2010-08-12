@@ -1,0 +1,179 @@
+<html>
+<head>
+    <title>SData Core Client API Demo</title>
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.5/dijit/themes/claro/claro.css" />
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.5/dojox/grid/resources/claroGrid.css" />
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.5/dojox/grid/enhanced/resources/claroEnhancedGrid.css" />
+    <!--
+    <link rel="stylesheet" type="text/css" href="libraries/dijit/themes/claro/claro.css" />
+    <link rel="stylesheet" type="text/css" href="libraries/dojox/grid/resources/grid.css" />
+    <link rel="stylesheet" type="text/css" href="libraries/dojox/grid/resources/claroGrid.css" />
+    <link rel="stylesheet" type="text/css" href="libraries/dojox/grid/enhanced/resources/claroEnhancedGrid.css" />
+    -->
+    <style type="text/css">
+    body, html { width:100%; height:100%; margin:0; padding:0; overflow:hidden; }
+    #viewport, #layout { width:100%; height:100% }
+    .block-loading
+    {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #eee url(ajax-loader.gif) no-repeat 50% 50%;
+        opacity: 0.5;
+    }
+    .dojoxgrid
+    {
+        border: none 0 black;
+    }
+
+    div.dojoxGridHeader
+    {
+        border-top: none 0 black;
+    }
+
+    div.dojoxgridheader .dojoxGridCell
+    {
+        border-width: 0 1px 1px 1px !important;
+    }
+    </style>
+</head>
+<body class="claro">
+    <div id="viewport">
+        <div dojoType="dijit.layout.BorderContainer" design="headline" gutters="false" liveSplitters="true" id="layout" style="visibility: hidden;">
+            <div dojoType="dijit.layout.TabContainer" region="center">
+                <div dojoType="dijit.layout.BorderContainer" title="Request" style="height: 100%;">
+                    <div dojoType="dijit.layout.ContentPane" region="top" splitter="false" style="height: 100px">top</div>
+                    <div dojoType="dijit.layout.ContentPane" region="center" splitter="true">center</div>
+                    <div dojoType="dijit.layout.ContentPane" region="bottom" splitter="true">bottom</div>
+                </div>                
+            </div>
+            <div dojoType="dijit.layout.ContentPane" region="bottom" style="height: 20px;"><a href="">refresh</a></div>
+        </div>
+    </div>
+    <script type="text/javascript">
+    djConfig = {
+        parseOnLoad: false,
+        debug: false,
+        modulePaths: {
+            'Sage': "../src/dojo/Sage"
+        }
+    };
+    </script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/dojo/1.5/dojo/dojo.xd.js"></script>
+    <!--
+    <script type="text/javascript" src="libraries/dojo/dojo.js"></script>
+    -->
+    <script type="text/javascript" src="../../libraries/sage/sage.js"></script>
+    <script type="text/javascript" src="../../libraries/sage/class.js"></script>
+    <script type="text/javascript" src="../../libraries/sage/deferred.js"></script>
+    <script type="text/javascript" src="../../libraries/sage/event.js"></script>
+    <script type="text/javascript" src="../../libraries/sage/evented.js"></script>
+    <script type="text/javascript" src="../../src/SDataUri.js"></script>
+    <script type="text/javascript" src="../../src/SDataService.js"></script>
+    <script type="text/javascript" src="../../src/SDataBaseRequest.js"></script>
+    <script type="text/javascript" src="../../src/SDataApplicationRequest.js"></script>
+    <script type="text/javascript" src="../../src/SDataResourceCollectionRequest.js"></script>
+    <script type="text/javascript" src="../../src/SDataSingleResourceRequest.js"></script>
+    <script type="text/javascript" src="../../src/SDataSystemRequest.js"></script>
+    <script type="text/javascript" src="../../src/SDataTemplateResourceRequest.js"></script>
+    <script type="text/javascript" src="../../libraries/ObjTree.js"></script>
+    <script type="text/javascript" src="../../libraries/Base64.js"></script>
+    <script type="text/javascript">
+    dojo.require("dojo.parser");
+    dojo.require("dijit.layout.ContentPane");
+    dojo.require("dijit.layout.BorderContainer");
+    dojo.require("dijit.layout.AccordionContainer");
+    dojo.require("dijit.layout.TabContainer");
+
+    dojo.addOnLoad(function() {
+        dojo.parser.parse(dojo.byId('viewport'));
+
+        var layout = dijit.byId('layout');
+
+        dojo.style(layout.domNode, {'visibility': 'visible'});
+
+        /*
+        var loading = new Simplate([
+            '<div class="block-loading">',
+            '</div>'
+        ]);
+
+        var layout = dojo.byId('layout');
+        var nav = dijit.byId('nav');
+
+        nav.addChild(new dijit.layout.ContentPane({
+            title: 'Sales',
+            content: ''
+        }));
+
+        nav.addChild(new dijit.layout.ContentPane({
+            title: 'Marketing',
+            content: ''
+        }));
+
+        nav.layout();
+
+        //dojo.place(loading.apply(), dojo.byId('main'));
+
+        dojo.style(layout, {'visibility': 'visible'});
+
+        //setTimeout(loadListView, 250);
+        */
+    });
+
+    var loadListView = function() {
+        dojo.require("dojox.grid.EnhancedGrid");
+        dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
+        dojo.require('Sage.Data.SDataStore');
+
+        var service = new Sage.SData.Client.SDataService({
+            serverName: 'slxbrowser.sagesaleslogixcloud.com',
+            virtualDirectory: 'sdata',
+            applicationName: 'slx',
+            contractName: 'dynamic',
+            port: 80,
+            json: true,
+            protocol: /https/i.test(window.location.protocol) ? 'https' : false,
+            userName: 'lee',
+            password: ''
+        });
+
+        var store = new Sage.Data.SDataStore({
+            service: service,
+            resourceKind: 'accounts',
+            select: ['AccountName','Address/City','Address/State','MainPhone','Type','Sub-Type','Status','AccountManager/UserInfo/UserName','Owner/OwnerDescription'],
+            include: []
+        });
+        var grid = new dojox.grid.EnhancedGrid({
+            id: 'list',
+            region: 'center',
+            structure: [
+                { field: 'AccountName', name: 'account', width: 'auto' },
+                { field: 'Address.City', name: 'city', width: '150px' },
+                { field: 'Address.State', name: 'state', width: '50px' },
+                { field: 'MainPhone', name: 'main phone', width: '100px' },
+                { field: 'Type', name: 'type', width: '100px' },
+                { field: 'Sub-Type', name: 'sub-type', width: '100px' },
+                { field: 'Status', name: 'status', width: '100px' },
+                { field: 'AccountManager.UserInfo.UserName', name: 'acct. mgr.', width: '150px' },
+                { field: 'Owner.OwnerDescription', name: 'owner', width: '150px' }
+            ],
+            store: store,
+            plugins: {
+                nestedSorting: true
+            }
+        });
+
+        var main = dijit.byId('main');
+
+        dojo.query('.block-loading', main._center).orphan();
+
+        main.addChild(grid);
+
+        grid.startup();
+    };
+    </script>
+</body>
+</html>
