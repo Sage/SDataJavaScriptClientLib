@@ -12,24 +12,18 @@ if (Sage)
             constructor: function() {
                 this.base.apply(this, arguments);
 
-                this.category = false;
+                this.uri.setPathSegment(
+                    Sage.SData.Client.SDataUri.ProductPathIndex,
+                    Sage.SData.Client.SDataUri.SystemSegment
+                );               
             },
             getCategory: function() {
-                return this.category;
+                this.uri.getPathSegment(Sage.SData.Client.SDataUri.ContractTypePathIndex);
             },
             setCategory: function(val) {
-                this.category = val;
+                this.uri.setPathSegment(Sage.SData.Client.SDataUri.ContractTypePathIndex, val);
                 return this;
-            },
-            buildUrl: function(uri) {
-                /// <param name="uri" type="Sage.SData.Client.SDataUri" />
-
-                this.base.apply(this, arguments);
-
-                uri.appendPath('$system');
-
-                if (this.category) uri.appendPath(this.category);
-            },
+            },            
             read: function(options) {
                 return this.service.readFeed(this, options);
             }

@@ -77,16 +77,9 @@ if (Sage)
             setQueryArg: function(key, val) {
                 this.uri.setQueryArg(key, val);
                 return this;
-            },
-            buildUrl: function(uri) {
-
-            },
-            toString: function() {
-                var uri = new Sage.SData.Client.SDataUri(this.uri);
-
-                this.buildUrl(uri);
-
-                return uri.toString();
+            },            
+            build: function() {
+                return this.uri.build();
             }
         });
     })(Sage);

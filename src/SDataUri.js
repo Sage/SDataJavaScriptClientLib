@@ -168,7 +168,7 @@ if (Sage)
                 );
                 return this;
             },
-            toString: function() {
+            build: function() {
                 var url = [];
 
                 url.push(this.getScheme());
@@ -300,7 +300,8 @@ if (Sage)
             CollectionTypePathIndex: 3,
             ResourcePropertyIndex: 4,
             ServiceMethodSegment: '$service',
-            TemplateSegment: '$template'
+            TemplateSegment: '$template',
+            SystemSegment: '$system'
         });
     })(Sage);
 }

@@ -188,7 +188,7 @@ if (Sage)
                 // todo: temporary fix for SalesLogix Dynamic Adapter only supporting json selector in format parameter
                 if (this.json) request.setQueryArg('format', 'json');
 
-                o.url = request.toString();
+                o.url = request.build();
 
                 this.fireEvent('beforerequest', request, o);
 
