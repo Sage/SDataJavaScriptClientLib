@@ -11,6 +11,12 @@ dojo.require('dijit._Templated');
 
 (function(){
     dojo.declare('Demo.View', [dijit._Widget, dijit._Templated], {
-        
+        widgetsInTemplate: true,
+        postCreate: function()
+        {
+            this.inherited(arguments);
+
+            console.log('postCreate');
+        }
     });
 })();
