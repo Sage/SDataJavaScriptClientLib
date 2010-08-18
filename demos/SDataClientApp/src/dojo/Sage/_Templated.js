@@ -4,7 +4,6 @@ dojo.require('dijit._Templated');
 (function(){
     dojo.declare('Sage._Templated', dijit._Templated, {
         buildRendering: function() {
-            debugger;
             if (this.domNode && !this.template) return;
 
             var root = dojo._toDom(['<div>',this.template.apply(this),'</div>'].join(''));
@@ -50,7 +49,6 @@ dojo.require('dijit._Templated');
             this.buildRendering();
         },
         startup: function() {
-            debugger;
             dojo.forEach(this._startupWidgets, function(w){
                 if(w && !w._started && w.startup){
                     w.startup();

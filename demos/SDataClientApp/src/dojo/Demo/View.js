@@ -6,11 +6,11 @@
  * To change this template use File | Settings | File Templates.
  */
 dojo.provide('Demo.View');
-dojo.require('dijit._Widget');
+dojo.require('dijit.layout._LayoutWidget');
 dojo.require('Sage._Templated');
 
 (function(){
-    dojo.declare('Demo.View', [dijit._Widget, Sage._Templated], {
+    dojo.declare('Demo.View', [dijit.layout._LayoutWidget, Sage._Templated], {
         widgetsInTemplate: true,
         postCreate: function()
         {

@@ -29,6 +29,7 @@ if (Sage)
                     if (o.virtualDirectory) this.uri.setServer(o.virtualDirectory);
                     if (o.applicationName) this.uri.setProduct(o.applicationName);
                     if (o.contractName) this.uri.setContract(o.contractName);
+                    if (o.dataSet) this.uri.setCompanyDataset(o.dataSet);
                     if (o.port) this.uri.setPort(o.port);
                     if (o.protocol) this.uri.setScheme(o.protocol);
 
