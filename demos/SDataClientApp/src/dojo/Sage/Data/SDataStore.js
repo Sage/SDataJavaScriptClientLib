@@ -6,6 +6,7 @@
  * To change this template use File | Settings | File Templates.
  */
 dojo.provide('Sage.Data.SDataStore');
+
 (function() {
     var nameToPathCache = {};
     var nameToPath = function(name) {

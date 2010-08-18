@@ -7,10 +7,10 @@
  */
 dojo.provide('Demo.View');
 dojo.require('dijit._Widget');
-dojo.require('dijit._Templated');
+dojo.require('Sage._Templated');
 
 (function(){
-    dojo.declare('Demo.View', [dijit._Widget, dijit._Templated], {
+    dojo.declare('Demo.View', [dijit._Widget, Sage._Templated], {
         widgetsInTemplate: true,
         postCreate: function()
         {
