@@ -11,7 +11,7 @@ dojo.require('dijit.form.Form');
 (function(){
     var T = new Simplate([
         '<div dojoType="dijit.layout.BorderContainer" style="height: 100%; width: 100%" dojoAttachPoint="container">',
-            '<div dojoType="dijit.layout.ContentPane" region="center" splitter="true">',
+            '<div dojoType="dijit.layout.ContentPane" region="center" splitter="true" style="width: 100%;">',
                 '<div dojoType="dijit.form.Form" dojoAttachPoint="form">',
                 '<fieldset>',
                 '<legend>Authentication</legend>',
