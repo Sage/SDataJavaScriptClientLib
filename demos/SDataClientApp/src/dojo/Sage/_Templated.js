@@ -6,42 +6,40 @@ dojo.require('dijit._Templated');
         buildRendering: function() {
             if (this.domNode && !this.template) return;
 
-            var root = dojo._toDom(['<div>',this.template.apply(this),'</div>'].join(''));
-
-            if (this.widgetsInTemplate)
-            {
-                this._startupWidgets = dojo.parser.parse(root, {
-                    noStart: !this._earlyTemplatedStartup,
-                    inherited: {dir: this.dir, lang: this.lang}
-                });
-
-                this._supportingWidgets = dijit.findWidgets(root);
-
-                this._attachTemplateNodes(this._startupWidgets, function(n,p){
-                    return n[p];
-                });
-            }
-
-            // todo: fix assumption that there is only one root node if it's a widget
-
-            var nodes = [];
-
-            while (root.firstChild)
-                nodes.push(root.removeChild(root.firstChild));
-
-            if (root.parentNode)
-                root.parentNode.removeChild(root);
-
-            var node = nodes[0];
-
-            if (this.domNode)
-            {
-                dojo.place(node, this.domNode, 'before');
-                this.destroyDescendants();
-                dojo.destroy(this.domNode);
-            }
+            var node = dojo._toDom(this.template.apply(this));
+            if (node.nodeType !== 1) throw new Error('Invalid template.');
 
             this.domNode = node;
+
+            if(this.widgetsInTemplate){
+				// Make sure dojoType is used for parsing widgets in template.
+				// The dojo.parser.query could be changed from multiversion support.
+				var parser = dojo.parser, qry, attr;
+				if(parser._query != "[dojoType]"){
+					qry = parser._query;
+					attr = parser._attrName;
+					parser._query = "[dojoType]";
+					parser._attrName = "dojoType";
+				}
+
+				// Store widgets that we need to start at a later point in time
+				var cw = (this._startupWidgets = dojo.parser.parse(node, {
+					noStart: !this._earlyTemplatedStartup,
+					inherited: {dir: this.dir, lang: this.lang}
+				}));
+
+				// Restore the query.
+				if(qry){
+					parser._query = qry;
+					parser._attrName = attr;
+				}
+
+				this._supportingWidgets = dijit.findWidgets(node);
+
+				this._attachTemplateNodes(cw, function(n,p){
+					return n[p];
+				});
+			}
 
             this._fillContent(this.srcNodeRef);
         },
