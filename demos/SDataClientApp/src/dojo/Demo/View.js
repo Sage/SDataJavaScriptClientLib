@@ -7,6 +7,7 @@
  */
 dojo.provide('Demo.View');
 dojo.require('dijit._Widget');
+dojo.require("dijit.form._FormWidget");
 dojo.require('Sage._Templated');
 
 (function(){
@@ -16,6 +17,21 @@ dojo.require('Sage._Templated');
         {
             this.inherited(arguments);
             this.startup();
+
+            if (this.bindings)
+            {
+                for (var i = 0; i < this.bindings.length; i++)
+                {
+                    var binding = this.bindings[i];
+
+                    if (this[binding.name] instanceof dijit.form._FormValueWidget)
+                        dojo.connect(
+                            this[binding.name],
+                            binding.event || 'onChange',
+                            dojo.hitch(binding.scope || this, binding.target, this[binding.name])
+                        );
+                }
+            }
         }
     });
 })();

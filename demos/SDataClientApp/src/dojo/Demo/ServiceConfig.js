@@ -8,6 +8,7 @@ dojo.require('dijit.form.ComboBox');
 dojo.require('dijit.form.NumberSpinner');
 dojo.require('dijit.form.Button');
 dojo.require('dijit.form.Form');
+
 (function(){
     var T = new Simplate([
         '<div style="height: 100%; width: 100%;">',
@@ -34,9 +35,9 @@ dojo.require('dijit.form.Form');
                         '</fieldset>',
                         '<fieldset>',
                         '<legend>URL</legend>',
-                        '<div dojoType="dijit.form.TextBox" title="URL:" name="url" dojoAttachPoint="url" style="width: 100%;"></div>',
+                        '<div dojoType="dijit.form.TextBox" title="URL:" name="url" dojoAttachPoint="url" style="width: 100%;" readonly></div>',
                         '</fieldset>',
-                        '<button dojoType="dijit.form.Button" type="button" dojoAttachEvent="onClick:save">Save</button>',
+                        '<button dojoType="dijit.form.Button" type="button" dojoAttachEvent="onClick:save">Initialize</button>',
                     '</form>',
                 '</div>',
             '</div>',
@@ -45,14 +46,14 @@ dojo.require('dijit.form.Form');
 
     dojo.declare('Demo.ServiceConfig', [Demo.View], {
         template: T,
-        bind: [
-            'serverName',
-            'virtualDirectory',
-            'applicationName',
-            'contractName',
-            'dataSet',
-            'protocol'
-        ],
+        bindings: [
+            {name: 'serverName', event: 'onChange', target: 'change'},
+            {name: 'virtualDirector', event: 'onChange', target: 'change'},
+            {name: 'applicationName', event: 'onChange', target: 'change'},
+            {name: 'contractName', event: 'onChange', target: 'change'},
+            {name: 'dataSet', event: 'onChange', target: 'change'},
+            {name: 'protocol', event: 'onChange', target: 'change'}
+        ],        
         constructor: function() {
             this.inherited(arguments);
             
@@ -60,8 +61,8 @@ dojo.require('dijit.form.Form');
                 virtualDirectory: 'sage'
             });
         },
-        save: function(evt) {
-            console.log('values: %o', this.form.getValues());
+        save: function(evt) {            
+            App.setService(new Sage.SData.Client.SDataService(this.form.getValues()));
         },
         change: function(field, value) {            
             switch (field.name)
@@ -93,25 +94,6 @@ dojo.require('dijit.form.Form');
             this.inherited(arguments);
  
             this.url.attr('value', this.service.getUri().build());
-
-            for (var i = 0; i < this.bind.length; i++)
-                if (this[this.bind[i]] instanceof dijit.form._FormValueWidget)
-                    dojo.connect(
-                        this[this.bind[i]],
-                        'onChange',
-                        dojo.hitch(this, this.change, this[this.bind[i]])
-                    );
-
-            /*
-            // auto bind
-            for (var property in this)
-                if (this[property] instanceof dijit.form._FormValueWidget)
-                    dojo.connect(
-                        this[property],
-                        'onChange',
-                        dojo.hitch(this, this.change, this[property])
-                    );
-            */
         }
     });
 })();

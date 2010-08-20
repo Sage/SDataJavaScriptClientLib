@@ -52,7 +52,9 @@
     <div id="viewport">
         <div dojoType="dijit.layout.BorderContainer" design="headline" gutters="false" liveSplitters="true" id="layout" style="visibility: hidden;">
             <div dojoType="dijit.layout.TabContainer" region="center">
-                <div dojoType="Demo.ServiceConfig" title="Service Config" id="test">                    
+                <div dojoType="Demo.ServiceConfig" title="Service Config" id="service-config">
+                </div>
+                <div dojoType="Demo.ResourceCollection" title="Resource Collection" id="resource-collection">                    
                 </div>
                 <div dojoType="dijit.layout.BorderContainer" title="Request" style="height: 100%;">
                     <div dojoType="dijit.layout.ContentPane" region="top" splitter="false" style="height: 100px">top</div>
@@ -89,6 +91,7 @@
 
     dojo.require('Demo.Application');
     dojo.require('Demo.ServiceConfig');
+    dojo.require('Demo.ResourceCollection');
     </script>
 
     <script type="text/javascript" src="../../libraries/sage/sage.js"></script>
@@ -111,92 +114,14 @@
 
     <script type="text/javascript">
     dojo.addOnLoad(function() {
+        App.init();
+
         dojo.parser.parse(dojo.byId('viewport'));
 
         var layout = dijit.byId('layout');
 
         dojo.style(layout.domNode, {'visibility': 'visible'});
-
-        /*
-        var loading = new Simplate([
-            '<div class="block-loading">',
-            '</div>'
-        ]);
-
-        var layout = dojo.byId('layout');
-        var nav = dijit.byId('nav');
-
-        nav.addChild(new dijit.layout.ContentPane({
-            title: 'Sales',
-            content: ''
-        }));
-
-        nav.addChild(new dijit.layout.ContentPane({
-            title: 'Marketing',
-            content: ''
-        }));
-
-        nav.layout();
-
-        //dojo.place(loading.apply(), dojo.byId('main'));
-
-        dojo.style(layout, {'visibility': 'visible'});
-
-        //setTimeout(loadListView, 250);
-        */
     });
-
-    var loadListView = function() {
-        dojo.require("dojox.grid.EnhancedGrid");
-        dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
-        dojo.require('Sage.Data.SDataStore');
-
-        var service = new Sage.SData.Client.SDataService({
-            serverName: 'slxbrowser.sagesaleslogixcloud.com',
-            virtualDirectory: 'sdata',
-            applicationName: 'slx',
-            contractName: 'dynamic',
-            port: 80,
-            json: true,
-            protocol: /https/i.test(window.location.protocol) ? 'https' : false,
-            userName: 'lee',
-            password: ''
-        });
-
-        var store = new Sage.Data.SDataStore({
-            service: service,
-            resourceKind: 'accounts',
-            select: ['AccountName','Address/City','Address/State','MainPhone','Type','Sub-Type','Status','AccountManager/UserInfo/UserName','Owner/OwnerDescription'],
-            include: []
-        });
-        var grid = new dojox.grid.EnhancedGrid({
-            id: 'list',
-            region: 'center',
-            structure: [
-                { field: 'AccountName', name: 'account', width: 'auto' },
-                { field: 'Address.City', name: 'city', width: '150px' },
-                { field: 'Address.State', name: 'state', width: '50px' },
-                { field: 'MainPhone', name: 'main phone', width: '100px' },
-                { field: 'Type', name: 'type', width: '100px' },
-                { field: 'Sub-Type', name: 'sub-type', width: '100px' },
-                { field: 'Status', name: 'status', width: '100px' },
-                { field: 'AccountManager.UserInfo.UserName', name: 'acct. mgr.', width: '150px' },
-                { field: 'Owner.OwnerDescription', name: 'owner', width: '150px' }
-            ],
-            store: store,
-            plugins: {
-                nestedSorting: true
-            }
-        });
-
-        var main = dijit.byId('main');
-
-        dojo.query('.block-loading', main._center).orphan();
-
-        main.addChild(grid);
-
-        grid.startup();
-    };
     </script>
 </body>
 </html>

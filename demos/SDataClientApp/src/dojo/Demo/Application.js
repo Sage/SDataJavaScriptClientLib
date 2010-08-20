@@ -16,6 +16,16 @@ dojo.provide('Demo.Application');
         },
         init: function() {
 
+        },
+        setService: function(service) {
+            this.service = service;
+            this.onServiceChanged(service);
+        },
+        getService: function() {
+            return this.service;
+        },
+        // event
+        onServiceChanged: function(service) {
         }
     });
 })();
