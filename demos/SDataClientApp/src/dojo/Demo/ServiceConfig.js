@@ -55,7 +55,7 @@ dojo.require('dijit.form.Form');
         ],
         constructor: function() {
             this.inherited(arguments);
-
+            
             this.service = new Sage.SData.Client.SDataService({
                 virtualDirectory: 'sage'
             });
@@ -91,7 +91,7 @@ dojo.require('dijit.form.Form');
         postCreate: function()
         {
             this.inherited(arguments);
-
+ 
             this.url.attr('value', this.service.getUri().build());
 
             for (var i = 0; i < this.bind.length; i++)

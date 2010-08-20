@@ -41,27 +41,39 @@ if(Sage) {
             INITIALIZING = true;
             var prototype = new this();
             INITIALIZING = false;
+
+            var wrap = function(name, fn) {
+                return function() {
+                    var tmp = this.base;
+                    // Add a new .base() method that is the same method
+                    // but on the base class
+                    this.base = base[name];
+                    // The method only need to be bound temporarily, so we
+                    // remove it when we're done executing
+                    var ret = fn.apply(this, arguments);
+                    this.base = tmp;
+                    return ret;
+                };
+            };
+
             // Copy the properties over onto the new prototype
-            for (var name in prop) {
+            var hidden = ['constructor'],
+                i = 0,
+                name;
+
+            for (name in prop) {
                 // Check if we're overwriting an existing function
                 prototype[name] = typeof prop[name] === "function" && 
                 typeof base[name] === "function" &&
-                OVERRIDE.test(prop[name]) ?
-                (function(name, fn) {
-                    return function() {
-                        var tmp = this.base;
-                        // Add a new .base() method that is the same method
-                        // but on the base class
-                        this.base = base[name];
-                        // The method only need to be bound temporarily, so we
-                        // remove it when we're done executing
-                        var ret = fn.apply(this, arguments);        
-                        this.base = tmp;
-                        return ret;
-                    };
-                }(name, prop[name])) :
-                prop[name];
+                OVERRIDE.test(prop[name]) ? wrap(name, prop[name]) : prop[name];
             }
+
+            while (name = hidden[i++])
+                if (prop[name] != base[name])
+                    prototype[name] = typeof prop[name] === "function" &&
+                        typeof base[name] === "function" &&
+                        OVERRIDE.test(prop[name]) ? wrap(name, prop[name]) : prop[name];
+
             // The dummy class constructor
             function Class() {
                 // All construction is actually done in the initialize method

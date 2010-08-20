@@ -14,7 +14,6 @@ if (Sage)
         C.SDataService = S.Evented.extend({
             constructor: function(o) {
                 /// <field name="uri" type="Sage.SData.Client.SDataUri" />
-
                 this.base.apply(this, arguments);
 
                 this.uri = new Sage.SData.Client.SDataUri();
