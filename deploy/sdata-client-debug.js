@@ -294,6 +294,9 @@ if (Sage)
             create: function(entry, options) {
                 return this.service.createEntry(this, entry, options);
             },
+			'delete': function(entry, options) {
+				return this.service.deleteEntry(this, entry, options);
+			},
             getResourceSelector: function() {
                 return this.uri.getCollectionPredicate();
             },
@@ -983,6 +986,17 @@ if (Sage)
 
                 return this.executeRequest(request, o, ajax);
             },
+			deleteEntry: function(request, entry, options) {
+				/// <param name="request" type="Sage.SData.Client.SDataSingleResourceRequest">request object</param>
+				var ajax = S.apply({}, {
+                    method: 'DELETE',
+					headers: {
+						'If-Match': entry['$etag']
+					}
+                });
+
+				return this.executeRequest(request, options, ajax);
+			},
             parseFeedXml: function(text) {
                 var xml = new XML.ObjTree();
                 xml.attr_prefix = '@';
@@ -1134,6 +1148,10 @@ if (Sage)
                 var contentType = typeof response.getResponseHeader === 'function'
                     ? response.getResponseHeader('Content-Type')
                     : false;
+				
+				if (!response.responseText)
+					return null;
+				
                 if ((contentType === 'application/json') || (!contentType && this.isJsonEnabled()))
                 {
                     var doc = JSON.parse(response.responseText);
