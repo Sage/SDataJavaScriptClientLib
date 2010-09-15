@@ -266,6 +266,34 @@
         }
     });
 })();
+(function(){
+    var S = Sage,
+        C = S.namespace('SData.Client');
+
+    C.SDataNamedQueryRequest = C.SDataResourceCollectionRequest.extend({
+        constructor: function() {
+            this.base.apply(this, arguments);
+
+            this.uri.setPathSegment(
+                C.SDataUri.ResourcePropertyIndex,
+                C.SDataUri.NamedQuerySegment
+            );
+        },
+        getQueryName: function() {
+            return this.uri.getPathSegment(C.SDataUri.ResourcePropertyIndex + 1);
+        },
+        setQueryName: function(val) {
+            this.uri.setPathSegment(
+                C.SDataUri.ResourcePropertyIndex + 1,
+                val
+            );
+            return this;
+        },
+        read: function(options) {
+            return this.service.readEntry(this, options);
+        }
+    });
+})();
 /// <reference path="../libraries/ext/ext-core-debug.js"/>
 /// <reference path="../libraries/ObjTree.js"/>
 /// <reference path="SDataUri.js"/>
@@ -288,6 +316,9 @@
         },
         create: function(entry, options) {
             return this.service.createEntry(this, entry, options);
+        },
+        'delete': function(entry, options) {
+            return this.service.deleteEntry(this, entry, options);
         },
         getResourceSelector: function() {
             return this.uri.getCollectionPredicate();
@@ -975,6 +1006,17 @@
 
             return this.executeRequest(request, o, ajax);
         },
+        deleteEntry: function(request, entry, options) {
+            /// <param name="request" type="Sage.SData.Client.SDataSingleResourceRequest">request object</param>
+            var ajax = S.apply({}, {
+                method: 'DELETE',
+                headers: {
+                    'If-Match': entry['$etag']
+                }
+            });
+
+            return this.executeRequest(request, options, ajax);
+        },
         parseFeedXml: function(text) {
             var xml = new XML.ObjTree();
             xml.attr_prefix = '@';
@@ -1123,9 +1165,12 @@
             return result;
         },
         processFeed: function(response) {
+            if (!response.responseText) return null;
+
             var contentType = typeof response.getResponseHeader === 'function'
                 ? response.getResponseHeader('Content-Type')
                 : false;
+            
             if ((contentType === 'application/json') || (!contentType && this.isJsonEnabled()))
             {
                 var doc = JSON.parse(response.responseText);

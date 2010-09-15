@@ -19,6 +19,9 @@
 			text: 'SDataResourceCollectionRequest.js',
 			path: '../src/'
 		},{
+			text: 'SDataNamedQueryRequest.js',
+			path: '../src/'
+		},{
 			text: 'SDataSingleResourceRequest.js',
 			path: '../src/'
 		},{

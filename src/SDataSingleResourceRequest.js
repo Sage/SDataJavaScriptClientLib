@@ -21,6 +21,9 @@
         create: function(entry, options) {
             return this.service.createEntry(this, entry, options);
         },
+        'delete': function(entry, options) {
+            return this.service.deleteEntry(this, entry, options);
+        },
         getResourceSelector: function() {
             return this.uri.getCollectionPredicate();
         },
