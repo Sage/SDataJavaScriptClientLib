@@ -1,7 +1,7 @@
 /*!
  * 
  */
-﻿/**
+/**
 *
 *  Base64 encode / decode
 *  http://www.webtoolkit.info/

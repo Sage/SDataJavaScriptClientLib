@@ -20,9 +20,6 @@
                 val
             );
             return this;
-        },
-        read: function(options) {
-            return this.service.readEntry(this, options);
         }
     });
 })();
