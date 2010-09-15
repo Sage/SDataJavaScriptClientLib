@@ -4,23 +4,21 @@
 /// <reference path="SDataBaseRequest.js"/>
 /// <reference path="SDataApplicationRequest.js"/>
 
-if (Sage)
-{
-    (function(S){
-        var C = S.namespace('SData.Client');
+(function(){
+    var S = Sage,
+        C = S.namespace('SData.Client');
 
-        C.SDataTemplateResourceRequest = C.SDataApplicationRequest.extend({
-            constructor: function() {
-                this.base.apply(this, arguments);
+    C.SDataTemplateResourceRequest = C.SDataApplicationRequest.extend({
+        constructor: function() {
+            this.base.apply(this, arguments);
 
-                this.uri.setPathSegment(
-                    Sage.SData.Client.SDataUri.ResourcePropertyIndex,
-                    Sage.SData.Client.SDataUri.TemplateSegment
-                );
-            },
-            read: function(options) {
-                return this.service.readEntry(this, options);
-            }
-        });
-    })(Sage);
-}
+            this.uri.setPathSegment(
+                Sage.SData.Client.SDataUri.ResourcePropertyIndex,
+                Sage.SData.Client.SDataUri.TemplateSegment
+            );
+        },
+        read: function(options) {
+            return this.service.readEntry(this, options);
+        }
+    });
+})();
