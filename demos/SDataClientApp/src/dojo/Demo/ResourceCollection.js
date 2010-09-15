@@ -41,7 +41,7 @@ dojo.require('dijit.form.Form');
         ]);
 
     dojo.declare('Demo.ResourceCollection', [Demo.View], {
-        template: T,
+        widgetTemplate: T,
         bindings: [
             {name: 'resourceKind', event: 'onChange', target: 'change'},
             {name: 'startIndex', event: 'onChange', target: 'change'},

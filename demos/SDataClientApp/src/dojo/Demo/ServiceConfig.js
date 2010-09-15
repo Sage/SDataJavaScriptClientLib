@@ -45,7 +45,7 @@ dojo.require('dijit.form.Form');
         ]);
 
     dojo.declare('Demo.ServiceConfig', [Demo.View], {
-        template: T,
+        widgetTemplate: T,
         bindings: [
             {name: 'serverName', event: 'onChange', target: 'change'},
             {name: 'virtualDirector', event: 'onChange', target: 'change'},
