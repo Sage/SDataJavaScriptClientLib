@@ -436,6 +436,7 @@
                 else if (typeof value === 'object' && value.hasOwnProperty('$resources'))
                 {
                     // todo: add resource collection support
+                    value = this.formatEntityCollection(ns, value);
                 }
                 else if (typeof value === 'object')
                 {
@@ -446,6 +447,20 @@
             }
 
             return applyTo;
+        },
+        formatEntityCollection: function(ns, value) {
+            var result = {};
+
+            for (var i = 0; i < value['$resources'].length; i++)
+            {
+                var item = value['$resources'][i],
+                    name = item['$name'],
+                    target = (result[name] = result[name] || []);
+
+                target.push(this.formatEntity(ns, value['$resources'][i]));
+            }
+
+            return result;
         },
         convertEntry: function(entry) {
             var result = {};
