@@ -10,32 +10,34 @@
     var S = Sage,
         C = S.namespace('SData.Client');
 
-    C.SDataService = S.Evented.extend({
-        constructor: function(o) {
+    C.SDataService = S.Evented.extend({        
+        uri: null,
+        userAgent: 'Sage',
+        userName: false,
+        password: '',
+        constructor: function(options) {
             /// <field name="uri" type="Sage.SData.Client.SDataUri" />
+            S.apply(this, options);
 
             this.base.apply(this, arguments);
 
-            this.uri = new Sage.SData.Client.SDataUri();
-            this.userAgent = 'Sage';
-            this.username = false;
-            this.password = '';
+            if (!this.uri) this.uri = new Sage.SData.Client.SDataUri();            
 
-            if (o)
+            if (options)
             {
-                if (o.version) this.uri.setVersion(o.version);
-                if (o.serverName) this.uri.setHost(o.serverName);
-                if (o.virtualDirectory) this.uri.setServer(o.virtualDirectory);
-                if (o.applicationName) this.uri.setProduct(o.applicationName);
-                if (o.contractName) this.uri.setContract(o.contractName);
-                if (o.port) this.uri.setPort(o.port);
-                if (o.protocol) this.uri.setScheme(o.protocol);
+                if (options.version) this.uri.setVersion(options.version);
+                if (options.serverName) this.uri.setHost(options.serverName);
+                if (options.virtualDirectory) this.uri.setServer(options.virtualDirectory);
+                if (options.applicationName) this.uri.setProduct(options.applicationName);
+                if (options.contractName) this.uri.setContract(options.contractName);
+                if (options.port) this.uri.setPort(options.port);
+                if (options.protocol) this.uri.setScheme(options.protocol);
 
-                if (typeof o.includeContent === 'boolean') this.uri.setIncludeContent(o.includeContent);
+                if (typeof options.includeContent === 'boolean') this.uri.setIncludeContent(options.includeContent);
 
-                if (o.userName) this.username = o.userName;
-                if (o.password) this.password = o.password;
-                if (o.json) this.json = true;
+                if (options.userName) this.userName = options.userName;
+                if (options.password) this.password = options.password;
+                if (options.json) this.json = true;
             }
 
             this.addEvents(
@@ -68,10 +70,10 @@
         },
         getUserName: function() {
             /// <returns type="String" />
-            return this.username;
+            return this.userName;
         },
         setUserName: function(val) {
-            this.username = val;
+            this.userName = val;
             return this;
         },
         getPassword: function() {
@@ -145,7 +147,7 @@
             return this;
         },
         createBasicAuthToken: function() {
-            return 'Basic ' + Base64.encode(this.username + ":" + this.password);
+            return 'Basic ' + Base64.encode(this.userName + ":" + this.password);
         },
         createHeadersForRequest: function(request) {
             var headers = {
@@ -153,7 +155,7 @@
                 'X-Authorization-Mode': 'no-challenge'
             };
 
-            if (this.username !== false)
+            if (this.userName !== false)
                 headers['Authorization'] = headers['X-Authorization'] = this.createBasicAuthToken();
 
             return headers;
@@ -346,8 +348,8 @@
             {
                 if (fqPropertyName.indexOf(prefix) === 0)
                 {
-                    var propertyName = fqPropertyName.substring(prefix.length);
-                    var value = entity[fqPropertyName];
+                    var propertyName = fqPropertyName.substring(prefix.length),
+                        value = entity[fqPropertyName];
 
                     if (typeof value === 'object')
                     {
@@ -355,9 +357,17 @@
                         {
                             var converted = null;
                         }
-                        else if (value.hasOwnProperty('@sdata:key')) // included
+                        else if (value.hasOwnProperty('@sdata:key')) // included reference
                         {
                             var converted = this.convertEntity(ns, propertyName, value);
+                        }
+                        else if (value.hasOwnProperty('@sdata:uri')) // included collection
+                        {
+                            var converted = this.convertEntityCollection(ns, propertyName, value);
+                        }
+                        else // no conversion, read only
+                        {                            
+                            converted = this.convertCustomEntityProperty(ns, propertyName, value);
                         }
 
                         value = converted;
@@ -368,6 +378,42 @@
             }
 
             return applyTo;
+        },
+        convertEntityCollection: function(ns, name, collection) {
+            var prefix = ns + ':';
+
+            for (var fqPropertyName in collection)
+            {
+                var propertyName = fqPropertyName.substring(prefix.length),
+                    value = collection[fqPropertyName];
+                
+                if (S.isArray(value))
+                {
+                    var converted = [];
+
+                    for (var i = 0; i < value.length; i++)
+                        converted.push(this.convertEntity(ns, propertyName, value[i]));
+
+                    return {
+                        '$resources': converted
+                    };
+                }
+                else
+                {
+                    return {
+                        '$resources': [
+                            this.convertEntity(ns, propertyName, value)
+                        ]
+                    };
+                }
+
+                break; // will always ever be one property, either an entity, or an array of
+            }
+
+            return null;
+        },
+        convertCustomEntityProperty: function(ns, name, value) {
+            return value;
         },
         formatEntity: function(ns, entity, applyTo) {
             applyTo = applyTo || {};
@@ -386,6 +432,10 @@
                 if (value == null)
                 {
                     value = {'@xsi:nil': 'true'};
+                }
+                else if (typeof value === 'object' && value.hasOwnProperty('$resources'))
+                {
+                    // todo: add resource collection support
                 }
                 else if (typeof value === 'object')
                 {
