@@ -33,31 +33,4 @@ JEST.it('can read from system request', function() {
         }
     });
 });
-JEST.it('can create with child collection', function() {
-    var request = new Sage.SData.Client.SDataSingleResourceRequest(this.service)
-        .setResourceKind('accounts');
-
-    ASSERT.exists(request);
-
-    var entry = {
-        $name: 'Account',
-        AccountName: '_Test Account',
-        Contacts: {
-            $resources: [{
-                $name: 'Contact',
-                AccountName: '_Test Account',
-                LastName: '_Test Contact'
-            }]
-        }
-    };
-
-    request.create(entry, {
-        async: false,
-        success: function() {
-        },
-        failure: function() {
-            ASSERT.fail('fail', 'success', 'failure returned', 'fail');
-        }
-    });
-});
 JEST.run();
