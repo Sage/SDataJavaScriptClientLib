@@ -53,7 +53,7 @@ dojo.require('dijit._Templated');
                 });
 
                 this._startupWidgets = this._startupWidgets || [];
-                this._startupWidgets.concat();
+                this._startupWidgets = this._startupWidgets.concat(widgetsToAttach);
 
                 // Restore the query.
                 if (qry) {
