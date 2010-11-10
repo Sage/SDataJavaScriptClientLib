@@ -12,19 +12,19 @@
 
     C.SDataService = S.Evented.extend({        
         uri: null,
+        useCredentialedRequest: false,
         userAgent: 'Sage',
         userName: false,
         password: '',
         constructor: function(options) {
             /// <field name="uri" type="Sage.SData.Client.SDataUri" />
-            S.apply(this, options);
-
-            this.base.apply(this, arguments);
-
-            if (!this.uri) this.uri = new Sage.SData.Client.SDataUri();            
+            this.base.apply(this, arguments);   
+            
+            this.uri = new Sage.SData.Client.SDataUri();
 
             if (options)
             {
+                if (options.uri) this.uri = options.uri;
                 if (options.version) this.uri.setVersion(options.version);
                 if (options.serverName) this.uri.setHost(options.serverName);
                 if (options.virtualDirectory) this.uri.setServer(options.virtualDirectory);
@@ -35,9 +35,10 @@
 
                 if (typeof options.includeContent === 'boolean') this.uri.setIncludeContent(options.includeContent);
 
-                if (options.userName) this.userName = options.userName;
-                if (options.password) this.password = options.password;
                 if (options.json) this.json = true;
+                if (options.userName) this.userName = options.userName;
+                if (options.password) this.password = options.password;                
+                if (options.useCredentialedRequest) this.useCredentialedRequest = true;
             }
 
             this.addEvents(
@@ -154,8 +155,8 @@
                 /* 'User-Agent': this.userAgent */ /* 'User-Agent' cannot be set on XmlHttpRequest */
                 'X-Authorization-Mode': 'no-challenge'
             };
-
-            if (this.userName !== false)
+            
+            if (this.userName && !this.useCredentialedRequest)
                 headers['Authorization'] = headers['X-Authorization'] = this.createBasicAuthToken();
 
             return headers;
@@ -185,6 +186,12 @@
             }, ajax);
 
             S.apply(o.headers, this.createHeadersForRequest(request));
+            
+            if (this.userName && this.useCredentialedRequest)
+            {
+                o.user = this.userName;
+                o.password = this.password;
+            }
 
             // todo: temporary fix for SalesLogix Dynamic Adapter only supporting json selector in format parameter
             if (this.json) request.setQueryArg('format', 'json');
@@ -193,7 +200,7 @@
 
             this.fireEvent('beforerequest', request, o);
 
-            /* if the event provied its own result, do not execute the ajax call */
+            /* if the event provided its own result, do not execute the ajax call */
             if (typeof o.result !== 'undefined')
             {
                 if (options.success)
