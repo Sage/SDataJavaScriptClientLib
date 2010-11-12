@@ -25,6 +25,9 @@
 			text: 'SDataSingleResourceRequest.js',
 			path: '../src/'
 		},{
+			text: 'SDataResourcePropertyRequest.js',
+			path: '../src/'
+		},{
 			text: 'SDataSystemRequest.js',
 			path: '../src/'
 		},{
