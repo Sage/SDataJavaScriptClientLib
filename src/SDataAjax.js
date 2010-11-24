@@ -4,7 +4,7 @@
 
     var successful = function(code)
     {
-        return ((code >= 200 && code < 300) || code === 304 || code === 0);
+        return ((code >= 200 && code < 300) || code === 304);
     };
 
     var onReadyStateChange = function(xhr, o)
@@ -15,6 +15,11 @@
             {
                 if (o.success)
                     o.success.call(o.scope || this, xhr, o);
+            }
+            else if (xhr.status === 0)
+            {
+                if (o.aborted)
+                    o.aborted.call(o.scope || this, xhr, o);
             }
             else
             {

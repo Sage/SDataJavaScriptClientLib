@@ -44,7 +44,8 @@
             this.addEvents(
                 'beforerequest',
                 'requestcomplete',
-                'requestexception'
+                'requestexception',
+                'requestaborted'
             );
         },
         isJsonEnabled: function() {
@@ -182,6 +183,12 @@
 
                     if (options.failure)
                         options.failure.call(options.scope || this, response, opt);
+                },
+                aborted: function(response, opt) {
+                    this.fireEvent('requestaborted', request, opt, response);
+
+                    if (options.aborted)
+                        options.aborted.call(options.scope || this, response, opt);
                 }
             }, ajax);
 
