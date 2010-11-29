@@ -84,9 +84,18 @@
             {
             }
 
-            bindOnReadyStateChange(xhr, o);
+            if (o.async)
+            {
+                bindOnReadyStateChange(xhr, o);
 
-            xhr.send(o.body || null);
+                xhr.send(o.body || null);
+            }
+            else
+            {
+                xhr.send(o.body || null);
+
+                onReadyStateChange(xhr, o);
+            }
 
             return xhr;
         },

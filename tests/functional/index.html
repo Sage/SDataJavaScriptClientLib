@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Functional Tests</title>
+    <script type="text/javascript" src="../../libraries/jest/assert.js"></script>
+    <script type="text/javascript" src="../../libraries/jest/jest.js"></script>
+    <script type="text/javascript" src="../../libraries/sage/sage.js"></script>
+    <script type="text/javascript" src="../../libraries/sage/class.js"></script>
+    <script type="text/javascript" src="../../libraries/sage/event.js"></script>
+    <script type="text/javascript" src="../../libraries/sage/evented.js"></script>
+    <script type="text/javascript" src="../../libraries/sage/deferred.js"></script>
+    <script type="text/javascript" src="../../libraries/Base64.js"></script>
+    <script type="text/javascript" src="../../libraries/ObjTree.js"></script>
+
+    <script type="text/javascript" src="../../src/SDataAjax.js"></script>
+    <script type="text/javascript" src="../../src/SDataUri.js"></script>
+    <script type="text/javascript" src="../../src/SDataBaseRequest.js"></script>
+    <script type="text/javascript" src="../../src/SDataApplicationRequest.js"></script>
+    <script type="text/javascript" src="../../src/SDataSingleResourceRequest.js"></script>
+    <script type="text/javascript" src="../../src/SDataSystemRequest.js"></script>
+    <script type="text/javascript" src="../../src/SDataTemplateResourceRequest.js"></script>
+    <script type="text/javascript" src="../../src/SDataResourceCollectionRequest.js"></script>
+    <script type="text/javascript" src="../../src/SDataNamedQueryRequest.js"></script>
+    <script type="text/javascript" src="../../src/SDataResourcePropertyRequest.js"></script>
+    <script type="text/javascript" src="../../src/SDataService.js"></script>
+
+    <script type="text/javascript">
+    testConfig = {
+        server: 'ec2-174-129-106-224.compute-1.amazonaws.com'
+    };
+    </script>
+    <script type="text/javascript" src="SDataSystemRequestTests.js"></script>
+    <script type="text/javascript" src="SDataSingleResourceRequestTests.js"></script>
+    <script type="text/javascript">
+    JEST.run();    
+    </script>
+</head>
+<body>
+
+</body>
+</html>
