@@ -87,7 +87,7 @@
             {
             }
 
-            if (o.async)
+            if (o.async !== false)
             {
                 bindOnReadyStateChange(xhr, o);
 
