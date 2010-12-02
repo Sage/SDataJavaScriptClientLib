@@ -1,21 +1,13 @@
-JEST.testCase('creation');
-JEST.before(function() {
-});
-JEST.it('can create service', function() {
-    var service = new Sage.SData.Client.SDataService();
-
-    ASSERT.exists(service);
-});
-JEST.testCase('requests');
+JEST.testCase('SDataSystemRequest');
 JEST.before(function() {
     this.service = new Sage.SData.Client.SDataService({
-        serverName: 'slxbrowser.sagesaleslogixcloud.com',
+        serverName: testConfig.server,
         virtualDirectory: 'sdata',
         applicationName: 'slx',
         contractName: 'dynamic',
         port: 80,
         protocol: /https/i.test(window.location.protocol) ? 'https' : false,
-        userName: 'lee',
+        userName: 'Admin',
         password: ''
     });
 });
@@ -26,11 +18,10 @@ JEST.it('can read from system request', function() {
 
     request.read({
         async: false,
-        success: function() {
+        success: function(entry) {            
         },
         failure: function() {
             ASSERT.fail('fail', 'success', 'failure returned', 'fail');
         }
     });
 });
-JEST.run();

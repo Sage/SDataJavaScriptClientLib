@@ -398,30 +398,33 @@
 
             for (var fqPropertyName in collection)
             {
-                var propertyName = fqPropertyName.substring(prefix.length),
-                    value = collection[fqPropertyName];
-                
-                if (S.isArray(value))
+                if (fqPropertyName.indexOf(prefix) === 0)
                 {
-                    var converted = [];
+                    var propertyName = fqPropertyName.substring(prefix.length),
+                        value = collection[fqPropertyName];
 
-                    for (var i = 0; i < value.length; i++)
-                        converted.push(this.convertEntity(ns, propertyName, value[i]));
+                    if (S.isArray(value))
+                    {
+                        var converted = [];
 
-                    return {
-                        '$resources': converted
-                    };
+                        for (var i = 0; i < value.length; i++)
+                            converted.push(this.convertEntity(ns, propertyName, value[i]));
+
+                        return {
+                            '$resources': converted
+                        };
+                    }
+                    else
+                    {
+                        return {
+                            '$resources': [
+                                this.convertEntity(ns, propertyName, value)
+                            ]
+                        };
+                    }
+
+                    break; // will always ever be one property, either an entity, or an array of
                 }
-                else
-                {
-                    return {
-                        '$resources': [
-                            this.convertEntity(ns, propertyName, value)
-                        ]
-                    };
-                }
-
-                break; // will always ever be one property, either an entity, or an array of
             }
 
             return null;
