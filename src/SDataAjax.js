@@ -18,8 +18,28 @@
             }
             else if (xhr.status === 0)
             {
-                if (o.aborted)
-                    o.aborted.call(o.scope || this, xhr, o);
+                var isAbortedRequest = false;
+                try
+                {
+                    // FF will throw an exception on access of statusText on an aborted request
+                    isAbortedRequest = (xhr.statusText === '');
+                }
+                catch (exception)
+                {
+                    isAbortedRequest = true;
+                }
+
+                if (isAbortedRequest)
+                {
+                    var handler = o.aborted || o.failure;
+                    if (handler)
+                        handler.call(o.scope || this, xhr, o);
+                }
+                else
+                {
+                    if (o.failure)
+                        o.failure.call(o.scope || this, xhr, o);
+                }
             }
             else
             {
