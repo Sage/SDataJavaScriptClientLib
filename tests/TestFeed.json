@@ -1,0 +1,57 @@
+{
+	"$totalResults": 2,
+	"$startIndex": 1,
+	"$itemsPerPage": 10,
+	"$link": {
+	},
+	"$resources": [
+		{
+			"$descriptor": "14417807",
+			"$etag": null,
+			"$httpStatus": null,
+			"$name": "Employee",
+			"$key": null,
+			"$url": null,
+			"$uuid": null,
+			"Title": "Production Technician - WC60",
+			"NationalIdNumber": "14417807",
+			"ContactId": "1209",
+			"LoginId": "adventure-works\\guy1", 
+			"ManagerId": "16",
+			"BirthDate": "1972-05-15T00:00:00+00:00",
+			"MaritalStatus": "False",
+			"Gender": "False",
+			"HireDate": "1996-07-31T00:00:00+00:00",
+			"Salariedflag": "False",
+			"VacationHours": "21",
+			"SickleaveHours": "30",
+			"Currentflag": "True",
+			"RowGuid": "aae1d04a-c237-4974-b4d5-935247737718",
+			"ModifiedDate": "2004-07-31T00:00:00+00:00"
+		},
+		{
+			"$descriptor": "253022876",
+			"$etag": null,
+			"$httpStatus": null,
+			"$name": "Employee",
+			"$key": null,
+			"$url": null,
+			"$uuid": null,
+			"Title": "Marketing Assistant",
+			"NationalIdNumber": "253022876",
+			"ContactId": "1030",
+			"LoginId": "adventure-works\\kevin0",
+			"ManagerId": "6",
+			"BirthDate": "1977-06-03T00:00:00+00:00",
+			"MaritalStatus": "False",
+			"Gender": "False",
+			"HireDate": "1997-02-26T00:00:00+00:00",
+			"Salariedflag": "False",
+			"VacationHours": "42",
+			"SickleaveHours": "41",
+			"Currentflag": "True",
+			"RowGuid": "1b480240-95c0-410f-a717-eb29943c8886",
+			"ModifiedDate": "2004-07-31T00:00:00+00:00"
+		}
+	]
+}

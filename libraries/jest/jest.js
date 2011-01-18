@@ -95,15 +95,20 @@
             return this.tests;
         };
 
-        this.runTest = function(cb) {
-            var context = {}; //each test has an empty context
+        this.runBefore = function(context) {
             this.beforeCallbacks.forEach(function(f) {
                 f.apply(context);
             });
-            cb.apply(context);
+        };
+
+        this.runAfter = function(context) {
             this.afterCallbacks.forEach(function(f) {
                 f.apply(context);
             });
+        };
+
+        this.runTest = function(context, cb) {
+            cb.apply(context);
         };
     }; // end $Case
 
@@ -118,9 +123,14 @@
         this.error = null;
 
         this.run = function(r) {
-            if(this.passed || this.error) {return;}
+            if(this.passed || this.error) return;
+
+            var context = {};
+
+            this.$case.runBefore(context);
+
             try {
-                this.$case.runTest(this.callback);
+                this.$case.runTest(context, this.callback);
                 this.passed = true;
                 this.error = null;
                 //r.greenLight();
@@ -130,6 +140,8 @@
                 this.passed = false;
                 //r.redLight();
             }
+
+            this.$case.runAfter(context);
         };    
     }; // end Test
 

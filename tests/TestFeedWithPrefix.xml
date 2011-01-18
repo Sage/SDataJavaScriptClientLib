@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns:sme="http://schemas.sage.com/sdata/sme/2007"
+      xmlns:sdata="http://schemas.sage.com/sdata/2008/1"
+      xmlns:cf="http://www.microsoft.com/schemas/rss/core/2005"
+      xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/"
+      xmlns:aw="http://schemas.sage.com/dynamic/2007"
+      xmlns="http://www.w3.org/2005/Atom">
+  <author>
+    <name>aw</name>
+    <uri />
+    <email />
+  </author>
+  <category term="" scheme="" label="" />
+  <generator uri="" version="1.0">Sage Dynamic Integration Adapter</generator>
+  <id />
+  <link href="http://localhost:8001/sdata/aw/dynamic/-/employees?startIndex=1&amp;count=2" rel="self" type="application/atom+xml" title="" />
+  <subtitle>Provides a feed containing Employee details</subtitle>
+  <title>Sage | employees</title>
+  <opensearch:totalResults>2</opensearch:totalResults>
+  <opensearch:startIndex>1</opensearch:startIndex>
+  <opensearch:itemsPerPage>10</opensearch:itemsPerPage>
+  <entry>
+    <author>
+      <name>aw</name>
+      <uri />
+      <email />
+    </author>
+    <id>http://localhost:8001/sdata/aw/dynamic/-/employees(1)</id>
+    <link href="http://localhost:8001/sdata/aw/dynamic/-/employees(1)?format=html" rel="alternate" type="text/html" title="" />
+    <link href="http://localhost:8001/sdata/aw/dynamic/-/employees(1)" rel="self" type="application/atom+xml" title="" />
+    <link href="http://localhost:8001/sdata/aw/dynamic/-/employees(1)" rel="edit" type="application/atom+xml" title="" />
+    <link href="http://localhost:8001/sdata/aw/dynamic/-/employees?startIndex=1&amp;count=2" rel="via" type="application/atom+xml" title="" />
+    <published>0001-01-01T00:00:00+00:00</published>    
+    <summary />
+    <title>14417807</title>
+    <updated>0001-01-01T00:00:00+00:00</updated>
+    <sdata:payload>
+      <aw:Employee>
+        <aw:Title>Production Technician - WC60</aw:Title>
+        <aw:NationalIdNumber>14417807</aw:NationalIdNumber>
+        <aw:ContactId>1209</aw:ContactId>
+        <aw:LoginId>adventure-works\guy1</aw:LoginId>
+        <aw:ManagerId>16</aw:ManagerId>
+        <aw:BirthDate>1972-05-15T00:00:00+00:00</aw:BirthDate>
+        <aw:MaritalStatus>False</aw:MaritalStatus>
+        <aw:Gender>False</aw:Gender>
+        <aw:HireDate>1996-07-31T00:00:00+00:00</aw:HireDate>
+        <aw:Salariedflag>False</aw:Salariedflag>
+        <aw:VacationHours>21</aw:VacationHours>
+        <aw:SickleaveHours>30</aw:SickleaveHours>
+        <aw:Currentflag>True</aw:Currentflag>
+        <aw:RowGuid>aae1d04a-c237-4974-b4d5-935247737718</aw:RowGuid>
+        <aw:ModifiedDate>2004-07-31T00:00:00+00:00</aw:ModifiedDate>
+      </aw:Employee>
+    </sdata:payload>
+  </entry>
+  <entry>
+    <author>
+      <name>aw</name>
+      <uri />
+      <email />
+    </author>
+    <id>http://localhost:8001/sdata/aw/dynamic/-/employees(2)</id>
+    <link href="http://localhost:8001/sdata/aw/dynamic/-/employees(2)?format=html" rel="alternate" type="text/html" title="" />
+    <link href="http://localhost:8001/sdata/aw/dynamic/-/employees(2)" rel="self" type="application/atom+xml" title="" />
+    <link href="http://localhost:8001/sdata/aw/dynamic/-/employees(2)" rel="edit" type="application/atom+xml" title="" />
+    <link href="http://localhost:8001/sdata/aw/dynamic/-/employees?startIndex=1&amp;count=2" rel="via" type="application/atom+xml" title="" />
+    <published>0001-01-01T00:00:00+00:00</published>    
+    <summary />
+    <title>253022876</title>
+    <updated>0001-01-01T00:00:00+00:00</updated>
+    <sdata:payload>
+      <aw:Employee>
+        <aw:Title>Marketing Assistant</aw:Title>
+        <aw:NationalIdNumber>253022876</aw:NationalIdNumber>
+        <aw:ContactId>1030</aw:ContactId>
+        <aw:LoginId>adventure-works\kevin0</aw:LoginId>
+        <aw:ManagerId>6</aw:ManagerId>
+        <aw:BirthDate>1977-06-03T00:00:00+00:00</aw:BirthDate>
+        <aw:MaritalStatus>False</aw:MaritalStatus>
+        <aw:Gender>False</aw:Gender>
+        <aw:HireDate>1997-02-26T00:00:00+00:00</aw:HireDate>
+        <aw:Salariedflag>False</aw:Salariedflag>
+        <aw:VacationHours>42</aw:VacationHours>
+        <aw:SickleaveHours>41</aw:SickleaveHours>
+        <aw:Currentflag>True</aw:Currentflag>
+        <aw:RowGuid>1b480240-95c0-410f-a717-eb29943c8886</aw:RowGuid>
+        <aw:ModifiedDate>2004-07-31T00:00:00+00:00</aw:ModifiedDate>
+      </aw:Employee>
+    </sdata:payload>
+  </entry>
+</feed>

@@ -226,7 +226,7 @@
             return this.executeRequest(request, options, {
                 headers: {
                     'Accept': this.json
-                        ? 'application/json'
+                        ? 'application/json,*/*'
                         : 'application/atom+xml;type=feed,*/*'
                 }
             });
@@ -245,7 +245,7 @@
             return this.executeRequest(request, o, {
                 headers: {
                     'Accept': this.json
-                        ? 'application/json'
+                        ? 'application/json,*/*'
                         : 'application/atom+xml;type=entry,*/*'
                 }
             });
@@ -356,13 +356,13 @@
             applyTo['$url'] = entity['@sdata:uri'];
             applyTo['$uuid'] = entity['@sdata:uuid'];
 
-            var prefix = ns + ':';
+            var prefix = ns ? ns + ':' : false;
 
             for (var fqPropertyName in entity)
             {
-                if (fqPropertyName.indexOf(prefix) === 0)
+                if (!prefix || fqPropertyName.indexOf(prefix) === 0)
                 {
-                    var propertyName = fqPropertyName.substring(prefix.length),
+                    var propertyName = prefix ? fqPropertyName.substring(prefix.length) : fqPropertyName,
                         value = entity[fqPropertyName];
 
                     if (typeof value === 'object')
@@ -394,13 +394,13 @@
             return applyTo;
         },
         convertEntityCollection: function(ns, name, collection) {
-            var prefix = ns + ':';
+            var prefix = ns ? ns + ':' : false;
 
             for (var fqPropertyName in collection)
             {
-                if (fqPropertyName.indexOf(prefix) === 0)
+                if (!prefix || fqPropertyName.indexOf(prefix) === 0)
                 {
-                    var propertyName = fqPropertyName.substring(prefix.length),
+                    var propertyName = prefix ? fqPropertyName.substring(prefix.length) : fqPropertyName,
                         value = collection[fqPropertyName];
 
                     if (S.isArray(value))
@@ -492,12 +492,25 @@
             {
                 if (payload.hasOwnProperty(key) == false) continue;
 
-                var parts = key.split(':');
-                if (parts.length < 2) continue;
+                var parts = key.split(':'),
+                    ns,
+                    name,
+                    entity = payload[key];
 
-                var ns = parts[0];
-                var name = parts[1];
-                var entity = payload[key];
+                if (parts.length == 2)
+                {
+                    ns = parts[0];
+                    name = parts[1];
+                }
+                else if (parts.length < 2)
+                {
+                    ns = false;
+                    name = key;
+                }
+                else
+                {
+                    continue;
+                }   
 
                 this.convertEntity(ns, name, entity, result);
             }
