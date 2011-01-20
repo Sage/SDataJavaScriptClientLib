@@ -1137,6 +1137,8 @@
 
             for (var fqPropertyName in entity)
             {
+                if (fqPropertyName[0] === '@') continue;
+
                 if (!prefix || fqPropertyName.indexOf(prefix) === 0)
                 {
                     var propertyName = prefix ? fqPropertyName.substring(prefix.length) : fqPropertyName,
@@ -1219,7 +1221,7 @@
 
             for (var propertyName in entity)
             {
-                if (/^\$/.test(propertyName)) continue;
+                if (propertyName[0] === '$') continue;
 
                 var value = entity[propertyName];
 
