@@ -3,6 +3,7 @@
       xmlns:sdata="http://schemas.sage.com/sdata/2008/1"
       xmlns:cf="http://www.microsoft.com/schemas/rss/core/2005"
       xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/"
+      xmlns:aw="http://schemas.sage.com/dynamic/2007"
       xmlns="http://www.w3.org/2005/Atom">
   <author>
     <name>aw</name>

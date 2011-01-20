@@ -2,6 +2,7 @@
 <entry xmlns:sme="http://schemas.sage.com/sdata/sme/2007"
        xmlns:sdata="http://schemas.sage.com/sdata/2008/1"
        xmlns:cf="http://www.microsoft.com/schemas/rss/core/2005"
+       xmlns:aw="http://schemas.sage.com/dynamic/2007"
        xmlns="http://www.w3.org/2005/Atom">
   <id>http://localhost:8001/sdata/aw/dynamic/-/employees(1)</id>
   <link href="http://localhost:8001/sdata/aw/dynamic/-/employees(1)?format=html" rel="alternate" type="text/html" title="" />
@@ -26,6 +27,16 @@
       <aw:CurrentFlag>True</aw:CurrentFlag>
       <aw:RowGuid>aae1d04a-c237-4974-b4d5-935247737718</aw:RowGuid>
       <aw:ModifiedDate>2004-07-31T00:00:00+00:00</aw:ModifiedDate>
+      <aw:DirectReports>
+        <aw:Employee sdata:key="1210">
+          <aw:Title>Production Technician - WC61</aw:Title>
+          <aw:NationalIdNumber>14417808</aw:NationalIdNumber>
+        </aw:Employee>
+        <aw:Employee sdata:key="1211">
+          <aw:Title>Production Technician - WC62</aw:Title>
+          <aw:NationalIdNumber>14417809</aw:NationalIdNumber>
+        </aw:Employee>
+      </aw:DirectReports>
     </aw:Employee>
   </sdata:payload>
 </entry>
