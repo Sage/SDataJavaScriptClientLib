@@ -219,7 +219,7 @@
             return C.Ajax.request(o);
         },
         abortRequest: function(id) {
-            C.Ajax.abort(id);
+            C.Ajax.cancel(id);
         },
         readFeed: function(request, options) {
             /// <param name="request" type="Sage.SData.Client.SDataResourceCollectionRequest">request object</param>
