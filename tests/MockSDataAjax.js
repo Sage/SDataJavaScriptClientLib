@@ -15,9 +15,9 @@
         return query.join('&');
     };
 
-    var expand = function(expression) {
+    var expand = function(scope, expression) {
         if (typeof expression === 'function')
-            return expression.apply(this, Array.prototype.slice.call(arguments, 1));
+            return expression.apply(scope || this, Array.prototype.slice.call(arguments, 2));
         else
             return expression;
     };
@@ -47,23 +47,27 @@
             var rule = this._resolveMockRequestRule(o);
             if (rule)
             {
+                if (rule.capture) rule.capture.call(rule.scope || this, options);
+                
                 if (rule.url)
+                {
                     return request(S.apply(o, {
-                        url: rule.url
+                        url: expand(rule.scope, rule.url),
+                        method: 'GET'
                     }));
-
-                if (rule.aborted)
+                }
+                else if (rule.aborted)
                 {
                     var handler = options.aborted || options.failure;
-                    if (handler) return handler.call(options.scope || this, expand(rule.aborted), options);
+                    if (handler) return handler.call(options.scope || this, expand(rule.scope, rule.aborted), options);
                 }
                 else if (rule.failure)
                 {
-                    if (options.failure) return options.failure.call(options.scope || this, expand(rule.failure), options);
+                    if (options.failure) return options.failure.call(options.scope || this, expand(rule.scope, rule.failure), options);
                 }
                 else if (rule.success && options.success)
                 {
-                    if (options.success) return options.success.call(options.scope || this, expand(rule.success), options);
+                    if (options.success) return options.success.call(options.scope || this, expand(rule.scope, rule.success), options);
                 }
 
                 throw 'The mock request rule does not have a result.';

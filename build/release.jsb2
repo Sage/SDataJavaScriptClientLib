@@ -34,6 +34,9 @@
 			text: 'SDataTemplateResourceRequest.js',
 			path: '../src/'	
 		},{
+			text: 'SDataServiceOperationRequest.js',
+			path: '../src/'
+		},{
 			text: 'SDataUri.js',
 			path: '../src/'
 		},{

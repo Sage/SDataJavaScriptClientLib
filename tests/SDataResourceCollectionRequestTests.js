@@ -29,7 +29,7 @@ JEST.it('Can Build Url With Paging', function() {
         .setStartIndex(1)
         .setCount(100);
 
-    ASSERT.equal("http://localhost/sdata/aw/dynamic/-/employees?_includeContent=false&startIndex=1&count=100", request.build());
+    ASSERT.equal(request.build(), "http://localhost/sdata/aw/dynamic/-/employees?_includeContent=false&startIndex=1&count=100");
 });
 
 JEST.it('Can Build Url With Query', function() {
@@ -37,7 +37,7 @@ JEST.it('Can Build Url With Query', function() {
         .setResourceKind('employees')
         .setQueryArg('where', 'gender eq m');
 
-    ASSERT.equal("http://localhost/sdata/aw/dynamic/-/employees?_includeContent=false&where=gender%20eq%20m", request.build());
+    ASSERT.equal(request.build(), "http://localhost/sdata/aw/dynamic/-/employees?_includeContent=false&where=gender%20eq%20m");
 });
 
 JEST.it('Can Read Atom Feed With Prefixed Properties', function() {

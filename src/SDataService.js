@@ -342,6 +342,54 @@
 
             return this.executeRequest(request, options, ajax);
         },
+        executeServiceOperation: function(request, entry, options) {
+             var o = S.apply({}, {
+                success: function(feed) {
+                    var entry = feed['$resources'][0] || false,
+                        response = entry && entry['response'],
+                        resources = response && response['$resources'],
+                        payload = resources && resources[0];
+
+                    if (payload && payload['$name'])
+                    {
+                        entry['response'] = {};
+                        entry['response'][payload['$name']] = payload;
+                    }
+
+                    if (options.success)
+                        options.success.call(options.scope || this, entry);
+                }
+            }, options);
+
+            var ajax = S.apply({}, {
+                method: 'POST'
+            });
+
+            if (this.isJsonEnabled())
+            {
+                S.apply(ajax, {
+                    body: JSON.stringify(entry),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+            }
+            else
+            {
+                var xml = new XML.ObjTree();
+                xml.attr_prefix = '@';
+
+                S.apply(ajax, {
+                    body: xml.writeXML(this.formatEntry(entry)),
+                    headers: {
+                        'Content-Type': 'application/atom+xml;type=entry',
+                        'Accept': 'application/atom+xml;type=entry,*/*'
+                    }
+                });
+            }
+
+            return this.executeRequest(request, o, ajax);
+        },
         parseFeedXml: function(text) {
             var xml = new XML.ObjTree();
             xml.attr_prefix = '@';

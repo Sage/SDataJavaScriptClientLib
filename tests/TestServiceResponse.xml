@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<entry xmlns:atom="http://www.w3.org/2005/Atom"
+       xmlns:xs="http://www.w3.org/2001/XMLSchema"
+       xmlns:cf="http://www.microsoft.com/schemas/rss/core/2005"
+       xmlns="http://www.w3.org/2005/Atom"
+       xmlns:sdata="http://schemas.sage.com/sdata/2008/1"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/"
+       xmlns:sync="http://schemas.sage.com/sdata/sync/2008/1"
+       xmlns:sme="http://schemas.sage.com/sdata/sme/2007"
+       xmlns:http="http://schemas.sage.com/sdata/http/2008/1"
+       xmlns:aw="http://schemas.sage.com/dynamic/2007">
+    <author>
+        <name>aw</name>
+    </author>
+    <http:httpStatus>200</http:httpStatus>
+    <sdata:payload>
+        <aw:TaskComplete>
+            <aw:request xsi:nil="true" />
+            <aw:response>
+                <aw:Result sdata:key="1" sdata:uri="http://localhost/sdata/aw/dynamic/-/log('1')" sdata:lookup="http://localhost/sdata/aw/dynamic/-/log">
+                    <aw:CompletedDate>2011-03-16T19:41:09+00:00</aw:CompletedDate>
+                    <aw:Description>Confirm Meeting</aw:Description>
+                </aw:Result>
+            </aw:response>
+        </aw:TaskComplete>
+    </sdata:payload>
+</entry>

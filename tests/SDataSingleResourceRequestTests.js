@@ -25,7 +25,7 @@ JEST.it('Can Build Url With Simple Selector', function() {
         .setResourceKind('employees')
         .setResourceSelector('1');
 
-    ASSERT.equal("http://localhost/sdata/aw/dynamic/-/employees(1)?_includeContent=false", request.build());
+    ASSERT.equal(request.build(), "http://localhost/sdata/aw/dynamic/-/employees(1)?_includeContent=false");
 });
 
 JEST.it('Can Build Url With Complex Selector', function() {
@@ -33,7 +33,7 @@ JEST.it('Can Build Url With Complex Selector', function() {
         .setResourceKind('employees')
         .setResourceSelector("id eq '1234'");
 
-    ASSERT.equal("http://localhost/sdata/aw/dynamic/-/employees(id%20eq%20'1234')?_includeContent=false", request.build());
+    ASSERT.equal(request.build(), "http://localhost/sdata/aw/dynamic/-/employees(id%20eq%20'1234')?_includeContent=false");
 });
 
 JEST.it('Can Read Atom Entry With Prefixed Properties', function() {

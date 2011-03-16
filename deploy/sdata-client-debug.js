@@ -441,6 +441,37 @@
     });
 })();
 /// <reference path="../libraries/ext/ext-core-debug.js"/>
+/// <reference path="../libraries/ObjTree.js"/>
+/// <reference path="SDataUri.js"/>
+/// <reference path="SDataBaseRequest.js"/>
+/// <reference path="SDataApplicationRequest.js"/>
+
+(function(){
+    var S = Sage,
+        C = S.namespace('SData.Client');
+
+    C.SDataServiceOperationRequest = C.SDataApplicationRequest.extend({
+        constructor: function() {
+            this.base.apply(this, arguments);
+
+            this.uri.setPathSegment(
+                C.SDataUri.ResourcePropertyIndex,
+                C.SDataUri.ServiceMethodSegment
+            );
+        },
+        execute: function(entry, options) {
+            return this.service.executeServiceOperation(this, entry, options);
+        },
+        getOperationName: function() {
+            return this.uri.getPathSegment(C.SDataUri.ResourcePropertyIndex + 1);
+        },
+        setOperationName: function(name) {
+            this.uri.setPathSegment(C.SDataUri.ResourcePropertyIndex + 1, name);
+            return this;
+        }
+    });
+})();
+/// <reference path="../libraries/ext/ext-core-debug.js"/>
 
 (function(){
     var S = Sage,
@@ -1089,6 +1120,54 @@
             });
 
             return this.executeRequest(request, options, ajax);
+        },
+        executeServiceOperation: function(request, entry, options) {
+             var o = S.apply({}, {
+                success: function(feed) {
+                    var entry = feed['$resources'][0] || false,
+                        response = entry && entry['response'],
+                        resources = response && response['$resources'],
+                        payload = resources && resources[0];
+
+                    if (payload && payload['$name'])
+                    {
+                        entry['response'] = {};
+                        entry['response'][payload['$name']] = payload;
+                    }
+
+                    if (options.success)
+                        options.success.call(options.scope || this, entry);
+                }
+            }, options);
+
+            var ajax = S.apply({}, {
+                method: 'POST'
+            });
+
+            if (this.isJsonEnabled())
+            {
+                S.apply(ajax, {
+                    body: JSON.stringify(entry),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+            }
+            else
+            {
+                var xml = new XML.ObjTree();
+                xml.attr_prefix = '@';
+
+                S.apply(ajax, {
+                    body: xml.writeXML(this.formatEntry(entry)),
+                    headers: {
+                        'Content-Type': 'application/atom+xml;type=entry',
+                        'Accept': 'application/atom+xml;type=entry,*/*'
+                    }
+                });
+            }
+
+            return this.executeRequest(request, o, ajax);
         },
         parseFeedXml: function(text) {
             var xml = new XML.ObjTree();
