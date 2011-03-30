@@ -1109,7 +1109,7 @@
                 headers['Content-Type'] = 'application/atom+xml;type=entry';
                 headers['Accept'] = 'application/atom+xml;type=entry,*/*';
 
-                ajax.body = 'application/atom+xml;type=entry,*/*';
+                ajax.body = xml.writeXML(this.formatEntry(entry));
             }
 
             return this.executeRequest(request, o, ajax);
