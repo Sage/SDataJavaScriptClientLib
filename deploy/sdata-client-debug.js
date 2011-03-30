@@ -1002,6 +1002,8 @@
         },
         readFeed: function(request, options) {
             /// <param name="request" type="Sage.SData.Client.SDataResourceCollectionRequest">request object</param>
+            options = options || {};
+
             return this.executeRequest(request, options, {
                 headers: {
                     'Accept': this.json
@@ -1012,6 +1014,8 @@
         },
         readEntry: function(request, options) {
             /// <param name="request" type="Sage.SData.Client.SDataSingleResourceRequest">request object</param>
+            options = options || {};
+
             var o = S.apply({}, {
                 success: function(feed) {
                     var entry = feed['$resources'][0] || false;
@@ -1030,6 +1034,8 @@
             });
         },
         createEntry: function(request, entry, options) {
+            options = options || {};
+            
             var o = S.apply({}, {
                 success: function(feed) {
                     var entry = feed['$resources'][0] || false;
@@ -1070,6 +1076,8 @@
         },
         updateEntry: function(request, entry, options) {
             /// <param name="request" type="Sage.SData.Client.SDataSingleResourceRequest">request object</param>
+            options = options || {};
+
             var o = S.apply({}, {
                 success: function(feed) {
                     var entry = feed['$resources'][0] || false;
@@ -1079,45 +1087,45 @@
                 }
             }, options);
 
-            var ajax = S.apply({}, {
-                method: 'PUT'
-            });
+            var headers = {
+                    'If-Match': entry['$etag'] // the 'If-Match' header MUST be present for PUT requests
+                },
+                ajax = {
+                    method: 'PUT',
+                    headers: headers
+                };
 
             if (this.isJsonEnabled())
             {
-                S.apply(ajax, {
-                    body: JSON.stringify(entry),
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'If-Match': entry['$etag']
-                    }
-                });
+                headers['Content-Type'] = 'application/json';
+
+                ajax.body = JSON.stringify(entry);
             }
             else
             {
                 var xml = new XML.ObjTree();
                 xml.attr_prefix = '@';
 
-                S.apply(ajax, {
-                    body: xml.writeXML(this.formatEntry(entry)),
-                    headers: {
-                        'Content-Type': 'application/atom+xml;type=entry',
-                        'Accept': 'application/atom+xml;type=entry,*/*',
-                        'If-Match': entry['$etag']
-                    }
-                });
+                headers['Content-Type'] = 'application/atom+xml;type=entry';
+                headers['Accept'] = 'application/atom+xml;type=entry,*/*';
+
+                ajax.body = 'application/atom+xml;type=entry,*/*';
             }
 
             return this.executeRequest(request, o, ajax);
         },
         deleteEntry: function(request, entry, options) {
             /// <param name="request" type="Sage.SData.Client.SDataSingleResourceRequest">request object</param>
-            var ajax = S.apply({}, {
-                method: 'DELETE',
-                headers: {
-                    'If-Match': entry['$etag']
-                }
-            });
+            options = options || {};
+
+            var headers = {},
+                ajax = {
+                    method: 'DELETE',
+                    headers: headers
+                };
+
+            if (entry['$etag'] && !(options && options.ignoreETag))
+                headers['If-Match'] = entry['$etag'];
 
             return this.executeRequest(request, options, ajax);
         },
