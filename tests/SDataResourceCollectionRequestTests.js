@@ -1,3 +1,13 @@
+describe('SDataResourceCollectionRequest', function() {
+    var service;
+
+    beforeEach(function() {
+        service = new Sage.SData.Client.SDataService({
+        });
+    });
+});
+
+
 JEST.testCase('SDataResourceCollectionRequest');
 JEST.before(function() {
     this.service = new Sage.SData.Client.SDataService({
