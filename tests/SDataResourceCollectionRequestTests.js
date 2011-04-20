@@ -1,122 +1,115 @@
 describe('SDataResourceCollectionRequest', function() {
-    var service;
+    var service,
+        withResponseContent = function(name) {
+            spyOn(Sage.SData.Client.Ajax, 'request').andCallFake(function(options) {
+                options.success.call(options.scope || this, {
+                    responseText: Resources.get(name)
+                });
+            });
+        };
 
     beforeEach(function() {
         service = new Sage.SData.Client.SDataService({
+            serverName: 'localhost',
+            virtualDirectory: 'sdata',
+            applicationName: 'aw',
+            contractName: 'dynamic'
         });
     });
-});
 
+    it('can build url with paging', function() {
+        var request = new Sage.SData.Client.SDataResourceCollectionRequest(service)
+            .setResourceKind('employees')
+            .setStartIndex(1)
+            .setCount(100);
 
-JEST.testCase('SDataResourceCollectionRequest');
-JEST.before(function() {
-    this.service = new Sage.SData.Client.SDataService({
-        serverName: 'localhost',
-        virtualDirectory: 'sdata',
-        applicationName: 'aw',
-        contractName: 'dynamic'
+        expect(request.build()).toEqual("http://localhost/sdata/aw/dynamic/-/employees?_includeContent=false&startIndex=1&count=100");
     });
 
-    Sage.SData.Client.Ajax.push([{
-        predicate: /use=atomPrefixed/i,
-        url: 'TestFeedWithPrefix.xml'
-    },{
-        predicate: /use=atomNonPrefixed/i,
-        url: 'TestFeed.xml'
-    },{
-        predicate: /use=json/i,
-        url: 'TestFeed.json'
-    }]);
-});
+    it('can build url with query', function() {
+        var request = new Sage.SData.Client.SDataResourceCollectionRequest(service)
+            .setResourceKind('employees')
+            .setQueryArg('where', 'gender eq m');
 
-JEST.after(function() {
-    Sage.SData.Client.Ajax.pop();
-});
-
-JEST.it('Can Build Url With Paging', function() {
-    var request = new Sage.SData.Client.SDataResourceCollectionRequest(this.service)
-        .setResourceKind('employees')
-        .setStartIndex(1)
-        .setCount(100);
-
-    ASSERT.equal(request.build(), "http://localhost/sdata/aw/dynamic/-/employees?_includeContent=false&startIndex=1&count=100");
-});
-
-JEST.it('Can Build Url With Query', function() {
-    var request = new Sage.SData.Client.SDataResourceCollectionRequest(this.service)
-        .setResourceKind('employees')
-        .setQueryArg('where', 'gender eq m');
-
-    ASSERT.equal(request.build(), "http://localhost/sdata/aw/dynamic/-/employees?_includeContent=false&where=gender%20eq%20m");
-});
-
-JEST.it('Can Read Atom Feed With Prefixed Properties', function() {
-    var request = new Sage.SData.Client.SDataResourceCollectionRequest(this.service)
-        .setResourceKind('employees')
-        .setQueryArg('_use', 'atomPrefixed');
-
-    ASSERT.exists(request);
-
-    request.read({
-        async: false,
-        success: function(feed) {
-            ASSERT.exists(feed, 'feed does not exist.');
-            ASSERT.exists(feed['$resources'], 'feed does not have resources.');
-
-            ASSERT.equal(feed['$resources'].length, 2, 'resource count does not match expected.');
-            ASSERT.equal(feed['$resources'][0]['ContactId'], '1209', 'entry does not match expected.');
-        },
-        failure: function() {
-            ASSERT.fail('fail', 'success', 'failure returned', 'fail');
-        }
+        expect(request.build()).toEqual("http://localhost/sdata/aw/dynamic/-/employees?_includeContent=false&where=gender%20eq%20m");
     });
-});
 
-JEST.it('Can Read Atom Feed With Non-Prefixed Properties', function() {
-    var request = new Sage.SData.Client.SDataResourceCollectionRequest(this.service)
-        .setResourceKind('employees')
-        .setQueryArg('_use', 'atomNonPrefixed');
+    it('can read atom feed with non-prefixed properties', function() {
 
-    ASSERT.exists(request);
+        withResponseContent('TestFeed.xml');
 
-    request.read({
-        async: false,
-        success: function(feed) {
-            window._feed = feed;
-            ASSERT.exists(feed, 'feed does not exist.');
-            ASSERT.exists(feed['$resources'], 'feed does not have resources.');
+        var success = jasmine.createSpy(),
+            failure = jasmine.createSpy();
 
-            ASSERT.equal(feed['$resources'].length, 2, 'resource count does not match expected.');
-            ASSERT.equal(feed['$resources'][0]['ContactId'], '1209', 'entry does not match expected.');
-        },
-        failure: function() {
-            ASSERT.fail('fail', 'success', 'failure returned', 'fail');
-        }
+        var request = new Sage.SData.Client.SDataResourceCollectionRequest(service)
+            .setResourceKind('employees');
+
+        request.read({
+            success: success,
+            failure: failure
+        });
+
+        expect(success).toHaveBeenCalled();
+        expect(failure).not.toHaveBeenCalled();
+
+        (function(feed) {
+            expect(feed).toExist();
+            expect(feed).toHaveProperty('$resources');
+            expect(feed).toHaveProperty('$resources.length', 2);
+            expect(feed).toHaveProperty('$resources.0.ContactId', '1209');
+        })(success.mostRecentCall.args[0]);
     });
-});
 
-// if running this test through IIS, be sure to have the appropriate mime type, 'application/json', set for '.json'.
-JEST.it('Can Read Json Feed', function() {
-    this.service.enableJson();
+    it('can read atom feed with prefixed properties', function() {
 
-    var request = new Sage.SData.Client.SDataResourceCollectionRequest(this.service)
-        .setResourceKind('employees')
-        .setQueryArg('_use', 'json');
+        withResponseContent('TestFeedWithPrefix.xml');
 
-    ASSERT.exists(request);
+        var success = jasmine.createSpy(),
+            failure = jasmine.createSpy();
 
-    request.read({
-        async: false,
-        success: function(feed) {
-            window._feed = feed;
-            ASSERT.exists(feed, 'feed does not exist.');
-            ASSERT.exists(feed['$resources'], 'feed does not have resources.');
+        var request = new Sage.SData.Client.SDataResourceCollectionRequest(service)
+            .setResourceKind('employees');
 
-            ASSERT.equal(feed['$resources'].length, 2, 'resource count does not match expected.');
-            ASSERT.equal(feed['$resources'][0]['ContactId'], '1209', 'entry does not match expected.');
-        },
-        failure: function() {
-            ASSERT.fail('fail', 'success', 'failure returned', 'fail');
-        }
+        request.read({
+            success: success,
+            failure: failure
+        });
+
+        expect(success).toHaveBeenCalled();
+        expect(failure).not.toHaveBeenCalled();
+
+        (function(feed) {
+            expect(feed).toExist();
+            expect(feed).toHaveProperty('$resources');
+            expect(feed).toHaveProperty('$resources.length', 2);
+            expect(feed).toHaveProperty('$resources.0.ContactId', '1209');
+        })(success.mostRecentCall.args[0]);
+    });
+
+    it('can read json feed', function() {
+
+        withResponseContent('TestFeed.json');
+
+        var success = jasmine.createSpy(),
+            failure = jasmine.createSpy();
+
+        var request = new Sage.SData.Client.SDataResourceCollectionRequest(service)
+            .setResourceKind('employees');
+
+        service.enableJson();
+        request.read({
+            success: success,
+            failure: failure
+        });
+
+        expect(success).toHaveBeenCalled();
+        expect(failure).not.toHaveBeenCalled();
+
+        (function(feed) {
+            expect(feed).toExist();
+            expect(feed).toHaveProperty('$resources');
+            expect(feed).toHaveProperty('$resources.length', 2);
+            expect(feed).toHaveProperty('$resources.0.ContactId', '1209');
+        })(success.mostRecentCall.args[0]);
     });
 });

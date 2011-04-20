@@ -4,7 +4,8 @@
 <head>
     <title>SDataJavaScriptClientLib Test Runner</title>
 
-    <script src="http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojo/dojo.xd.js" type="text/javascript"></script>
+    <script src="../libraries/dojo/dojo.js" type="text/javascript"></script>
+    <script src="../libraries/dojo/DeferredList.js" type="text/javascript"></script>
 
     <link rel="stylesheet" type="text/css" href="../libraries/jasmine/jasmine.css">
     <script type="text/javascript" src="../libraries/jasmine/jasmine.js"></script>
@@ -30,23 +31,42 @@
     <script type="text/javascript" src="../src/SDataResourceCollectionRequest.js"></script>
     <script type="text/javascript" src="../src/SDataNamedQueryRequest.js"></script>
     <script type="text/javascript" src="../src/SDataResourcePropertyRequest.js"></script>
+    <script type="text/javascript" src="../src/SDataServiceOperationRequest.js"></script>
     <script type="text/javascript" src="../src/SDataService.js"></script>
+
+    <!-- test utility -->
+    <script type="text/javascript" src="Utility.js"></script>
+
+    <!-- tests -->
+    <script type="text/javascript" src="SDataSingleResourceRequestTests.js"></script>
+    <script type="text/javascript" src="SDataResourceCollectionRequestTests.js"></script>
+    <script type="text/javascript" src="SDataServiceOperationRequestTests.js"></script>
 </head>
 <body>
 <script type="text/javascript">
     dojo.require('dojo.DeferredList');
-    dojo.provide('Data');
+    dojo.provide('Resources');
+    dojo.mixin(Resources, {
+        _store: {},
+        get: function(name) {
+            return Resources._store[name];
+        },
+        set: function(name, value) {
+            Resources._store[name] = value;
+        }
+    });
+    
     dojo.ready(function() {
-        Data.store = {};
 
         var wait = [],
             preload = [
                 'TestEntry.xml',
                 'TestEntryWithPrefix.xml',
-                'TestFeed.json',
+                'TestFeed.json', // if running this test through IIS, be sure to have the appropriate mime type, 'application/json', set for '.json'.
                 'TestFeed.xml',
                 'TestFeedSplit.xml',
-                'TestFeedWithPrefix.xml'
+                'TestFeedWithPrefix.xml',
+                'TestServiceResponse.xml'
             ];
 
         dojo.forEach(preload, function(item) {
@@ -54,14 +74,14 @@
                 url: item,
                 handleAs: 'text'
             }).then(function(result) {
-                Data.store[item] = result;
+                Resources.set(item, result);
             }));
         });
 
         new dojo.DeferredList(wait)
             .then(function(results) {
                 if (dojo.some(results, function(result) { return !result[0]; }))
-                    throw new Error("Could not pre-load expected result content.");
+                    throw new Error("Could not pre-load expected resources.");
 
                 jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
                 jasmine.getEnv().execute();

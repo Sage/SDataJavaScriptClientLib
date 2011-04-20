@@ -1,70 +1,87 @@
-JEST.testCase('SDataServiceOperationRequest');
-JEST.before(function() {
-    this.xml = new XML.ObjTree();
-    this.xml.attr_prefix = '@';
-    
-    this.service = new Sage.SData.Client.SDataService({
-        serverName: 'localhost',
-        virtualDirectory: 'sdata',
-        applicationName: 'aw',
-        contractName: 'dynamic'
+describe('SDataServiceOperationRequest', function() {
+    var service,
+        xml = new XML.ObjTree(),
+        withResponseContent = function(name) {
+            spyOn(Sage.SData.Client.Ajax, 'request').andCallFake(function(options) {
+                options.success.call(options.scope || this, {
+                    responseText: Resources.get(name)
+                });
+            });
+        };
+
+    beforeEach(function() {
+        service = new Sage.SData.Client.SDataService({
+            serverName: 'localhost',
+            virtualDirectory: 'sdata',
+            applicationName: 'aw',
+            contractName: 'dynamic'
+        });
     });
 
-    Sage.SData.Client.Ajax.push([{
-        predicate: /use=atom/i,
-        scope: this,
-        url: 'TestServiceResponse.xml',
-        capture: function(options) {
-            this.requestOptions = options;
-        }
-    }]);
-});
+    it('can build url with service operation', function() {
+        var request = new Sage.SData.Client.SDataServiceOperationRequest(service)
+            .setResourceKind('tasks')
+            .setOperationName('CompleteTask');
 
-JEST.after(function() {
-    Sage.SData.Client.Ajax.pop();
-});
-
-JEST.it('Can Build Url With Service Operation', function() {
-    var request = new Sage.SData.Client.SDataServiceOperationRequest(this.service)
-        .setResourceKind('tasks')
-        .setOperationName('CompleteTask');
-
-    ASSERT.equal(request.build(), "http://localhost/sdata/aw/dynamic/-/tasks/%24service/CompleteTask?_includeContent=false");
-});
-
-JEST.it('Can Execute Service Operation', function() {
-    var request = new Sage.SData.Client.SDataServiceOperationRequest(this.service)
-        .setResourceKind('tasks')
-        .setOperationName('CompleteTask')
-        .setQueryArg('_use', 'atom');
-
-    ASSERT.exists(request);
-
-    var entry = {
-        '$name': 'TaskComplete',
-        'request': {
-            'TaskId': 1
-        }
-    };
-
-    request.execute(entry, {
-        async: false,
-        success: function(entry) {
-            ASSERT.exists(entry['response'], 'response does not exist.');
-            ASSERT.exists(entry['response']['Result'], 'response container does not exist.');
-            
-            ASSERT.equal(entry['response']['Result']['Description'], 'Confirm Meeting', 'Description does not match.');
-        },
-        failure: function() {
-            ASSERT.fail('fail', 'success', 'failure returned', 'fail');
-        }
+        expect(request.build()).toEqual("http://localhost/sdata/aw/dynamic/-/tasks/%24service/CompleteTask?_includeContent=false");
     });
 
-    var converted = this.xml.parseXML(this.requestOptions.body);
+    it('can format atom entry for service operation call', function() {
+        spyOn(Sage.SData.Client.Ajax, 'request');
 
-    ASSERT.exists(converted['entry']['sdata:payload'], 'payload does not exist.');
-    ASSERT.exists(converted['entry']['sdata:payload']['TaskComplete'], 'request container does not exist.');
-    ASSERT.exists(converted['entry']['sdata:payload']['TaskComplete']['request'], 'request does not exist.');
+        var request = new Sage.SData.Client.SDataServiceOperationRequest(service)
+            .setResourceKind('tasks')
+            .setOperationName('CompleteTask');        
 
-    ASSERT.equal(converted['entry']['sdata:payload']['TaskComplete']['request']['TaskId'], '1', 'TaskId does not match.');
+        var entry = {
+            '$name': 'TaskComplete',
+            'request': {
+                'TaskId': 1
+            }
+        };
+
+        request.execute(entry);
+
+        (function(formatted) {
+            expect(formatted).toHaveProperty('entry');
+            expect(formatted).toHaveProperty('entry.sdata:payload');
+            expect(formatted).toHaveProperty('entry.sdata:payload.TaskComplete');
+            expect(formatted).toHaveProperty('entry.sdata:payload.TaskComplete.request');
+            expect(formatted).toHaveProperty('entry.sdata:payload.TaskComplete.request.TaskId', '1');
+        })(xml.parseXML(Sage.SData.Client.Ajax.request.mostRecentCall.args[0].body));
+    });
+
+    it('can execute service operation call', function() {
+        
+        withResponseContent('TestServiceResponse.xml');
+
+        var success = jasmine.createSpy(),
+            failure = jasmine.createSpy();
+        
+        var request = new Sage.SData.Client.SDataServiceOperationRequest(service)
+            .setResourceKind('tasks')
+            .setOperationName('CompleteTask');
+
+        var entry = {
+            '$name': 'TaskComplete',
+            'request': {
+                'TaskId': 1
+            }
+        };
+
+        request.execute(entry, {
+            success: success,
+            failure: failure
+        });
+
+        expect(success).toHaveBeenCalled();
+        expect(failure).not.toHaveBeenCalled();
+
+        (function(entry) {
+            expect(entry).toExist();
+            expect(entry).toHaveProperty('response');
+            expect(entry).toHaveProperty('response.Result');
+            expect(entry).toHaveProperty('response.Result.Description', 'Confirm Meeting');
+        })(success.mostRecentCall.args[0]);
+    });
 });

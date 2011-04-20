@@ -1,87 +1,94 @@
-JEST.testCase('SDataSingleResourceRequest');
-JEST.before(function() {
-    this.service = new Sage.SData.Client.SDataService({
-        serverName: 'localhost',
-        virtualDirectory: 'sdata',
-        applicationName: 'aw',
-        contractName: 'dynamic'
+describe('SDataSingleResourceRequest', function() {
+    var service,
+        xml = new XML.ObjTree(),
+        withResponseContent = function(name) {
+            spyOn(Sage.SData.Client.Ajax, 'request').andCallFake(function(options) {
+                options.success.call(options.scope || this, {
+                    responseText: Resources.get(name)
+                });
+            });
+        };
+
+    beforeEach(function() {
+        service = new Sage.SData.Client.SDataService({
+            serverName: 'localhost',
+            virtualDirectory: 'sdata',
+            applicationName: 'aw',
+            contractName: 'dynamic'
+        });
     });
 
-    Sage.SData.Client.Ajax.push([{
-        predicate: /use=atomPrefixed/i,
-        url: 'TestEntryWithPrefix.xml'
-    },{
-        predicate: /use=atomNonPrefixed/i,
-        url: 'TestEntry.xml'
-    }]);
-});
+    it('can build url with simple selector', function() {
+        var request = new Sage.SData.Client.SDataSingleResourceRequest(service)
+            .setResourceKind('employees')
+            .setResourceSelector('1');
 
-JEST.after(function() {
-    Sage.SData.Client.Ajax.pop();
-});
-
-JEST.it('Can Build Url With Simple Selector', function() {
-    var request = new Sage.SData.Client.SDataSingleResourceRequest(this.service)
-        .setResourceKind('employees')
-        .setResourceSelector('1');
-
-    ASSERT.equal(request.build(), "http://localhost/sdata/aw/dynamic/-/employees(1)?_includeContent=false");
-});
-
-JEST.it('Can Build Url With Complex Selector', function() {
-    var request = new Sage.SData.Client.SDataSingleResourceRequest(this.service)
-        .setResourceKind('employees')
-        .setResourceSelector("id eq '1234'");
-
-    ASSERT.equal(request.build(), "http://localhost/sdata/aw/dynamic/-/employees(id%20eq%20'1234')?_includeContent=false");
-});
-
-JEST.it('Can Read Atom Entry With Prefixed Properties', function() {
-    var request = new Sage.SData.Client.SDataSingleResourceRequest(this.service)
-        .setResourceKind('employees')
-        .setResourceSelector('1')
-        .setQueryArg('_use', 'atomPrefixed');
-
-    ASSERT.exists(request);
-
-    request.read({
-        async: false,
-        success: function(entry) {
-            ASSERT.exists(entry, 'entry does not exist.');
-            ASSERT.exists(entry['NationalIdNumber'], 'entry does not have properties.');
-            ASSERT.exists(entry['DirectReports'], 'entry does not have included collection property.');
-            ASSERT.exists(entry['DirectReports']['$resources'], 'entry does not have included collection resources.');
-
-            ASSERT.equal(entry['DirectReports']['$resources'].length, 2, 'included collection resource count does not match expected.');
-            ASSERT.equal(entry['DirectReports']['$resources'][0]['NationalIdNumber'], '14417808', 'included collection does not match expected.');
-        },
-        failure: function() {
-            ASSERT.fail('fail', 'success', 'failure returned', 'fail');
-        }
+        expect(request.build()).toEqual("http://localhost/sdata/aw/dynamic/-/employees(1)?_includeContent=false");
     });
-});
 
-JEST.it('Can Read Atom Entry With Non-Prefixed Properties', function() {
-    var request = new Sage.SData.Client.SDataSingleResourceRequest(this.service)
-        .setResourceKind('employees')
-        .setResourceSelector('1')
-        .setQueryArg('_use', 'atomNonPrefixed');
+    it('can build url with complex selector', function() {
+        var request = new Sage.SData.Client.SDataSingleResourceRequest(service)
+            .setResourceKind('employees')
+            .setResourceSelector("id eq '1234'");
 
-    ASSERT.exists(request);
+        expect(request.build()).toEqual("http://localhost/sdata/aw/dynamic/-/employees(id%20eq%20'1234')?_includeContent=false");
+    });
 
-    request.read({
-        async: false,
-        success: function(entry) {
-            ASSERT.exists(entry, 'entry does not exist.');
-            ASSERT.exists(entry['NationalIdNumber'], 'entry does not have properties.');
-            ASSERT.exists(entry['DirectReports'], 'entry does not have included collection property.');
-            ASSERT.exists(entry['DirectReports']['$resources'], 'entry does not have included collection resources.');
+    it('can read atom entry with prefixed properties', function() {
 
-            ASSERT.equal(entry['DirectReports']['$resources'].length, 2, 'included collection resource count does not match expected.');
-            ASSERT.equal(entry['DirectReports']['$resources'][0]['NationalIdNumber'], '14417808', 'included collection does not match expected.');
-        },
-        failure: function() {
-            ASSERT.fail('fail', 'success', 'failure returned', 'fail');
-        }
+        withResponseContent('TestEntryWithPrefix.xml');
+
+        var success = jasmine.createSpy(),
+            failure = jasmine.createSpy();            
+
+        var request = new Sage.SData.Client.SDataSingleResourceRequest(service)
+            .setResourceKind('employees')
+            .setResourceSelector('1');
+
+        request.read({
+            success: success,
+            failure: failure
+        });
+
+        expect(success).toHaveBeenCalled();
+        expect(failure).not.toHaveBeenCalled();
+
+        (function(entry) {
+            expect(entry).toExist();
+            expect(entry).toHaveProperty('NationalIdNumber');
+            expect(entry).toHaveProperty('DirectReports');
+            expect(entry).toHaveProperty('DirectReports.$resources');
+            expect(entry).toHaveProperty('DirectReports.$resources.length', 2);
+            expect(entry).toHaveProperty('DirectReports.$resources.0.NationalIdNumber', '14417808');
+        })(success.mostRecentCall.args[0]);
+    });
+
+    it('can read atom entry with non-prefixed properties', function() {
+
+        withResponseContent('TestEntry.xml');
+
+        var success = jasmine.createSpy(),
+            failure = jasmine.createSpy();
+
+        var request = new Sage.SData.Client.SDataSingleResourceRequest(service)
+            .setResourceKind('employees')
+            .setResourceSelector('1');
+
+        request.read({
+            success: success,
+            failure: failure
+        });
+
+        expect(success).toHaveBeenCalled();
+        expect(failure).not.toHaveBeenCalled();
+
+        (function(entry) {
+            expect(entry).toExist();
+            expect(entry).toHaveProperty('NationalIdNumber');
+            expect(entry).toHaveProperty('DirectReports');
+            expect(entry).toHaveProperty('DirectReports.$resources');
+            expect(entry).toHaveProperty('DirectReports.$resources.length', 2);
+            expect(entry).toHaveProperty('DirectReports.$resources.0.NationalIdNumber', '14417808');
+        })(success.mostRecentCall.args[0]);
     });
 });
