@@ -4,26 +4,26 @@
 /// <reference path="SDataBaseRequest.js"/>
 /// <reference path="SDataApplicationRequest.js"/>
 
-(function(S){
+(function(){
     var S = Sage,
-        C = S.namespace('SData.Client');
+        C = Sage.namespace('Sage.SData.Client');
 
-    C.SDataResourceCollectionRequest = C.SDataApplicationRequest.extend({
+    Sage.SData.Client.SDataResourceCollectionRequest = Sage.SData.Client.SDataApplicationRequest.extend({
         constructor: function() {
             this.base.apply(this, arguments);
         },
         getCount: function() {
             return this.uri.getCount();
         },
-        setCount: function(val) {
-            this.uri.setCount(val);
+        setCount: function(value) {
+            this.uri.setCount(value);
             return this;
         },
         getStartIndex: function() {
             return this.uri.getStartIndex();
         },
-        setStartIndex: function(val) {
-            this.uri.setStartIndex(val);
+        setStartIndex: function(value) {
+            this.uri.setStartIndex(value);
             return this;
         },
         read: function(options) {

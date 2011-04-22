@@ -2,64 +2,73 @@
 
 (function(){
     var S = Sage,
-        C = S.namespace('SData.Client');
+        C = Sage.namespace('Sage.SData.Client'),
+        trueRE = /^true$/i;
 
-    C.SDataUri = S.Class.define({
+    Sage.SData.Client.SDataUri = Sage.Class.define({
+        scheme: 'http',
+        host: '',
+        server: '',
+        port: -1,
+        queryArgs: null,
+        pathSegments: null,
+        startIndex: false,
+        count: false,
         constructor: function(uri) {
             /// <field name="scheme" type="String"></field>
 
             this.base.apply(this, arguments);
 
-            this.scheme = C.SDataUri.Http;
-            this.host = '';
-            this.server = '';
-            this.port = C.SDataUri.UnspecifiedPort;
-            this.queryArgs = {};
-            this.pathSegments = [];
-            this.startIndex = false;
-            this.count = false;
             this.version = {
                 major: 1,
                 minor: 0
             };
 
             S.apply(this, uri);
+
+            /* create copies; segments only needs a shallow copy, as elements are replaced, not modified. */
+            this.queryArgs = S.apply({}, uri && uri.queryArgs);
+            this.pathSegments = (uri && uri.pathSegments && uri.pathSegments.slice(0)) || [];
         },
         getVersion: function() {
             return this.version;
         },
-        setVersion: function(val) {
+        setVersion: function(value) {
             this.version = S.apply({
                 major: 0,
                 minor: 0
-            }, val);
+            }, value);
+            
             return this;
         },
         getScheme: function() {
             /// <returns type="String">The scheme component of the URI.</returns>
             return this.scheme;
         },
-        setScheme: function(val) {
+        setScheme: function(value) {
             /// <param name="val" type="String">The new scheme for the URI</param>
-            this.scheme = val;
+            this.scheme = value;
+
             return this;
         },
         getHost: function() {
             /// <returns type="String">The host component of the URI.</returns>
             return this.host;
         },
-        setHost: function(val) {
+        setHost: function(value) {
             /// <param name="val" type="String">The new host for the URI</param>
-            this.host = val;
+            this.host = value;
+
             return this;
         },
         getPort: function() {
             /// <returns type="Number">The port component of the URI.</returns>
             return this.port;
         },
-        setPort: function(val) {
+        setPort: function(value) {
             /// <param name="val" type="String">The new port for the URI</param>
-            this.port = val;
+            this.port = value;
+
             return this;
         },
         getServer: function() {
@@ -71,24 +80,24 @@
             /// <returns type="String">The SData "server" component of URI.</returns>
             return this.server;
         },
-        setServer: function(val) {
+        setServer: function(value) {
             /// <param name="val" type="String">The new SData "server" for the URI</param>
-            this.server = val;
+            this.server = value;
+
             return this;
         },
         getQueryArgs: function() {
             /// <returns type="Object">The query arguments of the URI.</returns>
             return this.queryArgs;
         },
-        setQueryArgs: function(val, replace) {
+        setQueryArgs: function(value, replace) {
             /// <param name="val" type="Object">
             ///     The query arguments that will either be merged with the existing values, or replace
             ///     them entirely.
             /// <param>
             /// <param name="replace" type="Boolean" optional="true">True if you want to replace the existing query arguments.</param>
-            this.queryArgs = replace !== true
-                ? S.apply(this.queryArgs, val)
-                : val;
+            this.queryArgs = replace ? value : S.apply(this.queryArgs, value);
+
             return this;
         },
         getQueryArg: function(key) {
@@ -97,19 +106,21 @@
             /// <returns type="String">The value of the requested query argument.</returns>
             return this.queryArgs[key];
         },
-        setQueryArg: function(key, val) {
+        setQueryArg: function(key, value) {
             /// <summary>Sets a requested query argument.</summary>
             /// <param name="key" type="String">The name of the query argument to be set.</param>
             /// <param name="val" type="String">The new value for the query argument.</param>
-            this.queryArgs[key] = val;
+            this.queryArgs[key] = value;
+
             return this;
         },
         getPathSegments: function() {
             /// <returns elementType="String">The path segments of the URI.</returns>
             return this.pathSegments;
         },
-        setPathSegments: function(val) {
-            this.pathSegments = val;
+        setPathSegments: function(value) {
+            this.pathSegments = value;
+
             return this;
         },
         getPathSegment: function(i) {
@@ -117,15 +128,21 @@
                 ? this.pathSegments[i]
                 : false;
         },
-        setPathSegment: function(i, segment, predicate) {
-            if (typeof segment === 'string')
-            {
-                var segment = {
-                    'text': segment
-                };
-                if (predicate) segment['predicate'] = predicate;
-            }
-            this.pathSegments[i] = S.apply(this.pathSegments[i] || {}, segment);
+        setPathSegment: function(i, value, predicate) {
+            var segment = this.pathSegments[i] = typeof value === 'string' ? {text: value} : S.apply({}, value);
+
+            if (predicate) segment['predicate'] = predicate;
+
+            return this;
+        },
+        applyPathSegment: function(i, value, predicate) {
+            var segment = typeof value === 'string' ? {text: value} : S.apply({}, value);
+
+            if (predicate) segment['predicate'] = predicate;
+
+            /* copy existing segment values, then apply new values */
+            this.pathSegments[i] = S.apply({}, segment, this.pathSegments[i]);
+
             return this;
         },
         getStartIndex: function() {
@@ -133,8 +150,9 @@
                 ? parseInt(this.queryArgs[C.SDataUri.QueryArgNames.StartIndex])
                 : false;
         },
-        setStartIndex: function(val) {
-            this.queryArgs[C.SDataUri.QueryArgNames.StartIndex] = val;
+        setStartIndex: function(value) {
+            this.queryArgs[C.SDataUri.QueryArgNames.StartIndex] = value;
+
             return this;
         },
         getCount: function() {
@@ -142,29 +160,32 @@
                 ? parseInt(this.queryArgs[C.SDataUri.QueryArgNames.Count])
                 : false;
         },
-        setCount: function(val) {
-            this.queryArgs[C.SDataUri.QueryArgNames.Count] = val;
+        setCount: function(value) {
+            this.queryArgs[C.SDataUri.QueryArgNames.Count] = value;
+
             return this;
         },
         getIncludeContent: function() {
-            if (this.version.major >= 1)
-                return this.queryArgs[C.SDataUri.QueryArgNames.IncludeContent] == 'true';
-            else
-                return this.queryArgs[C.SDataUri.QueryArgNames.LegacyIncludeContent] == 'true';
+            var name = this.version.major >= 1
+                ? C.SDataUri.QueryArgNames.IncludeContent
+                : C.SDataUri.QueryArgNames.LegacyIncludeContent;
+
+            return trueRE.test(this.queryArgs[name]);
         },
-        setIncludeContent: function(val) {
-            if (this.version.major >= 1)
-                this.queryArgs[C.SDataUri.QueryArgNames.IncludeContent] = val ? 'true' : 'false';
-            else
-                this.queryArgs[C.SDataUri.QueryArgNames.LegacyIncludeContent] = val ? 'true' : 'false';
+        setIncludeContent: function(value) {
+            var name = this.version.major >= 1
+                ? C.SDataUri.QueryArgNames.IncludeContent
+                : C.SDataUri.QueryArgNames.LegacyIncludeContent;
+
+            this.queryArgs[name] = "" + value;
+
             return this;
         },
-        appendPath: function(val) {
-            this.pathSegments.push(
-                typeof val === 'string'
-                    ? {text: val}
-                    : val
-            );
+        appendPath: function(value) {
+            var segment = typeof value === 'string' ? {text: value} : value;
+
+            this.pathSegments.push(segment);
+
             return this;
         },
         build: function() {
@@ -252,18 +273,16 @@
         },
         getCollectionPredicate: function() {
             var segment = this.getPathSegment(C.SDataUri.CollectionTypePathIndex);
-            return segment && segment['predicate']
-                ? segment['predicate']
-                : false
+            return (segment && segment['predicate']) || false;
         },
-        setCollectionPredicate: function(val) {
-            return this.setPathSegment(C.SDataUri.CollectionTypePathIndex, {
-                predicate: val
+        setCollectionPredicate: function(value) {
+            return this.applyPathSegment(C.SDataUri.CollectionTypePathIndex, {
+                predicate: value
             });
         }
     });
 
-    S.apply(C.SDataUri, {
+    Sage.apply(Sage.SData.Client.SDataUri, {
         Http: 'http',
         Https: 'https',
         PathSegmentPrefix: '/',
@@ -301,6 +320,7 @@
         ServiceMethodSegment: '$service',
         TemplateSegment: '$template',
         SystemSegment: '$system',
-        NamedQuerySegment: '$queries'
+        NamedQuerySegment: '$queries',
+        BatchSegment: '$batch'
     });
 })();

@@ -6,9 +6,9 @@
 
 (function(){
     var S = Sage,
-        C = S.namespace('SData.Client');
+        C = Sage.namespace('Sage.SData.Client');
 
-    C.SDataServiceOperationRequest = C.SDataApplicationRequest.extend({
+    Sage.SData.Client.SDataServiceOperationRequest = Sage.SData.Client.SDataApplicationRequest.extend({
         constructor: function() {
             this.base.apply(this, arguments);
 

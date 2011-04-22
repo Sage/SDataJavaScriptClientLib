@@ -8,14 +8,16 @@
 
 (function(){
     var S = Sage,
-        C = S.namespace('SData.Client');
+        C = Sage.namespace('Sage.SData.Client'),
+        isDefined = function(value) { return typeof value !== 'undefined' };
 
-    C.SDataService = S.Evented.extend({        
+    Sage.SData.Client.SDataService = Sage.Evented.extend({
         uri: null,
         useCredentialedRequest: false,
         userAgent: 'Sage',
         userName: false,
         password: '',
+        currentBatch: null,
         constructor: function(options) {
             /// <field name="uri" type="Sage.SData.Client.SDataUri" />
             this.base.apply(this, arguments);   
@@ -24,21 +26,20 @@
 
             if (options)
             {
-                if (options.uri) this.uri = options.uri;
-                if (options.version) this.uri.setVersion(options.version);
-                if (options.serverName) this.uri.setHost(options.serverName);
-                if (options.virtualDirectory) this.uri.setServer(options.virtualDirectory);
-                if (options.applicationName) this.uri.setProduct(options.applicationName);
-                if (options.contractName) this.uri.setContract(options.contractName);
-                if (options.port) this.uri.setPort(options.port);
-                if (options.protocol) this.uri.setScheme(options.protocol);
+                if (isDefined(options.uri)) this.uri = options.uri;
+                if (isDefined(options.version)) this.uri.setVersion(options.version);
+                if (isDefined(options.serverName)) this.uri.setHost(options.serverName);
+                if (isDefined(options.virtualDirectory)) this.uri.setServer(options.virtualDirectory);
+                if (isDefined(options.applicationName)) this.uri.setProduct(options.applicationName);
+                if (isDefined(options.contractName)) this.uri.setContract(options.contractName);
+                if (isDefined(options.port)) this.uri.setPort(options.port);
+                if (isDefined(options.protocol)) this.uri.setScheme(options.protocol);
+                if (isDefined(options.includeContent)) this.uri.setIncludeContent(options.includeContent);
 
-                if (typeof options.includeContent === 'boolean') this.uri.setIncludeContent(options.includeContent);
-
-                if (options.json) this.json = true;
-                if (options.userName) this.userName = options.userName;
-                if (options.password) this.password = options.password;                
-                if (options.useCredentialedRequest) this.useCredentialedRequest = true;
+                if (isDefined(options.json)) this.json = options.json;
+                if (isDefined(options.userName)) this.userName = options.userName;
+                if (isDefined(options.password)) this.password = options.password;
+                if (isDefined(options.useCredentialedRequest)) this.useCredentialedRequest = options.useCredentialedRequest;
             }
 
             this.addEvents(
@@ -74,78 +75,78 @@
             /// <returns type="String" />
             return this.userName;
         },
-        setUserName: function(val) {
-            this.userName = val;
+        setUserName: function(value) {
+            this.userName = value;
             return this;
         },
         getPassword: function() {
             return this.password;
         },
-        setPassword: function(val) {
-            this.password = val;
+        setPassword: function(value) {
+            this.password = value;
             return this;
         },
         getProtocol: function() {
             return this.uri.getScheme();
         },
-        setProtocol: function(val) {
-            this.uri.setScheme(val);
+        setProtocol: function(value) {
+            this.uri.setScheme(value);
             return this;
         },
         getServerName: function() {
             return this.uri.getHost();
         },
-        setServerName: function(val) {
-            this.uri.setHost(val);
+        setServerName: function(value) {
+            this.uri.setHost(value);
             return this;
         },
         getPort: function() {
             return this.uri.getPort();
         },
-        setPort: function(val) {
-            this.uri.setPort(val);
+        setPort: function(value) {
+            this.uri.setPort(value);
             return this;
         },
         getVirtualDirectory: function() {
             return this.uri.getServer();
         },
-        setVirtualDirectory: function(val) {
-            this.uri.setServer(val);
+        setVirtualDirectory: function(value) {
+            this.uri.setServer(value);
             return this;
         },
         getApplicationName: function() {
             return this.uri.getProduct();
         },
-        setApplicationName: function(val) {
-            this.uri.setProduct(val);
+        setApplicationName: function(value) {
+            this.uri.setProduct(value);
             return this;
         },
         getContractName: function() {
             return this.uri.getContract();
         },
-        setContractName: function(val) {
-            this.uri.setContract(val);
+        setContractName: function(value) {
+            this.uri.setContract(value);
             return this;
         },
         getDataSet: function() {
             return this.uri.getCompanyDataset();
         },
-        setDataSet: function(val) {
-            this.uri.setCompanyDataset(val);
+        setDataSet: function(value) {
+            this.uri.setCompanyDataset(value);
             return this;
         },
         getIncludeContent: function() {
             return this.uri.getIncludeContent();
         },
-        setIncludeContent: function(val) {
-            this.uri.setIncludeContent(val);
+        setIncludeContent: function(value) {
+            this.uri.setIncludeContent(value);
             return this;
         },
         getUserAgent: function() {
             return this.userAgent;
         },
-        setUserAgent: function(val) {
-            this.userAgent = val;
+        setUserAgent: function(value) {
+            this.userAgent = value;
             return this;
         },
         createBasicAuthToken: function() {

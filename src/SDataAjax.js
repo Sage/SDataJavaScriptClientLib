@@ -1,6 +1,6 @@
 (function(){
     var S = Sage,
-        A = S.namespace('SData.Client.Ajax');
+        A = Sage.namespace('Sage.SData.Client.Ajax');
 
     var successful = function(code)
     {
@@ -68,7 +68,7 @@
         return query.join('&');
     };
 
-    S.apply(A, {
+    Sage.apply(Sage.SData.Client.Ajax, {
         request: function(o) {
             var o = S.apply({}, o);
 

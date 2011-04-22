@@ -8,17 +8,17 @@
     var S = Sage,
         C = Sage.namespace('Sage.SData.Client');
 
-    Sage.SData.Client.SDataTemplateResourceRequest = Sage.SData.Client.SDataApplicationRequest.extend({
+    Sage.SData.Client.SDataBatchRequest = Sage.SData.Client.SDataApplicationRequest.extend({
         constructor: function() {
             this.base.apply(this, arguments);
 
             this.uri.setPathSegment(
                 Sage.SData.Client.SDataUri.ResourcePropertyIndex,
-                Sage.SData.Client.SDataUri.TemplateSegment
+                Sage.SData.Client.SDataUri.BatchSegment
             );
         },
-        read: function(options) {
-            return this.service.readEntry(this, options);
+        using: function(fn, scope) {
+            if (this.service)
         }
     });
 })();

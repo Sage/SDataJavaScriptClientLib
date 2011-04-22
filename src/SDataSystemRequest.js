@@ -5,9 +5,9 @@
 
 (function(){
     var S = Sage,
-        C = S.namespace('SData.Client');
+        C = Sage.namespace('Sage.SData.Client');
 
-    C.SDataSystemRequest = C.SDataBaseRequest.extend({
+    Sage.SData.Client.SDataSystemRequest = Sage.SData.Client.SDataBaseRequest.extend({
         constructor: function() {
             this.base.apply(this, arguments);
 
@@ -19,8 +19,8 @@
         getCategory: function() {
             this.uri.getPathSegment(Sage.SData.Client.SDataUri.ContractTypePathIndex);
         },
-        setCategory: function(val) {
-            this.uri.setPathSegment(Sage.SData.Client.SDataUri.ContractTypePathIndex, val);
+        setCategory: function(value) {
+            this.uri.setPathSegment(Sage.SData.Client.SDataUri.ContractTypePathIndex, value);
             return this;
         },
         read: function(options) {

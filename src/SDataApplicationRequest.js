@@ -5,9 +5,9 @@
 
 (function(){
     var S = Sage,
-        C = S.namespace('SData.Client');
+        C = Sage.namespace('Sage.SData.Client');
 
-    C.SDataApplicationRequest = C.SDataBaseRequest.extend({
+    Sage.SData.Client.SDataApplicationRequest = Sage.SData.Client.SDataBaseRequest.extend({
         constructor: function() {
             this.base.apply(this, arguments);
 
@@ -21,29 +21,29 @@
         getApplicationName: function() {
             return this.uri.getProduct();
         },
-        setApplicationName: function(val) {
-            this.uri.setProduct(val);
+        setApplicationName: function(value) {
+            this.uri.setProduct(value);
             return this;
         },
         getContractName: function() {
             return this.uri.getContract();
         },
-        setContractName: function(val) {
-            this.uri.setContract(val);
+        setContractName: function(value) {
+            this.uri.setContract(value);
             return this;
         },
         getDataSet: function() {
             return this.uri.getCompanyDataset();
         },
-        setDataSet: function(val) {
-            this.uri.setCompanyDataset(val);
+        setDataSet: function(value) {
+            this.uri.setCompanyDataset(value);
             return this;
         },
         getResourceKind: function() {
             return this.uri.getCollectionType();
         },
-        setResourceKind: function(val) {
-            this.uri.setCollectionType(val);
+        setResourceKind: function(value) {
+            this.uri.setCollectionType(value);
             return this;
         }
     });

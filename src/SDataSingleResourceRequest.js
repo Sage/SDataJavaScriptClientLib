@@ -6,9 +6,9 @@
 
 (function(){
     var S = Sage,
-        C = S.namespace('SData.Client');
+        C = Sage.namespace('Sage.SData.Client');
 
-    C.SDataSingleResourceRequest = C.SDataApplicationRequest.extend({
+    Sage.SData.Client.SDataSingleResourceRequest = Sage.SData.Client.SDataApplicationRequest.extend({
         constructor: function() {
             this.base.apply(this, arguments);
         },
@@ -27,8 +27,8 @@
         getResourceSelector: function() {
             return this.uri.getCollectionPredicate();
         },
-        setResourceSelector: function(val) {
-            this.uri.setCollectionPredicate(val);
+        setResourceSelector: function(value) {
+            this.uri.setCollectionPredicate(value);
             return this;
         }
     });

@@ -6,9 +6,9 @@
 
 (function(){
     var S = Sage,
-        C = S.namespace('SData.Client');
+        C = Sage.namespace('Sage.SData.Client');
 
-    C.SDataResourcePropertyRequest = C.SDataSingleResourceRequest.extend({
+    Sage.SData.Client.SDataResourcePropertyRequest = Sage.SData.Client.SDataSingleResourceRequest.extend({
         constructor: function() {
             this.base.apply(this, arguments);
         },       
@@ -18,8 +18,8 @@
         getResourceProperty: function() {
             return this.uri.getPathSegment(Sage.SData.Client.SDataUri.ResourcePropertyIndex);
         },
-        setResourceProperty: function(val) {
-            this.uri.setPathSegment(Sage.SData.Client.SDataUri.ResourcePropertyIndex, val);
+        setResourceProperty: function(value) {
+            this.uri.setPathSegment(Sage.SData.Client.SDataUri.ResourcePropertyIndex, value);
             return this;
         }
     });

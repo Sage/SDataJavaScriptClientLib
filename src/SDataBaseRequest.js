@@ -4,9 +4,9 @@
 
 (function(){
     var S = Sage,
-        C = S.namespace('SData.Client');
+        C = Sage.namespace('Sage.SData.Client');
 
-    C.SDataBaseRequest = S.Class.define({
+    Sage.SData.Client.SDataBaseRequest = Sage.Class.define({
         constructor: function(service) {
             this.base.apply(this, arguments);
 
@@ -31,50 +31,50 @@
             /// <returns type="Sage.SData.Client.SDataUri" />
             return this.uri;
         },
-        setUri: function(val) {
-            this.uri = val;
+        setUri: function(value) {
+            this.uri = value;
             return this;
         },
         getServerName: function() {
             return this.uri.getHost();
         },
-        setServerName: function(val) {
-            this.uri.setHost(val);
+        setServerName: function(value) {
+            this.uri.setHost(value);
             return this;
         },
         getVirtualDirectory: function() {
             return this.uri.getServer();
         },
-        setVirtualDirectory: function(val) {
-            this.uri.setServer(val);
+        setVirtualDirectory: function(value) {
+            this.uri.setServer(value);
             return this;
         },
         getProtocol: function() {
             return this.uri.getScheme();
         },
-        setProtocol: function(val) {
-            this.uri.setScheme(val);
+        setProtocol: function(value) {
+            this.uri.setScheme(value);
             return this;
         },
         getPort: function() {
             return this.uri.getPort();
         },
-        setPort: function(val) {
-            this.uri.setPort(val);
+        setPort: function(value) {
+            this.uri.setPort(value);
             return this;
         },
         getQueryArgs: function() {
             return this.uri.getQueryArgs();
         },
-        setQueryArgs: function(val, replace) {
-            this.uri.setQueryArgs(val, replace);
+        setQueryArgs: function(value, replace) {
+            this.uri.setQueryArgs(value, replace);
             return this;
         },
         getQueryArg: function(key) {
             return this.uri.getQueryArg(key);
         },
-        setQueryArg: function(key, val) {
-            this.uri.setQueryArg(key, val);
+        setQueryArg: function(key, value) {
+            this.uri.setQueryArg(key, value);
             return this;
         },
         build: function() {

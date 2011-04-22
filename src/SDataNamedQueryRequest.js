@@ -1,8 +1,8 @@
 (function(){
     var S = Sage,
-        C = S.namespace('SData.Client');
+        C = Sage.namespace('Sage.SData.Client');
 
-    C.SDataNamedQueryRequest = C.SDataResourceCollectionRequest.extend({
+    Sage.SData.Client.SDataNamedQueryRequest = Sage.SData.Client.SDataResourceCollectionRequest.extend({
         constructor: function() {
             this.base.apply(this, arguments);
 
@@ -14,10 +14,10 @@
         getQueryName: function() {
             return this.uri.getPathSegment(C.SDataUri.ResourcePropertyIndex + 1);
         },
-        setQueryName: function(val) {
+        setQueryName: function(value) {
             this.uri.setPathSegment(
                 C.SDataUri.ResourcePropertyIndex + 1,
-                val
+                value
             );
             return this;
         }
