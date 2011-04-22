@@ -8,6 +8,8 @@
     var S = Sage,
         C = Sage.namespace('Sage.SData.Client');
 
+    var stack = [];
+
     Sage.SData.Client.SDataBatchRequest = Sage.SData.Client.SDataApplicationRequest.extend({
         constructor: function() {
             this.base.apply(this, arguments);
@@ -18,7 +20,7 @@
             );
         },
         using: function(fn, scope) {
-            if (this.service)
+               
         }
     });
 })();

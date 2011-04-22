@@ -10,6 +10,7 @@
         host: '',
         server: '',
         port: -1,
+        version: null,
         queryArgs: null,
         pathSegments: null,
         startIndex: false,
@@ -19,16 +20,12 @@
 
             this.base.apply(this, arguments);
 
-            this.version = {
-                major: 1,
-                minor: 0
-            };
-
             S.apply(this, uri);
 
             /* create copies; segments only needs a shallow copy, as elements are replaced, not modified. */
             this.queryArgs = S.apply({}, uri && uri.queryArgs);
             this.pathSegments = (uri && uri.pathSegments && uri.pathSegments.slice(0)) || [];
+            this.version = (uri && uri.version && S.apply({}, uri.version)) || { major: 1, minor: 0 };
         },
         getVersion: function() {
             return this.version;
