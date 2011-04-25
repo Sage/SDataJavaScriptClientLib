@@ -43,8 +43,8 @@ describe('SDataBatchRequest', function() {
         });
 
         expect(batch.items.length).toEqual(2);
-        expect(batch.items[0].url).toEqual("http://localhost/sdata/aw/dynamic/-/employees(1)");
-        expect(batch.items[1].url).toEqual("http://localhost/sdata/aw/dynamic/-/employees(2)");
+        expect(batch.items[0].url).toEqual("http://localhost/sdata/aw/dynamic/-/employees(1)?_includeContent=false");
+        expect(batch.items[1].url).toEqual("http://localhost/sdata/aw/dynamic/-/employees(2)?_includeContent=false");
     });
 
     it('can format feed for batch request', function() {
@@ -82,8 +82,8 @@ describe('SDataBatchRequest', function() {
             expect(formatted).toHaveProperty('feed');
             expect(formatted).toHaveProperty('feed.entry');
             expect(formatted).toHaveProperty('feed.entry.length', 2);
-            expect(formatted).toHaveProperty('feed.entry.0.id', 'http://localhost/sdata/aw/dynamic/-/employees(1)');
-            expect(formatted).toHaveProperty('feed.entry.1.id', 'http://localhost/sdata/aw/dynamic/-/employees(2)');
+            expect(formatted).toHaveProperty('feed.entry.0.id', 'http://localhost/sdata/aw/dynamic/-/employees(1)?_includeContent=false');
+            expect(formatted).toHaveProperty('feed.entry.1.id', 'http://localhost/sdata/aw/dynamic/-/employees(2)?_includeContent=false');
         })(xml.parseXML(Sage.SData.Client.Ajax.request.mostRecentCall.args[0].body));
     });
 

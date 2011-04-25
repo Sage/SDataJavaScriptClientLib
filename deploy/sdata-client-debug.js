@@ -1091,7 +1091,7 @@
             if (this.batchScope)
             {
                 this.batchScope.add({
-                    url: request.build(true),
+                    url: request.build(),
                     method: 'GET'
                 });
 
@@ -1121,7 +1121,7 @@
             if (this.batchScope)
             {
                 this.batchScope.add({
-                    url: request.build(true),
+                    url: request.build(),
                     entry: entry,
                     method: 'POST'
                 });
@@ -1174,7 +1174,7 @@
             if (this.batchScope)
             {
                 this.batchScope.add({
-                    url: request.build(true),
+                    url: request.build(),
                     entry: entry,
                     method: 'PUT',
                     etag: entry['$etag']
@@ -1226,7 +1226,7 @@
             if (this.batchScope)
             {
                 this.batchScope.add({
-                    url: request.build(true),
+                    url: request.build(),
                     method: 'DELETE',
                     etag: !(options && options.ignoreETag) && entry['$etag']
                 });
@@ -1311,7 +1311,7 @@
                 if (item.etag) entry['$ifMatch'] = item.etag;
                 if (item.method) entry['$httpMethod'] = item.method;
 
-                delete item['$etag'];
+                delete entry['$etag'];
 
                 feed['$resources'].push(entry);
             }
@@ -1564,7 +1564,7 @@
                 result['@xmlns'] = 'http://www.w3.org/2005/Atom';
             }
 
-            if (entry['$httpMethod']) result['http:method'] = entry['$httpMethod'];
+            if (entry['$httpMethod']) result['http:httpMethod'] = entry['$httpMethod'];
             if (entry['$ifMatch']) result['http:ifMatch'] = entry['$ifMatch'];
             if (entry['$etag']) result['http:etag'] = entry['$etag'];
             if (entry['$url']) result['id'] = entry['$url'];
