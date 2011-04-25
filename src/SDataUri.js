@@ -13,8 +13,6 @@
         version: null,
         queryArgs: null,
         pathSegments: null,
-        startIndex: false,
-        count: false,
         constructor: function(uri) {
             /// <field name="scheme" type="String"></field>
 
@@ -126,26 +124,33 @@
                 : false;
         },
         setPathSegment: function(i, value, predicate) {
-            var segment = this.pathSegments[i] = typeof value === 'string' ? {text: value} : S.apply({}, value);
+            /* can clear the segment */
+            if (!value && !predicate)
+            {
+                this.pathSegments[i] = null;
+            }
+            /* merge object onto segment */
+            else if (typeof value === 'object')
+            {
+                this.pathSegments[i] = S.apply({}, value, this.pathSegments[i]);
+            }
+            /* merge values onto segment */
+            else
+            {
+                var segment = {};
 
-            if (predicate) segment['predicate'] = predicate;
+                if (value) segment['text'] = value;
+                if (predicate) segment['predicate'] = predicate;
 
-            return this;
-        },
-        applyPathSegment: function(i, value, predicate) {
-            var segment = typeof value === 'string' ? {text: value} : S.apply({}, value);
-
-            if (predicate) segment['predicate'] = predicate;
-
-            /* copy existing segment values, then apply new values */
-            this.pathSegments[i] = S.apply({}, segment, this.pathSegments[i]);
-
+                this.pathSegments[i] = S.apply({}, segment, this.pathSegments[i]);
+            }
+            
             return this;
         },
         getStartIndex: function() {
             return this.queryArgs[C.SDataUri.QueryArgNames.StartIndex]
                 ? parseInt(this.queryArgs[C.SDataUri.QueryArgNames.StartIndex])
-                : false;
+                : -1;
         },
         setStartIndex: function(value) {
             this.queryArgs[C.SDataUri.QueryArgNames.StartIndex] = value;
@@ -155,7 +160,7 @@
         getCount: function() {
             return this.queryArgs[C.SDataUri.QueryArgNames.Count]
                 ? parseInt(this.queryArgs[C.SDataUri.QueryArgNames.Count])
-                : false;
+                : -1;
         },
         setCount: function(value) {
             this.queryArgs[C.SDataUri.QueryArgNames.Count] = value;
@@ -185,20 +190,16 @@
 
             return this;
         },
-        build: function() {
+        build: function(excludeQuery) {
             var url = [];
 
-            url.push(this.getScheme());
+            url.push(this.getScheme() || C.SDataUri.Http);
             url.push(C.SDataUri.SchemeSuffix);
             url.push(C.SDataUri.PathSegmentPrefix);
             url.push(C.SDataUri.PathSegmentPrefix);
             url.push(this.getHost());
 
-            if (this.getPort() !== C.SDataUri.UnspecifiedPort)
-            {
-                url.push(C.SDataUri.PortPrefix);
-                url.push(this.getPort());
-            }
+            if (this.getPort() > 0) url.push(C.SDataUri.PortPrefix, this.getPort());
 
             url.push(C.SDataUri.PathSegmentPrefix);
 
@@ -212,17 +213,18 @@
             for (var i = 0; i < segments.length; i++)
             {
                 var segment = segments[i];
-
-                if (typeof segment === 'undefined') continue;
-
-                // need to check predicate for beginning and end parenthesis and strip them
-                if (segment['predicate'])
-                    path.push(encodeURIComponent(segment['text'] + '(' + segment['predicate'] + ')'));
-                else
-                    path.push(encodeURIComponent(segment['text']));
+                if (segment && segment['text'])
+                {
+                    if (segment['predicate'])
+                        path.push(encodeURIComponent(segment['text'] + '(' + segment['predicate'] + ')'));
+                    else
+                        path.push(encodeURIComponent(segment['text']));
+                }
             }
 
             url.push(path.join(C.SDataUri.PathSegmentPrefix));
+
+            if (excludeQuery) return url.join('');
 
             var queryArgs = this.getQueryArgs();
             var query = [];
@@ -273,7 +275,7 @@
             return (segment && segment['predicate']) || false;
         },
         setCollectionPredicate: function(value) {
-            return this.applyPathSegment(C.SDataUri.CollectionTypePathIndex, {
+            return this.setPathSegment(C.SDataUri.CollectionTypePathIndex, {
                 predicate: value
             });
         }

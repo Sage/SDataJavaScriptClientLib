@@ -3,7 +3,7 @@
  */
 (function(){
     var S = Sage,
-        A = S.namespace('SData.Client.Ajax');
+        A = Sage.namespace('Sage.SData.Client.Ajax');
 
     var successful = function(code)
     {
@@ -71,7 +71,7 @@
         return query.join('&');
     };
 
-    S.apply(A, {
+    Sage.apply(Sage.SData.Client.Ajax, {
         request: function(o) {
             var o = S.apply({}, o);
 
@@ -138,9 +138,9 @@
 
 (function(){
     var S = Sage,
-        C = S.namespace('SData.Client');
+        C = Sage.namespace('Sage.SData.Client');
 
-    C.SDataBaseRequest = S.Class.define({
+    Sage.SData.Client.SDataBaseRequest = Sage.Class.define({
         constructor: function(service) {
             this.base.apply(this, arguments);
 
@@ -165,54 +165,54 @@
             /// <returns type="Sage.SData.Client.SDataUri" />
             return this.uri;
         },
-        setUri: function(val) {
-            this.uri = val;
+        setUri: function(value) {
+            this.uri = value;
             return this;
         },
         getServerName: function() {
             return this.uri.getHost();
         },
-        setServerName: function(val) {
-            this.uri.setHost(val);
+        setServerName: function(value) {
+            this.uri.setHost(value);
             return this;
         },
         getVirtualDirectory: function() {
             return this.uri.getServer();
         },
-        setVirtualDirectory: function(val) {
-            this.uri.setServer(val);
+        setVirtualDirectory: function(value) {
+            this.uri.setServer(value);
             return this;
         },
         getProtocol: function() {
             return this.uri.getScheme();
         },
-        setProtocol: function(val) {
-            this.uri.setScheme(val);
+        setProtocol: function(value) {
+            this.uri.setScheme(value);
             return this;
         },
         getPort: function() {
             return this.uri.getPort();
         },
-        setPort: function(val) {
-            this.uri.setPort(val);
+        setPort: function(value) {
+            this.uri.setPort(value);
             return this;
         },
         getQueryArgs: function() {
             return this.uri.getQueryArgs();
         },
-        setQueryArgs: function(val, replace) {
-            this.uri.setQueryArgs(val, replace);
+        setQueryArgs: function(value, replace) {
+            this.uri.setQueryArgs(value, replace);
             return this;
         },
         getQueryArg: function(key) {
             return this.uri.getQueryArg(key);
         },
-        setQueryArg: function(key, val) {
-            this.uri.setQueryArg(key, val);
+        setQueryArg: function(key, value) {
+            this.uri.setQueryArg(key, value);
             return this;
         },
-        build: function() {
-            return this.uri.build();
+        build: function(excludeQuery) {
+            return this.uri.build(excludeQuery);
         }
     });
 })();
@@ -223,9 +223,9 @@
 
 (function(){
     var S = Sage,
-        C = S.namespace('SData.Client');
+        C = Sage.namespace('Sage.SData.Client');
 
-    C.SDataApplicationRequest = C.SDataBaseRequest.extend({
+    Sage.SData.Client.SDataApplicationRequest = Sage.SData.Client.SDataBaseRequest.extend({
         constructor: function() {
             this.base.apply(this, arguments);
 
@@ -239,29 +239,29 @@
         getApplicationName: function() {
             return this.uri.getProduct();
         },
-        setApplicationName: function(val) {
-            this.uri.setProduct(val);
+        setApplicationName: function(value) {
+            this.uri.setProduct(value);
             return this;
         },
         getContractName: function() {
             return this.uri.getContract();
         },
-        setContractName: function(val) {
-            this.uri.setContract(val);
+        setContractName: function(value) {
+            this.uri.setContract(value);
             return this;
         },
         getDataSet: function() {
             return this.uri.getCompanyDataset();
         },
-        setDataSet: function(val) {
-            this.uri.setCompanyDataset(val);
+        setDataSet: function(value) {
+            this.uri.setCompanyDataset(value);
             return this;
         },
         getResourceKind: function() {
             return this.uri.getCollectionType();
         },
-        setResourceKind: function(val) {
-            this.uri.setCollectionType(val);
+        setResourceKind: function(value) {
+            this.uri.setCollectionType(value);
             return this;
         }
     });
@@ -273,26 +273,26 @@
 /// <reference path="SDataBaseRequest.js"/>
 /// <reference path="SDataApplicationRequest.js"/>
 
-(function(S){
+(function(){
     var S = Sage,
-        C = S.namespace('SData.Client');
+        C = Sage.namespace('Sage.SData.Client');
 
-    C.SDataResourceCollectionRequest = C.SDataApplicationRequest.extend({
+    Sage.SData.Client.SDataResourceCollectionRequest = Sage.SData.Client.SDataApplicationRequest.extend({
         constructor: function() {
             this.base.apply(this, arguments);
         },
         getCount: function() {
             return this.uri.getCount();
         },
-        setCount: function(val) {
-            this.uri.setCount(val);
+        setCount: function(value) {
+            this.uri.setCount(value);
             return this;
         },
         getStartIndex: function() {
             return this.uri.getStartIndex();
         },
-        setStartIndex: function(val) {
-            this.uri.setStartIndex(val);
+        setStartIndex: function(value) {
+            this.uri.setStartIndex(value);
             return this;
         },
         read: function(options) {
@@ -302,9 +302,9 @@
 })();
 (function(){
     var S = Sage,
-        C = S.namespace('SData.Client');
+        C = Sage.namespace('Sage.SData.Client');
 
-    C.SDataNamedQueryRequest = C.SDataResourceCollectionRequest.extend({
+    Sage.SData.Client.SDataNamedQueryRequest = Sage.SData.Client.SDataResourceCollectionRequest.extend({
         constructor: function() {
             this.base.apply(this, arguments);
 
@@ -316,10 +316,10 @@
         getQueryName: function() {
             return this.uri.getPathSegment(C.SDataUri.ResourcePropertyIndex + 1);
         },
-        setQueryName: function(val) {
+        setQueryName: function(value) {
             this.uri.setPathSegment(
                 C.SDataUri.ResourcePropertyIndex + 1,
-                val
+                value
             );
             return this;
         }
@@ -333,9 +333,9 @@
 
 (function(){
     var S = Sage,
-        C = S.namespace('SData.Client');
+        C = Sage.namespace('Sage.SData.Client');
 
-    C.SDataSingleResourceRequest = C.SDataApplicationRequest.extend({
+    Sage.SData.Client.SDataSingleResourceRequest = Sage.SData.Client.SDataApplicationRequest.extend({
         constructor: function() {
             this.base.apply(this, arguments);
         },
@@ -354,8 +354,8 @@
         getResourceSelector: function() {
             return this.uri.getCollectionPredicate();
         },
-        setResourceSelector: function(val) {
-            this.uri.setCollectionPredicate(val);
+        setResourceSelector: function(value) {
+            this.uri.setCollectionPredicate(value);
             return this;
         }
     });
@@ -368,9 +368,9 @@
 
 (function(){
     var S = Sage,
-        C = S.namespace('SData.Client');
+        C = Sage.namespace('Sage.SData.Client');
 
-    C.SDataResourcePropertyRequest = C.SDataSingleResourceRequest.extend({
+    Sage.SData.Client.SDataResourcePropertyRequest = Sage.SData.Client.SDataSingleResourceRequest.extend({
         constructor: function() {
             this.base.apply(this, arguments);
         },       
@@ -380,8 +380,8 @@
         getResourceProperty: function() {
             return this.uri.getPathSegment(Sage.SData.Client.SDataUri.ResourcePropertyIndex);
         },
-        setResourceProperty: function(val) {
-            this.uri.setPathSegment(Sage.SData.Client.SDataUri.ResourcePropertyIndex, val);
+        setResourceProperty: function(value) {
+            this.uri.setPathSegment(Sage.SData.Client.SDataUri.ResourcePropertyIndex, value);
             return this;
         }
     });
@@ -393,9 +393,9 @@
 
 (function(){
     var S = Sage,
-        C = S.namespace('SData.Client');
+        C = Sage.namespace('Sage.SData.Client');
 
-    C.SDataSystemRequest = C.SDataBaseRequest.extend({
+    Sage.SData.Client.SDataSystemRequest = Sage.SData.Client.SDataBaseRequest.extend({
         constructor: function() {
             this.base.apply(this, arguments);
 
@@ -407,8 +407,8 @@
         getCategory: function() {
             this.uri.getPathSegment(Sage.SData.Client.SDataUri.ContractTypePathIndex);
         },
-        setCategory: function(val) {
-            this.uri.setPathSegment(Sage.SData.Client.SDataUri.ContractTypePathIndex, val);
+        setCategory: function(value) {
+            this.uri.setPathSegment(Sage.SData.Client.SDataUri.ContractTypePathIndex, value);
             return this;
         },
         read: function(options) {
@@ -424,9 +424,9 @@
 
 (function(){
     var S = Sage,
-        C = S.namespace('SData.Client');
+        C = Sage.namespace('Sage.SData.Client');
 
-    C.SDataTemplateResourceRequest = C.SDataApplicationRequest.extend({
+    Sage.SData.Client.SDataTemplateResourceRequest = Sage.SData.Client.SDataApplicationRequest.extend({
         constructor: function() {
             this.base.apply(this, arguments);
 
@@ -448,9 +448,9 @@
 
 (function(){
     var S = Sage,
-        C = S.namespace('SData.Client');
+        C = Sage.namespace('Sage.SData.Client');
 
-    C.SDataServiceOperationRequest = C.SDataApplicationRequest.extend({
+    Sage.SData.Client.SDataServiceOperationRequest = Sage.SData.Client.SDataApplicationRequest.extend({
         constructor: function() {
             this.base.apply(this, arguments);
 
@@ -472,67 +472,117 @@
     });
 })();
 /// <reference path="../libraries/ext/ext-core-debug.js"/>
+/// <reference path="../libraries/ObjTree.js"/>
+/// <reference path="SDataUri.js"/>
+/// <reference path="SDataBaseRequest.js"/>
+/// <reference path="SDataApplicationRequest.js"/>
 
 (function(){
     var S = Sage,
-        C = S.namespace('SData.Client');
+        C = Sage.namespace('Sage.SData.Client');
 
-    C.SDataUri = S.Class.define({
+    Sage.SData.Client.SDataBatchRequest = Sage.SData.Client.SDataApplicationRequest.extend({
+        items: null,
+        constructor: function() {
+            this.base.apply(this, arguments);
+
+            this.items = [];
+            this.uri.setPathSegment(
+                Sage.SData.Client.SDataUri.ResourcePropertyIndex,
+                Sage.SData.Client.SDataUri.BatchSegment
+            );
+        },
+        using: function(fn, scope) {
+            if (this.service)
+                this.service.registerBatchScope(this);
+            else
+                throw "A service must be associated with the batch request.";
+
+            try
+            {
+                fn.call(scope || this, this);
+            }
+            catch (e)
+            {
+                this.service.clearBatchScope(this);
+                throw e;
+            }
+
+            this.service.clearBatchScope(this);
+        },
+        add: function(item) {
+            this.items.push(item);
+        },
+        commit: function(options) {
+            this.service.commitBatch(this, options);
+        }
+    });
+})();/// <reference path="../libraries/ext/ext-core-debug.js"/>
+
+(function(){
+    var S = Sage,
+        C = Sage.namespace('Sage.SData.Client'),
+        trueRE = /^true$/i;
+
+    Sage.SData.Client.SDataUri = Sage.Class.define({
+        scheme: 'http',
+        host: '',
+        server: '',
+        port: -1,
+        version: null,
+        queryArgs: null,
+        pathSegments: null,
         constructor: function(uri) {
             /// <field name="scheme" type="String"></field>
 
             this.base.apply(this, arguments);
 
-            this.scheme = C.SDataUri.Http;
-            this.host = '';
-            this.server = '';
-            this.port = C.SDataUri.UnspecifiedPort;
-            this.queryArgs = {};
-            this.pathSegments = [];
-            this.startIndex = false;
-            this.count = false;
-            this.version = {
-                major: 1,
-                minor: 0
-            };
-
             S.apply(this, uri);
+
+            /* create copies; segments only needs a shallow copy, as elements are replaced, not modified. */
+            this.queryArgs = S.apply({}, uri && uri.queryArgs);
+            this.pathSegments = (uri && uri.pathSegments && uri.pathSegments.slice(0)) || [];
+            this.version = (uri && uri.version && S.apply({}, uri.version)) || { major: 1, minor: 0 };
         },
         getVersion: function() {
             return this.version;
         },
-        setVersion: function(val) {
+        setVersion: function(value) {
             this.version = S.apply({
                 major: 0,
                 minor: 0
-            }, val);
+            }, value);
+            
             return this;
         },
         getScheme: function() {
             /// <returns type="String">The scheme component of the URI.</returns>
             return this.scheme;
         },
-        setScheme: function(val) {
+        setScheme: function(value) {
             /// <param name="val" type="String">The new scheme for the URI</param>
-            this.scheme = val;
+            this.scheme = value;
+
             return this;
         },
         getHost: function() {
             /// <returns type="String">The host component of the URI.</returns>
             return this.host;
         },
-        setHost: function(val) {
+        setHost: function(value) {
             /// <param name="val" type="String">The new host for the URI</param>
-            this.host = val;
+            this.host = value;
+
             return this;
         },
         getPort: function() {
             /// <returns type="Number">The port component of the URI.</returns>
             return this.port;
         },
-        setPort: function(val) {
+        setPort: function(value) {
             /// <param name="val" type="String">The new port for the URI</param>
-            this.port = val;
+            this.port = value;
+
             return this;
         },
         getServer: function() {
@@ -544,24 +594,24 @@
             /// <returns type="String">The SData "server" component of URI.</returns>
             return this.server;
         },
-        setServer: function(val) {
+        setServer: function(value) {
             /// <param name="val" type="String">The new SData "server" for the URI</param>
-            this.server = val;
+            this.server = value;
+
             return this;
         },
         getQueryArgs: function() {
             /// <returns type="Object">The query arguments of the URI.</returns>
             return this.queryArgs;
         },
-        setQueryArgs: function(val, replace) {
+        setQueryArgs: function(value, replace) {
             /// <param name="val" type="Object">
             ///     The query arguments that will either be merged with the existing values, or replace
             ///     them entirely.
             /// <param>
             /// <param name="replace" type="Boolean" optional="true">True if you want to replace the existing query arguments.</param>
-            this.queryArgs = replace !== true
-                ? S.apply(this.queryArgs, val)
-                : val;
+            this.queryArgs = replace ? value : S.apply(this.queryArgs, value);
+
             return this;
         },
         getQueryArg: function(key) {
@@ -570,19 +620,21 @@
             /// <returns type="String">The value of the requested query argument.</returns>
             return this.queryArgs[key];
         },
-        setQueryArg: function(key, val) {
+        setQueryArg: function(key, value) {
             /// <summary>Sets a requested query argument.</summary>
             /// <param name="key" type="String">The name of the query argument to be set.</param>
             /// <param name="val" type="String">The new value for the query argument.</param>
-            this.queryArgs[key] = val;
+            this.queryArgs[key] = value;
+
             return this;
         },
         getPathSegments: function() {
             /// <returns elementType="String">The path segments of the URI.</returns>
             return this.pathSegments;
         },
-        setPathSegments: function(val) {
-            this.pathSegments = val;
+        setPathSegments: function(value) {
+            this.pathSegments = value;
+
             return this;
         },
         getPathSegment: function(i) {
@@ -590,70 +642,83 @@
                 ? this.pathSegments[i]
                 : false;
         },
-        setPathSegment: function(i, segment, predicate) {
-            if (typeof segment === 'string')
+        setPathSegment: function(i, value, predicate) {
+            /* can clear the segment */
+            if (!value && !predicate)
             {
-                var segment = {
-                    'text': segment
-                };
-                if (predicate) segment['predicate'] = predicate;
+                this.pathSegments[i] = null;
             }
-            this.pathSegments[i] = S.apply(this.pathSegments[i] || {}, segment);
+            /* merge object onto segment */
+            else if (typeof value === 'object')
+            {
+                this.pathSegments[i] = S.apply({}, value, this.pathSegments[i]);
+            }
+            /* merge values onto segment */
+            else
+            {
+                var segment = {};
+
+                if (value) segment['text'] = value;
+                if (predicate) segment['predicate'] = predicate;
+
+                this.pathSegments[i] = S.apply({}, segment, this.pathSegments[i]);
+            }
+            
             return this;
         },
         getStartIndex: function() {
             return this.queryArgs[C.SDataUri.QueryArgNames.StartIndex]
                 ? parseInt(this.queryArgs[C.SDataUri.QueryArgNames.StartIndex])
-                : false;
+                : -1;
         },
-        setStartIndex: function(val) {
-            this.queryArgs[C.SDataUri.QueryArgNames.StartIndex] = val;
+        setStartIndex: function(value) {
+            this.queryArgs[C.SDataUri.QueryArgNames.StartIndex] = value;
+
             return this;
         },
         getCount: function() {
             return this.queryArgs[C.SDataUri.QueryArgNames.Count]
                 ? parseInt(this.queryArgs[C.SDataUri.QueryArgNames.Count])
-                : false;
+                : -1;
         },
-        setCount: function(val) {
-            this.queryArgs[C.SDataUri.QueryArgNames.Count] = val;
+        setCount: function(value) {
+            this.queryArgs[C.SDataUri.QueryArgNames.Count] = value;
+
             return this;
         },
         getIncludeContent: function() {
-            if (this.version.major >= 1)
-                return this.queryArgs[C.SDataUri.QueryArgNames.IncludeContent] == 'true';
-            else
-                return this.queryArgs[C.SDataUri.QueryArgNames.LegacyIncludeContent] == 'true';
+            var name = this.version.major >= 1
+                ? C.SDataUri.QueryArgNames.IncludeContent
+                : C.SDataUri.QueryArgNames.LegacyIncludeContent;
+
+            return trueRE.test(this.queryArgs[name]);
         },
-        setIncludeContent: function(val) {
-            if (this.version.major >= 1)
-                this.queryArgs[C.SDataUri.QueryArgNames.IncludeContent] = val ? 'true' : 'false';
-            else
-                this.queryArgs[C.SDataUri.QueryArgNames.LegacyIncludeContent] = val ? 'true' : 'false';
+        setIncludeContent: function(value) {
+            var name = this.version.major >= 1
+                ? C.SDataUri.QueryArgNames.IncludeContent
+                : C.SDataUri.QueryArgNames.LegacyIncludeContent;
+
+            this.queryArgs[name] = "" + value;
+
             return this;
         },
-        appendPath: function(val) {
-            this.pathSegments.push(
-                typeof val === 'string'
-                    ? {text: val}
-                    : val
-            );
+        appendPath: function(value) {
+            var segment = typeof value === 'string' ? {text: value} : value;
+
+            this.pathSegments.push(segment);
+
             return this;
         },
-        build: function() {
+        build: function(excludeQuery) {
             var url = [];
 
-            url.push(this.getScheme());
+            url.push(this.getScheme() || C.SDataUri.Http);
             url.push(C.SDataUri.SchemeSuffix);
             url.push(C.SDataUri.PathSegmentPrefix);
             url.push(C.SDataUri.PathSegmentPrefix);
             url.push(this.getHost());
 
-            if (this.getPort() !== C.SDataUri.UnspecifiedPort)
-            {
-                url.push(C.SDataUri.PortPrefix);
-                url.push(this.getPort());
-            }
+            if (this.getPort() > 0) url.push(C.SDataUri.PortPrefix, this.getPort());
 
             url.push(C.SDataUri.PathSegmentPrefix);
 
@@ -667,17 +732,18 @@
             for (var i = 0; i < segments.length; i++)
             {
                 var segment = segments[i];
-
-                if (typeof segment === 'undefined') continue;
-
-                // need to check predicate for beginning and end parenthesis and strip them
-                if (segment['predicate'])
-                    path.push(encodeURIComponent(segment['text'] + '(' + segment['predicate'] + ')'));
-                else
-                    path.push(encodeURIComponent(segment['text']));
+                if (segment && segment['text'])
+                {
+                    if (segment['predicate'])
+                        path.push(encodeURIComponent(segment['text'] + '(' + segment['predicate'] + ')'));
+                    else
+                        path.push(encodeURIComponent(segment['text']));
+                }
             }
 
             url.push(path.join(C.SDataUri.PathSegmentPrefix));
+
+            if (excludeQuery) return url.join('');
 
             var queryArgs = this.getQueryArgs();
             var query = [];
@@ -725,18 +791,16 @@
         },
         getCollectionPredicate: function() {
             var segment = this.getPathSegment(C.SDataUri.CollectionTypePathIndex);
-            return segment && segment['predicate']
-                ? segment['predicate']
-                : false
+            return (segment && segment['predicate']) || false;
         },
-        setCollectionPredicate: function(val) {
+        setCollectionPredicate: function(value) {
             return this.setPathSegment(C.SDataUri.CollectionTypePathIndex, {
-                predicate: val
+                predicate: value
             });
         }
     });
 
-    S.apply(C.SDataUri, {
+    Sage.apply(Sage.SData.Client.SDataUri, {
         Http: 'http',
         Https: 'https',
         PathSegmentPrefix: '/',
@@ -774,7 +838,8 @@
         ServiceMethodSegment: '$service',
         TemplateSegment: '$template',
         SystemSegment: '$system',
-        NamedQuerySegment: '$queries'
+        NamedQuerySegment: '$queries',
+        BatchSegment: '$batch'
     });
 })();
 /// <reference path="../libraries/ext/ext-core-debug.js"/>
@@ -787,14 +852,16 @@
 
 (function(){
     var S = Sage,
-        C = S.namespace('SData.Client');
+        C = Sage.namespace('Sage.SData.Client'),
+        isDefined = function(value) { return typeof value !== 'undefined' };
 
-    C.SDataService = S.Evented.extend({        
+    Sage.SData.Client.SDataService = Sage.Evented.extend({
         uri: null,
         useCredentialedRequest: false,
         userAgent: 'Sage',
         userName: false,
         password: '',
+        batchScope: null,
         constructor: function(options) {
             /// <field name="uri" type="Sage.SData.Client.SDataUri" />
             this.base.apply(this, arguments);   
@@ -803,21 +870,20 @@
 
             if (options)
             {
-                if (options.uri) this.uri = options.uri;
-                if (options.version) this.uri.setVersion(options.version);
-                if (options.serverName) this.uri.setHost(options.serverName);
-                if (options.virtualDirectory) this.uri.setServer(options.virtualDirectory);
-                if (options.applicationName) this.uri.setProduct(options.applicationName);
-                if (options.contractName) this.uri.setContract(options.contractName);
-                if (options.port) this.uri.setPort(options.port);
-                if (options.protocol) this.uri.setScheme(options.protocol);
+                if (isDefined(options.uri)) this.uri = options.uri;
+                if (isDefined(options.version)) this.uri.setVersion(options.version);
+                if (isDefined(options.serverName)) this.uri.setHost(options.serverName);
+                if (isDefined(options.virtualDirectory)) this.uri.setServer(options.virtualDirectory);
+                if (isDefined(options.applicationName)) this.uri.setProduct(options.applicationName);
+                if (isDefined(options.contractName)) this.uri.setContract(options.contractName);
+                if (isDefined(options.port)) this.uri.setPort(options.port);
+                if (isDefined(options.protocol)) this.uri.setScheme(options.protocol);
+                if (isDefined(options.includeContent)) this.uri.setIncludeContent(options.includeContent);
 
-                if (typeof options.includeContent === 'boolean') this.uri.setIncludeContent(options.includeContent);
-
-                if (options.json) this.json = true;
-                if (options.userName) this.userName = options.userName;
-                if (options.password) this.password = options.password;                
-                if (options.useCredentialedRequest) this.useCredentialedRequest = true;
+                if (isDefined(options.json)) this.json = options.json;
+                if (isDefined(options.userName)) this.userName = options.userName;
+                if (isDefined(options.password)) this.password = options.password;
+                if (isDefined(options.useCredentialedRequest)) this.useCredentialedRequest = options.useCredentialedRequest;
             }
 
             this.addEvents(
@@ -853,79 +919,85 @@
             /// <returns type="String" />
             return this.userName;
         },
-        setUserName: function(val) {
-            this.userName = val;
+        setUserName: function(value) {
+            this.userName = value;
             return this;
         },
         getPassword: function() {
             return this.password;
         },
-        setPassword: function(val) {
-            this.password = val;
+        setPassword: function(value) {
+            this.password = value;
             return this;
         },
         getProtocol: function() {
             return this.uri.getScheme();
         },
-        setProtocol: function(val) {
-            this.uri.setScheme(val);
+        setProtocol: function(value) {
+            this.uri.setScheme(value);
             return this;
         },
         getServerName: function() {
             return this.uri.getHost();
         },
-        setServerName: function(val) {
-            this.uri.setHost(val);
+        setServerName: function(value) {
+            this.uri.setHost(value);
             return this;
         },
         getPort: function() {
             return this.uri.getPort();
         },
-        setPort: function(val) {
-            this.uri.setPort(val);
+        setPort: function(value) {
+            this.uri.setPort(value);
             return this;
         },
         getVirtualDirectory: function() {
             return this.uri.getServer();
         },
-        setVirtualDirectory: function(val) {
-            this.uri.setServer(val);
+        setVirtualDirectory: function(value) {
+            this.uri.setServer(value);
             return this;
         },
         getApplicationName: function() {
             return this.uri.getProduct();
         },
-        setApplicationName: function(val) {
-            this.uri.setProduct(val);
+        setApplicationName: function(value) {
+            this.uri.setProduct(value);
             return this;
         },
         getContractName: function() {
             return this.uri.getContract();
         },
-        setContractName: function(val) {
-            this.uri.setContract(val);
+        setContractName: function(value) {
+            this.uri.setContract(value);
             return this;
         },
         getDataSet: function() {
             return this.uri.getCompanyDataset();
         },
-        setDataSet: function(val) {
-            this.uri.setCompanyDataset(val);
+        setDataSet: function(value) {
+            this.uri.setCompanyDataset(value);
             return this;
         },
         getIncludeContent: function() {
             return this.uri.getIncludeContent();
         },
-        setIncludeContent: function(val) {
-            this.uri.setIncludeContent(val);
+        setIncludeContent: function(value) {
+            this.uri.setIncludeContent(value);
             return this;
         },
         getUserAgent: function() {
             return this.userAgent;
         },
-        setUserAgent: function(val) {
-            this.userAgent = val;
+        setUserAgent: function(value) {
+            this.userAgent = value;
             return this;
+        },
+        registerBatchScope: function(scope) {
+            this.batchScope = scope;
+        },
+        clearBatchScope: function(scope) {
+            this.batchScope = null;
         },
         createBasicAuthToken: function() {
             return 'Basic ' + Base64.encode(this.userName + ":" + this.password);
@@ -1016,6 +1088,16 @@
             /// <param name="request" type="Sage.SData.Client.SDataSingleResourceRequest">request object</param>
             options = options || {};
 
+            if (this.batchScope)
+            {
+                this.batchScope.add({
+                    url: request.build(true),
+                    method: 'GET'
+                });
+
+                return;
+            }
+
             var o = S.apply({}, {
                 success: function(feed) {
                     var entry = feed['$resources'][0] || false;
@@ -1035,6 +1117,17 @@
         },
         createEntry: function(request, entry, options) {
             options = options || {};
+
+            if (this.batchScope)
+            {
+                this.batchScope.add({
+                    url: request.build(true),
+                    entry: entry,
+                    method: 'POST'
+                });
+
+                return;
+            }            
             
             var o = S.apply({}, {
                 success: function(feed) {
@@ -1078,6 +1171,18 @@
             /// <param name="request" type="Sage.SData.Client.SDataSingleResourceRequest">request object</param>
             options = options || {};
 
+            if (this.batchScope)
+            {
+                this.batchScope.add({
+                    url: request.build(true),
+                    entry: entry,
+                    method: 'PUT',
+                    etag: entry['$etag']
+                });
+
+                return;
+            }
+
             var o = S.apply({}, {
                 success: function(feed) {
                     var entry = feed['$resources'][0] || false;
@@ -1117,6 +1222,17 @@
         deleteEntry: function(request, entry, options) {
             /// <param name="request" type="Sage.SData.Client.SDataSingleResourceRequest">request object</param>
             options = options || {};
+
+            if (this.batchScope)
+            {
+                this.batchScope.add({
+                    url: request.build(true),
+                    method: 'DELETE',
+                    etag: !(options && options.ignoreETag) && entry['$etag']
+                });
+
+                return;
+            }
 
             var headers = {},
                 ajax = {
@@ -1176,6 +1292,58 @@
             }
 
             return this.executeRequest(request, o, ajax);
+        },
+        commitBatch: function(request, options) {
+            options = options || {};
+
+            var item,
+                entry,
+                feed = {
+                    '$resources': []
+                };
+
+            for (var i = 0; i < request.items.length; i++)
+            {
+                item = request.items[i];
+                entry = S.apply({}, item.entry); /* only need a shallow copy as only top-level properties will be modified */
+
+                if (item.url) entry['$url'] = item.url;
+                if (item.etag) entry['$ifMatch'] = item.etag;
+                if (item.method) entry['$httpMethod'] = item.method;
+
+                delete item['$etag'];
+
+                feed['$resources'].push(entry);
+            }
+
+            var ajax = S.apply({}, {
+                method: 'POST'
+            });
+
+            if (this.isJsonEnabled())
+            {
+                S.apply(ajax, {
+                    body: JSON.stringify(feed),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+            }
+            else
+            {
+                var xml = new XML.ObjTree();
+                xml.attr_prefix = '@';
+
+                S.apply(ajax, {
+                    body: xml.writeXML(this.formatFeed(feed)),
+                    headers: {
+                        'Content-Type': 'application/atom+xml;type=feed',
+                        'Accept': 'application/atom+xml;type=feed,*/*'
+                    }
+                });
+            }
+
+            return this.executeRequest(request, options, ajax);
         },
         parseFeedXml: function(text) {
             var xml = new XML.ObjTree();
@@ -1302,9 +1470,11 @@
             applyTo = applyTo || {};
 
             if (entity['$key']) applyTo['@sdata:key'] = entity['$key'];
-            if (entity['$url']) applyTo['@sdata:uri'] = entity['$url'];
+       
+            // todo: is this necessary? does not appear to be looking at the spec
+            // if (entity['$url']) applyTo['@sdata:uri'] = entity['$url'];
 
-            // note: not using namespaces at this time
+            // note: not using explicit namespaces at this time
 
             for (var propertyName in entity)
             {
@@ -1383,15 +1553,21 @@
 
             return result;
         },
-        formatEntry: function(entry) {
+        formatEntry: function(entry, excludeNS) {
             var result = {};
 
-            result['@xmlns:sdata'] = 'http://schemas.sage.com/sdata/2008/1';
-            result['@xmlns:xsi'] = 'http://www.w3.org/2001/XMLSchema-instance';
-            result['@xmlns:http'] = 'http://schemas.sage.com/sdata/http/2008/1';
-            result['@xmlns'] = 'http://www.w3.org/2005/Atom';
+            if (!excludeNS)
+            {
+                result['@xmlns:sdata'] = 'http://schemas.sage.com/sdata/2008/1';
+                result['@xmlns:xsi'] = 'http://www.w3.org/2001/XMLSchema-instance';
+                result['@xmlns:http'] = 'http://schemas.sage.com/sdata/http/2008/1';
+                result['@xmlns'] = 'http://www.w3.org/2005/Atom';
+            }
 
+            if (entry['$httpMethod']) result['http:method'] = entry['$httpMethod'];
+            if (entry['$ifMatch']) result['http:ifMatch'] = entry['$ifMatch'];
             if (entry['$etag']) result['http:etag'] = entry['$etag'];
+            if (entry['$url']) result['id'] = entry['$url'];
 
             result['sdata:payload'] = {};
             result['sdata:payload'][entry['$name']] = {
@@ -1433,6 +1609,25 @@
                 result['$resources'].push(this.convertEntry(feed['entry']));
 
             return result;
+        },
+        formatFeed: function(feed) {
+            var result = {};
+
+            result['@xmlns:sdata'] = 'http://schemas.sage.com/sdata/2008/1';
+            result['@xmlns:xsi'] = 'http://www.w3.org/2001/XMLSchema-instance';
+            result['@xmlns:http'] = 'http://schemas.sage.com/sdata/http/2008/1';
+            result['@xmlns'] = 'http://www.w3.org/2005/Atom';
+
+            if (feed['$url']) result['id'] = feed['$url'];
+
+            result['entry'] = [];
+
+            for (var i = 0; i < feed['$resources'].length; i++)
+            {
+                result['entry'].push(this.formatEntry(feed['$resources'][i], true)['entry']);
+            }
+
+            return {'feed': result};
         },
         processFeed: function(response) {
             if (!response.responseText) return null;

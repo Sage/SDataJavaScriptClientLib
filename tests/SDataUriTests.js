@@ -109,4 +109,75 @@ describe('SDataUri', function() {
         expect(uriA.build()).toEqual("http://localhost/sdata/aw/dynamic/-/employees?_includeContent=false");
         expect(uriB.build()).toEqual("http://localhost/sdata/aw/dynamic/-/employees?includeContent=false");
     });
+
+    it('uses http when no scheme is specified', function() {
+        var uri = new Sage.SData.Client.SDataUri()
+            .setScheme(false)
+            .setHost('localhost')
+            .setServer('sdata')
+            .setProduct('aw')
+            .setContract('dynamic')
+            .setCompanyDataset('-')
+            .setCollectionType('employees');
+
+        expect(uri.build()).toEqual("http://localhost/sdata/aw/dynamic/-/employees");
+    });
+
+    it('can specify port', function() {
+        var uri = new Sage.SData.Client.SDataUri()
+            .setHost('localhost')
+            .setPort(8080)
+            .setServer('sdata')
+            .setProduct('aw')
+            .setContract('dynamic')
+            .setCompanyDataset('-')
+            .setCollectionType('employees');
+
+        expect(uri.build()).toEqual("http://localhost:8080/sdata/aw/dynamic/-/employees");
+    });
+
+    it('can set resource selector then resource kind', function() {
+        var uri = new Sage.SData.Client.SDataUri()
+            .setHost('localhost')
+            .setPort(8080)
+            .setServer('sdata')
+            .setProduct('aw')
+            .setContract('dynamic')
+            .setCompanyDataset('-');
+
+        uri.setCollectionPredicate('1');
+        uri.setCollectionType('employees');
+
+        expect(uri.build()).toEqual("http://localhost:8080/sdata/aw/dynamic/-/employees(1)");
+    });
+
+    it('can set resource kind then resource selector', function() {
+        var uri = new Sage.SData.Client.SDataUri()
+            .setHost('localhost')
+            .setPort(8080)
+            .setServer('sdata')
+            .setProduct('aw')
+            .setContract('dynamic')
+            .setCompanyDataset('-');
+
+        uri.setCollectionType('employees');
+        uri.setCollectionPredicate('1');
+
+        expect(uri.build()).toEqual("http://localhost:8080/sdata/aw/dynamic/-/employees(1)");
+    });
+
+    it('can clear path segment', function() {
+        var uri = new Sage.SData.Client.SDataUri()
+            .setHost('localhost')
+            .setPort(8080)
+            .setServer('sdata')
+            .setProduct('aw')
+            .setContract('dynamic')
+            .setCompanyDataset('-')
+            .setCollectionType('employees');
+
+        uri.setPathSegment(Sage.SData.Client.SDataUri.CollectionTypePathIndex, null);
+
+        expect(uri.build()).toEqual("http://localhost:8080/sdata/aw/dynamic/-");
+    });
 });

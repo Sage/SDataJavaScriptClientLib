@@ -17,7 +17,7 @@
         userAgent: 'Sage',
         userName: false,
         password: '',
-        currentBatch: null,
+        batchScope: null,
         constructor: function(options) {
             /// <field name="uri" type="Sage.SData.Client.SDataUri" />
             this.base.apply(this, arguments);   
@@ -149,6 +149,12 @@
             this.userAgent = value;
             return this;
         },
+        registerBatchScope: function(scope) {
+            this.batchScope = scope;
+        },
+        clearBatchScope: function(scope) {
+            this.batchScope = null;
+        },
         createBasicAuthToken: function() {
             return 'Basic ' + Base64.encode(this.userName + ":" + this.password);
         },
@@ -238,6 +244,16 @@
             /// <param name="request" type="Sage.SData.Client.SDataSingleResourceRequest">request object</param>
             options = options || {};
 
+            if (this.batchScope)
+            {
+                this.batchScope.add({
+                    url: request.build(true),
+                    method: 'GET'
+                });
+
+                return;
+            }
+
             var o = S.apply({}, {
                 success: function(feed) {
                     var entry = feed['$resources'][0] || false;
@@ -257,6 +273,17 @@
         },
         createEntry: function(request, entry, options) {
             options = options || {};
+
+            if (this.batchScope)
+            {
+                this.batchScope.add({
+                    url: request.build(true),
+                    entry: entry,
+                    method: 'POST'
+                });
+
+                return;
+            }            
             
             var o = S.apply({}, {
                 success: function(feed) {
@@ -300,6 +327,18 @@
             /// <param name="request" type="Sage.SData.Client.SDataSingleResourceRequest">request object</param>
             options = options || {};
 
+            if (this.batchScope)
+            {
+                this.batchScope.add({
+                    url: request.build(true),
+                    entry: entry,
+                    method: 'PUT',
+                    etag: entry['$etag']
+                });
+
+                return;
+            }
+
             var o = S.apply({}, {
                 success: function(feed) {
                     var entry = feed['$resources'][0] || false;
@@ -339,6 +378,17 @@
         deleteEntry: function(request, entry, options) {
             /// <param name="request" type="Sage.SData.Client.SDataSingleResourceRequest">request object</param>
             options = options || {};
+
+            if (this.batchScope)
+            {
+                this.batchScope.add({
+                    url: request.build(true),
+                    method: 'DELETE',
+                    etag: !(options && options.ignoreETag) && entry['$etag']
+                });
+
+                return;
+            }
 
             var headers = {},
                 ajax = {
@@ -398,6 +448,58 @@
             }
 
             return this.executeRequest(request, o, ajax);
+        },
+        commitBatch: function(request, options) {
+            options = options || {};
+
+            var item,
+                entry,
+                feed = {
+                    '$resources': []
+                };
+
+            for (var i = 0; i < request.items.length; i++)
+            {
+                item = request.items[i];
+                entry = S.apply({}, item.entry); /* only need a shallow copy as only top-level properties will be modified */
+
+                if (item.url) entry['$url'] = item.url;
+                if (item.etag) entry['$ifMatch'] = item.etag;
+                if (item.method) entry['$httpMethod'] = item.method;
+
+                delete item['$etag'];
+
+                feed['$resources'].push(entry);
+            }
+
+            var ajax = S.apply({}, {
+                method: 'POST'
+            });
+
+            if (this.isJsonEnabled())
+            {
+                S.apply(ajax, {
+                    body: JSON.stringify(feed),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+            }
+            else
+            {
+                var xml = new XML.ObjTree();
+                xml.attr_prefix = '@';
+
+                S.apply(ajax, {
+                    body: xml.writeXML(this.formatFeed(feed)),
+                    headers: {
+                        'Content-Type': 'application/atom+xml;type=feed',
+                        'Accept': 'application/atom+xml;type=feed,*/*'
+                    }
+                });
+            }
+
+            return this.executeRequest(request, options, ajax);
         },
         parseFeedXml: function(text) {
             var xml = new XML.ObjTree();
@@ -524,9 +626,11 @@
             applyTo = applyTo || {};
 
             if (entity['$key']) applyTo['@sdata:key'] = entity['$key'];
-            if (entity['$url']) applyTo['@sdata:uri'] = entity['$url'];
+       
+            // todo: is this necessary? does not appear to be looking at the spec
+            // if (entity['$url']) applyTo['@sdata:uri'] = entity['$url'];
 
-            // note: not using namespaces at this time
+            // note: not using explicit namespaces at this time
 
             for (var propertyName in entity)
             {
@@ -605,15 +709,21 @@
 
             return result;
         },
-        formatEntry: function(entry) {
+        formatEntry: function(entry, excludeNS) {
             var result = {};
 
-            result['@xmlns:sdata'] = 'http://schemas.sage.com/sdata/2008/1';
-            result['@xmlns:xsi'] = 'http://www.w3.org/2001/XMLSchema-instance';
-            result['@xmlns:http'] = 'http://schemas.sage.com/sdata/http/2008/1';
-            result['@xmlns'] = 'http://www.w3.org/2005/Atom';
+            if (!excludeNS)
+            {
+                result['@xmlns:sdata'] = 'http://schemas.sage.com/sdata/2008/1';
+                result['@xmlns:xsi'] = 'http://www.w3.org/2001/XMLSchema-instance';
+                result['@xmlns:http'] = 'http://schemas.sage.com/sdata/http/2008/1';
+                result['@xmlns'] = 'http://www.w3.org/2005/Atom';
+            }
 
+            if (entry['$httpMethod']) result['http:method'] = entry['$httpMethod'];
+            if (entry['$ifMatch']) result['http:ifMatch'] = entry['$ifMatch'];
             if (entry['$etag']) result['http:etag'] = entry['$etag'];
+            if (entry['$url']) result['id'] = entry['$url'];
 
             result['sdata:payload'] = {};
             result['sdata:payload'][entry['$name']] = {
@@ -655,6 +765,25 @@
                 result['$resources'].push(this.convertEntry(feed['entry']));
 
             return result;
+        },
+        formatFeed: function(feed) {
+            var result = {};
+
+            result['@xmlns:sdata'] = 'http://schemas.sage.com/sdata/2008/1';
+            result['@xmlns:xsi'] = 'http://www.w3.org/2001/XMLSchema-instance';
+            result['@xmlns:http'] = 'http://schemas.sage.com/sdata/http/2008/1';
+            result['@xmlns'] = 'http://www.w3.org/2005/Atom';
+
+            if (feed['$url']) result['id'] = feed['$url'];
+
+            result['entry'] = [];
+
+            for (var i = 0; i < feed['$resources'].length; i++)
+            {
+                result['entry'].push(this.formatEntry(feed['$resources'][i], true)['entry']);
+            }
+
+            return {'feed': result};
         },
         processFeed: function(response) {
             if (!response.responseText) return null;

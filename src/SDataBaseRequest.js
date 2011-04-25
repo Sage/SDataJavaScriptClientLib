@@ -77,8 +77,8 @@
             this.uri.setQueryArg(key, value);
             return this;
         },
-        build: function() {
-            return this.uri.build();
+        build: function(excludeQuery) {
+            return this.uri.build(excludeQuery);
         }
     });
 })();

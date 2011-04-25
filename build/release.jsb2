@@ -37,6 +37,9 @@
 			text: 'SDataServiceOperationRequest.js',
 			path: '../src/'
 		},{
+			text: 'SDataBatchRequest.js',
+			path: '../src/'
+		},{
 			text: 'SDataUri.js',
 			path: '../src/'
 		},{
@@ -70,17 +73,5 @@
 			path: '../libraries/sage/'
 		}]
 	}],
-	resources: [{
-		src: '../src',
-		dest: 'src',
-		filters: ".*\\.js"
-	},{
-	    src: '../libraries',
-		dest: 'src/libraries',
-		filters: ".*[Base64|ObjTree|json2]"
-	},{
-	    src: '../libraries/sage',
-		dest: 'src/libraries/sage',
-		filters: ".*\\.js"
-	}]
+	resources: []
 }
