@@ -1632,9 +1632,7 @@
         processFeed: function(response) {
             if (!response.responseText) return null;
 
-            var contentType = typeof response.getResponseHeader === 'function'
-                ? response.getResponseHeader('Content-Type')
-                : false;
+            var contentType = response.getResponseHeader && response.getResponseHeader('Content-Type');
             
             if ((contentType === 'application/json') || (!contentType && this.isJsonEnabled()))
             {
