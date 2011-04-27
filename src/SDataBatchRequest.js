@@ -36,6 +36,8 @@
             }
 
             this.service.clearBatchScope(this);
+
+            return this;
         },
         add: function(item) {
             this.items.push(item);
