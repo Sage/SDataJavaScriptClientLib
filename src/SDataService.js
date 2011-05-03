@@ -1,10 +1,17 @@
-/// <reference path="../libraries/ext/ext-core-debug.js"/>
-/// <reference path="../libraries/ObjTree.js"/>
-/// <reference path="../libraries/Base64.js"/>
-/// <reference path="SDataBaseRequest.js"/>
-/// <reference path="SDataApplicationRequest.js"/>
-/// <reference path="SDataResourceCollectionRequest.js"/>
-/// <reference path="SDataUri.js"/>
+/* Copyright (c) 2010, Sage Software, Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 (function(){
     var S = Sage,
@@ -26,12 +33,13 @@
 
             if (options)
             {
-                if (isDefined(options.uri)) this.uri = options.uri;
+                if (isDefined(options.uri)) this.uri = new Sage.SData.Client.SDataUri(options.uri);
                 if (isDefined(options.version)) this.uri.setVersion(options.version);
                 if (isDefined(options.serverName)) this.uri.setHost(options.serverName);
                 if (isDefined(options.virtualDirectory)) this.uri.setServer(options.virtualDirectory);
                 if (isDefined(options.applicationName)) this.uri.setProduct(options.applicationName);
                 if (isDefined(options.contractName)) this.uri.setContract(options.contractName);
+                if (isDefined(options.dataSet)) this.uri.setCompanyDataset(options.dataSet);
                 if (isDefined(options.port)) this.uri.setPort(options.port);
                 if (isDefined(options.protocol)) this.uri.setScheme(options.protocol);
                 if (isDefined(options.includeContent)) this.uri.setIncludeContent(options.includeContent);
@@ -169,6 +177,10 @@
 
             return headers;
         },
+        extendAcceptRequestHeader: function(value, extension) {
+            if (value) return value.split(/\s*,\s*/).join(';' + extension + ',') + ';' + extension;
+            return value;
+        },
         executeRequest: function(request, options, ajax) {
             /// <param name="request" type="Sage.SData.Client.SDataBaseRequest">request object</param>
             var o = S.apply({
@@ -199,7 +211,11 @@
                 }
             }, ajax);
 
-            S.apply(o.headers, this.createHeadersForRequest(request));
+            S.apply(o.headers, this.createHeadersForRequest(request), request.completeHeaders);
+
+            /* we only handle `Accept` for now */
+            if (request.extendedHeaders['Accept'])
+                o.headers['Accept'] = this.extendAcceptRequestHeader(o.headers['Accept'], request.extendedHeaders['Accept']);
             
             if (this.userName && this.useCredentialedRequest)
             {

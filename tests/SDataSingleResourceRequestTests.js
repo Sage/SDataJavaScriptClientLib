@@ -91,4 +91,36 @@ describe('SDataSingleResourceRequest', function() {
             expect(entry).toHaveProperty('DirectReports.$resources.0.NationalIdNumber', '14417808');
         })(success.mostRecentCall.args[0]);
     });
+
+    it('uses correct accept header for atom', function() {
+        spyOn(Sage.SData.Client.Ajax, 'request');
+
+        var request = new Sage.SData.Client.SDataSingleResourceRequest(service)
+            .setResourceKind('employees')
+            .setResourceSelector('1');
+
+        request.read();
+
+        (function(options) {
+            expect(options).toHaveProperty('headers');
+            expect(options).toHaveProperty('headers.Accept', 'application/atom+xml;type=entry,*/*');
+        })(Sage.SData.Client.Ajax.request.mostRecentCall.args[0]);
+    });
+
+    it('uses correct accept header for json', function() {
+        spyOn(Sage.SData.Client.Ajax, 'request');
+
+        var request = new Sage.SData.Client.SDataSingleResourceRequest(service)
+            .setResourceKind('employees')
+            .setResourceSelector('1');
+
+        service.enableJson();
+
+        request.read();
+
+        (function(options) {
+            expect(options).toHaveProperty('headers');
+            expect(options).toHaveProperty('headers.Accept', 'application/json,*/*');
+        })(Sage.SData.Client.Ajax.request.mostRecentCall.args[0]);
+    });
 });

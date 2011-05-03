@@ -97,6 +97,7 @@ describe('SDataResourceCollectionRequest', function() {
             .setResourceKind('employees');
 
         service.enableJson();
+        
         request.read({
             success: success,
             failure: failure
@@ -111,5 +112,35 @@ describe('SDataResourceCollectionRequest', function() {
             expect(feed).toHaveProperty('$resources.length', 2);
             expect(feed).toHaveProperty('$resources.0.ContactId', '1209');
         })(success.mostRecentCall.args[0]);
+    });
+
+    it('uses correct accept header for atom', function() {
+        spyOn(Sage.SData.Client.Ajax, 'request');
+
+        var request = new Sage.SData.Client.SDataResourceCollectionRequest(service)
+            .setResourceKind('employees');
+
+        request.read();
+
+        (function(options) {
+            expect(options).toHaveProperty('headers');
+            expect(options).toHaveProperty('headers.Accept', 'application/atom+xml;type=feed,*/*');
+        })(Sage.SData.Client.Ajax.request.mostRecentCall.args[0]);
+    });
+
+    it('uses correct accept header for json', function() {
+        spyOn(Sage.SData.Client.Ajax, 'request');
+
+        var request = new Sage.SData.Client.SDataResourceCollectionRequest(service)
+            .setResourceKind('employees');
+
+        service.enableJson();
+
+        request.read();
+
+        (function(options) {
+            expect(options).toHaveProperty('headers');
+            expect(options).toHaveProperty('headers.Accept', 'application/json,*/*');
+        })(Sage.SData.Client.Ajax.request.mostRecentCall.args[0]);
     });
 });
