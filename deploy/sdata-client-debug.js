@@ -1369,13 +1369,17 @@
                 }
             }, options);
 
-            var headers = {
-                    'If-Match': entry['$etag'] // the 'If-Match' header MUST be present for PUT requests
-                },
+            var headers = {},
                 ajax = {
                     method: 'PUT',
                     headers: headers
                 };
+
+            // per the spec, the 'If-Match' header MUST be present for PUT requests.
+            // however, we are breaking with the spec here, on the consumer, to allow it to be OPTIONAL so
+            // that the provider can decide if it wishes to break with the spec or not.
+            if (entry['$etag'] && !(options && options.ignoreETag))
+                headers['If-Match'] = entry['$etag'];
 
             if (this.isJsonEnabled())
             {
