@@ -63,6 +63,35 @@ describe('SDataSingleResourceRequest', function() {
         })(success.mostRecentCall.args[0]);
     });
 
+    it('can read atom entry with mixed properties', function() {
+
+        withResponseContent('TestEntryMixedPrefix.xml');
+
+        var success = jasmine.createSpy(),
+            failure = jasmine.createSpy();
+
+        var request = new Sage.SData.Client.SDataSingleResourceRequest(service)
+            .setResourceKind('employees')
+            .setResourceSelector('1');
+
+        request.read({
+            success: success,
+            failure: failure
+        });
+
+        expect(success).toHaveBeenCalled();
+        expect(failure).not.toHaveBeenCalled();
+
+        (function(entry) {
+            expect(entry).toExist();
+            expect(entry).toHaveProperty('NationalIdNumber');
+            expect(entry).toHaveProperty('DirectReports');
+            expect(entry).toHaveProperty('DirectReports.$resources');
+            expect(entry).toHaveProperty('DirectReports.$resources.length', 2);
+            expect(entry).toHaveProperty('DirectReports.$resources.0.NationalIdNumber', '14417808');
+        })(success.mostRecentCall.args[0]);
+    });
+
     it('can read atom entry with non-prefixed properties', function() {
 
         withResponseContent('TestEntry.xml');

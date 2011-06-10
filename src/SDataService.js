@@ -16,7 +16,8 @@
 (function(){
     var S = Sage,
         C = Sage.namespace('Sage.SData.Client'),
-        isDefined = function(value) { return typeof value !== 'undefined' };
+        isDefined = function(value) { return typeof value !== 'undefined' },
+        nsRE = /^(.+?):(.*)$/;
 
     Sage.SData.Client.SDataService = Sage.Evented.extend({
         uri: null,
@@ -247,6 +248,16 @@
         readFeed: function(request, options) {
             /// <param name="request" type="Sage.SData.Client.SDataResourceCollectionRequest">request object</param>
             options = options || {};
+
+            if (this.batchScope)
+            {
+                this.batchScope.add({
+                    url: request.build(),
+                    method: 'GET'
+                });
+
+                return;
+            }
 
             return this.executeRequest(request, options, {
                 headers: {
@@ -564,77 +575,74 @@
             applyTo['$url'] = entity['@sdata:uri'];
             applyTo['$uuid'] = entity['@sdata:uuid'];
 
-            var prefix = ns ? ns + ':' : false;
-
             for (var fqPropertyName in entity)
             {
                 if (fqPropertyName[0] === '@') continue;
 
-                if (!prefix || fqPropertyName.indexOf(prefix) === 0)
+                var hasNS = nsRE.exec(fqPropertyName),
+                    propertyNS = hasNS ? hasNS[1] : false,
+                    propertyName = hasNS ? hasNS[2] : fqPropertyName,
+                    value = entity[fqPropertyName];
+
+                if (typeof value === 'object')
                 {
-                    var propertyName = prefix ? fqPropertyName.substring(prefix.length) : fqPropertyName,
-                        value = entity[fqPropertyName];
-
-                    if (typeof value === 'object')
+                    if (value.hasOwnProperty('@xsi:nil')) // null
                     {
-                        if (value.hasOwnProperty('@xsi:nil')) // null
-                        {
-                            var converted = null;
-                        }
-                        else if (this.isIncludedReference(ns, propertyName, value)) // included reference
-                        {
-                            var converted = this.convertEntity(ns, propertyName, value);
-                        }
-                        else if (this.isIncludedCollection(ns, propertyName, value)) // included collection
-                        {
-                            var converted = this.convertEntityCollection(ns, propertyName, value);
-                        }
-                        else // no conversion, read only
-                        {                            
-                            converted = this.convertCustomEntityProperty(ns, propertyName, value);
-                        }
-
-                        value = converted;
+                        var converted = null;
+                    }
+                    else if (this.isIncludedReference(propertyNS, propertyName, value)) // included reference
+                    {
+                        var converted = this.convertEntity(propertyNS, propertyName, value);
+                    }
+                    else if (this.isIncludedCollection(propertyNS, propertyName, value)) // included collection
+                    {
+                        var converted = this.convertEntityCollection(propertyNS, propertyName, value);
+                    }
+                    else // no conversion, read only
+                    {
+                        converted = this.convertCustomEntityProperty(propertyNS, propertyName, value);
                     }
 
-                    applyTo[propertyName] = value;
+                    value = converted;
                 }
+
+                applyTo[propertyName] = value;
             }
 
             return applyTo;
         },
         convertEntityCollection: function(ns, name, collection) {
-            var prefix = ns ? ns + ':' : false;
-
             for (var fqPropertyName in collection)
             {
-                if (!prefix || fqPropertyName.indexOf(prefix) === 0)
+                if (fqPropertyName[0] === '@') continue;
+
+                var hasNS = nsRE.exec(fqPropertyName),
+                    propertyNS = hasNS ? hasNS[1] : false,
+                    propertyName = hasNS ? hasNS[2] : fqPropertyName,
+                    value = collection[fqPropertyName];
+
+                if (S.isArray(value))
                 {
-                    var propertyName = prefix ? fqPropertyName.substring(prefix.length) : fqPropertyName,
-                        value = collection[fqPropertyName];
+                    var converted = [];
 
-                    if (S.isArray(value))
-                    {
-                        var converted = [];
+                    for (var i = 0; i < value.length; i++)
+                        converted.push(this.convertEntity(ns, propertyName, value[i]));
 
-                        for (var i = 0; i < value.length; i++)
-                            converted.push(this.convertEntity(ns, propertyName, value[i]));
-
-                        return {
-                            '$resources': converted
-                        };
-                    }
-                    else
-                    {
-                        return {
-                            '$resources': [
-                                this.convertEntity(ns, propertyName, value)
-                            ]
-                        };
-                    }
-
-                    break; // will always ever be one property, either an entity, or an array of
+                    return {
+                        '$resources': converted
+                    };
                 }
+                else
+                {
+                    return {
+                        '$resources': [
+                            this.convertEntity(ns, propertyName, value)
+                        ]
+                    };
+                }
+
+                break; // will always ever be one property, either an entity, or an array of
+
             }
 
             return null;
