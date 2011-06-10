@@ -551,6 +551,8 @@
 
             for (var fqPropertyName in value)
             {
+                if (fqPropertyName[0] === '@') continue;
+                
                 firstChild = value[fqPropertyName];
                 break; // will always ever be one property, either an entity, or an array of
             }

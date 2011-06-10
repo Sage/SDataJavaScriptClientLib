@@ -26,7 +26,7 @@
       <CurrentFlag>True</CurrentFlag>
       <RowGuid>aae1d04a-c237-4974-b4d5-935247737718</RowGuid>
       <ModifiedDate>2004-07-31T00:00:00+00:00</ModifiedDate>
-      <DirectReports>
+      <DirectReports deleteMissing="true">
         <Employee sdata:key="1210">
           <Title>Production Technician - WC61</Title>
           <NationalIdNumber>14417808</NationalIdNumber>
