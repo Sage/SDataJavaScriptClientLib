@@ -184,10 +184,15 @@
         },
         executeRequest: function(request, options, ajax) {
             /// <param name="request" type="Sage.SData.Client.SDataBaseRequest">request object</param>
+            
+            // todo: temporary fix for SalesLogix Dynamic Adapter only supporting json selector in format parameter
+            if (this.json) request.setQueryArg('format', 'json');
+
             var o = S.apply({
+                async: options.async,
                 headers: {},
                 method: 'GET',
-                async: options.async
+                url: request.build()
             }, {
                 scope: this,
                 success: function(response, opt) {
@@ -224,11 +229,6 @@
                 o.password = this.password;
             }
 
-            // todo: temporary fix for SalesLogix Dynamic Adapter only supporting json selector in format parameter
-            if (this.json) request.setQueryArg('format', 'json');
-
-            o.url = request.build();
-
             this.fireEvent('beforerequest', request, o);
 
             /* if the event provided its own result, do not execute the ajax call */
@@ -259,13 +259,27 @@
                 return;
             }
 
-            return this.executeRequest(request, options, {
+            var ajax = {
                 headers: {
                     'Accept': this.json
                         ? 'application/json,*/*'
                         : 'application/atom+xml;type=feed,*/*'
                 }
-            });
+            };
+
+            if (options.httpMethodOverride)
+            {
+                // todo: temporary fix for SalesLogix Dynamic Adapter only supporting json selector in format parameter
+                // todo: temporary fix for `X-HTTP-Method-Override` and the SalesLogix Dynamic Adapter
+                if (this.json) request.setQueryArg('format', 'json');
+
+                ajax.headers['X-HTTP-Method-Override'] = 'GET';
+                ajax.method = 'POST';
+                ajax.body = request.build();
+                ajax.url = request.build(true); // exclude query
+            }
+
+            return this.executeRequest(request, options, ajax);
         },
         readEntry: function(request, options) {
             /// <param name="request" type="Sage.SData.Client.SDataSingleResourceRequest">request object</param>
