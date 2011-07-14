@@ -21,6 +21,10 @@
         constructor: function() {
             this.base.apply(this, arguments);
         },
+        clone: function() {
+            return new Sage.SData.Client.SDataResourceCollectionRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
+        },
         getCount: function() {
             return this.uri.getCount();
         },

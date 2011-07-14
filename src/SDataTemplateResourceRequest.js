@@ -26,6 +26,10 @@
                 Sage.SData.Client.SDataUri.TemplateSegment
             );
         },
+        clone: function() {
+            return new Sage.SData.Client.SDataTemplateResourceRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
+        },
         read: function(options) {
             return this.service.readEntry(this, options);
         }

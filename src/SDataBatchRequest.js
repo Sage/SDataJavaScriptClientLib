@@ -28,6 +28,18 @@
                 Sage.SData.Client.SDataUri.BatchSegment
             );
         },
+        clone: function() {
+            return new Sage.SData.Client.SDataApplicationRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri))
+                .setItems(this.items.slice(0));
+        },
+        getItems: function() {
+            return this.items;
+        },
+        setItems: function(value) {
+            this.items = value;
+            return this;
+        },
         using: function(fn, scope) {
             if (this.service)
                 this.service.registerBatchScope(this);

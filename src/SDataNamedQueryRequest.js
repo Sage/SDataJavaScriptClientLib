@@ -26,6 +26,10 @@
                 C.SDataUri.NamedQuerySegment
             );
         },
+        clone: function() {
+            return new Sage.SData.Client.SDataNamedQueryRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
+        },
         getQueryName: function() {
             return this.uri.getPathSegment(C.SDataUri.ResourcePropertyIndex + 1);
         },

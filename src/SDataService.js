@@ -497,15 +497,16 @@
         commitBatch: function(request, options) {
             options = options || {};
 
-            var item,
+            var items = request.getItems(),
+                item,
                 entry,
                 feed = {
                     '$resources': []
                 };
 
-            for (var i = 0; i < request.items.length; i++)
+            for (var i = 0; i < items.length; i++)
             {
-                item = request.items[i];
+                item = items[i];
                 entry = S.apply({}, item.entry); /* only need a shallow copy as only top-level properties will be modified */
 
                 if (item.url) entry['$url'] = item.url;

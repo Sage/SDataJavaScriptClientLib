@@ -41,6 +41,10 @@
                 this.uri.setPort(this.service.getPort());
             }
         },
+        clone: function() {
+            return new Sage.SData.Client.SDataBaseRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
+        },
         setRequestHeader: function(name, value) {
             this.completeHeaders[name] = value;
         },
@@ -121,6 +125,9 @@
         },
         build: function(excludeQuery) {
             return this.uri.build(excludeQuery);
+        },
+        toString: function(excludeQuery) {
+            return this.build(excludeQuery);
         }
     });
 })();

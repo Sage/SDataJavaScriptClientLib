@@ -26,6 +26,10 @@
                 Sage.SData.Client.SDataUri.SystemSegment
             );
         },
+        clone: function() {
+            return new Sage.SData.Client.SDataSystemRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
+        },
         getCategory: function() {
             this.uri.getPathSegment(Sage.SData.Client.SDataUri.ContractTypePathIndex);
         },

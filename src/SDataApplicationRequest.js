@@ -28,6 +28,10 @@
                 this.uri.setCompanyDataset(this.service.getDataSet() ? this.service.getDataSet() : '-');
             }
         },
+        clone: function() {
+            return new Sage.SData.Client.SDataApplicationRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
+        },
         getApplicationName: function() {
             return this.uri.getProduct();
         },

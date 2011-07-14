@@ -38,6 +38,9 @@
             this.pathSegments = (uri && uri.pathSegments && uri.pathSegments.slice(0)) || [];
             this.version = (uri && uri.version && S.apply({}, uri.version)) || { major: 1, minor: 0 };
         },
+        clone: function() {
+            return new Sage.SData.Client.SDataUri(this);
+        },
         getVersion: function() {
             return this.version;
         },
@@ -202,6 +205,9 @@
             this.pathSegments.push(segment);
 
             return this;
+        },
+        toString: function(excludeQuery) {
+            return this.build(excludeQuery);
         },
         build: function(excludeQuery) {
             var url = [];

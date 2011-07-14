@@ -26,6 +26,10 @@
                 C.SDataUri.ServiceMethodSegment
             );
         },
+        clone: function() {
+            return new Sage.SData.Client.SDataServiceOperationRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
+        },
         execute: function(entry, options) {
             return this.service.executeServiceOperation(this, entry, options);
         },

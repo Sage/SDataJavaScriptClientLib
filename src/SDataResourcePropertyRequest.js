@@ -20,7 +20,11 @@
     Sage.SData.Client.SDataResourcePropertyRequest = Sage.SData.Client.SDataSingleResourceRequest.extend({
         constructor: function() {
             this.base.apply(this, arguments);
-        },       
+        },
+        clone: function() {
+            return new Sage.SData.Client.SDataResourcePropertyRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
+        },
         readFeed: function(options) {
             return this.service.readFeed(this, options);
         },
