@@ -190,6 +190,10 @@
                 this.uri.setPort(this.service.getPort());
             }
         },
+        clone: function() {
+            return new Sage.SData.Client.SDataBaseRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
+        },
         setRequestHeader: function(name, value) {
             this.completeHeaders[name] = value;
         },
@@ -270,6 +274,9 @@
         },
         build: function(excludeQuery) {
             return this.uri.build(excludeQuery);
+        },
+        toString: function(excludeQuery) {
+            return this.build(excludeQuery);
         }
     });
 })();
@@ -302,6 +309,10 @@
                 this.uri.setContract(this.service.getContractName() ? this.service.getContractName() : '-');
                 this.uri.setCompanyDataset(this.service.getDataSet() ? this.service.getDataSet() : '-');
             }
+        },
+        clone: function() {
+            return new Sage.SData.Client.SDataApplicationRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
         },
         getApplicationName: function() {
             return this.uri.getProduct();
@@ -357,6 +368,10 @@
         constructor: function() {
             this.base.apply(this, arguments);
         },
+        clone: function() {
+            return new Sage.SData.Client.SDataResourceCollectionRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
+        },
         getCount: function() {
             return this.uri.getCount();
         },
@@ -404,6 +419,10 @@
                 C.SDataUri.NamedQuerySegment
             );
         },
+        clone: function() {
+            return new Sage.SData.Client.SDataNamedQueryRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
+        },
         getQueryName: function() {
             return this.uri.getPathSegment(C.SDataUri.ResourcePropertyIndex + 1);
         },
@@ -438,6 +457,10 @@
     Sage.SData.Client.SDataSingleResourceRequest = Sage.SData.Client.SDataApplicationRequest.extend({
         constructor: function() {
             this.base.apply(this, arguments);
+        },
+        clone: function() {
+            return new Sage.SData.Client.SDataSingleResourceRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
         },
         read: function(options) {
             return this.service.readEntry(this, options);
@@ -482,7 +505,11 @@
     Sage.SData.Client.SDataResourcePropertyRequest = Sage.SData.Client.SDataSingleResourceRequest.extend({
         constructor: function() {
             this.base.apply(this, arguments);
-        },       
+        },
+        clone: function() {
+            return new Sage.SData.Client.SDataResourcePropertyRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
+        },
         readFeed: function(options) {
             return this.service.readFeed(this, options);
         },
@@ -522,6 +549,10 @@
                 Sage.SData.Client.SDataUri.ProductPathIndex,
                 Sage.SData.Client.SDataUri.SystemSegment
             );
+        },
+        clone: function() {
+            return new Sage.SData.Client.SDataSystemRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
         },
         getCategory: function() {
             this.uri.getPathSegment(Sage.SData.Client.SDataUri.ContractTypePathIndex);
@@ -563,6 +594,10 @@
                 Sage.SData.Client.SDataUri.TemplateSegment
             );
         },
+        clone: function() {
+            return new Sage.SData.Client.SDataTemplateResourceRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
+        },
         read: function(options) {
             return this.service.readEntry(this, options);
         }
@@ -595,6 +630,10 @@
                 C.SDataUri.ResourcePropertyIndex,
                 C.SDataUri.ServiceMethodSegment
             );
+        },
+        clone: function() {
+            return new Sage.SData.Client.SDataServiceOperationRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
         },
         execute: function(entry, options) {
             return this.service.executeServiceOperation(this, entry, options);
@@ -637,6 +676,18 @@
                 Sage.SData.Client.SDataUri.ResourcePropertyIndex,
                 Sage.SData.Client.SDataUri.BatchSegment
             );
+        },
+        clone: function() {
+            return new Sage.SData.Client.SDataApplicationRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri))
+                .setItems(this.items.slice(0));
+        },
+        getItems: function() {
+            return this.items;
+        },
+        setItems: function(value) {
+            this.items = value;
+            return this;
         },
         using: function(fn, scope) {
             if (this.service)
@@ -704,6 +755,9 @@
             this.queryArgs = S.apply({}, uri && uri.queryArgs);
             this.pathSegments = (uri && uri.pathSegments && uri.pathSegments.slice(0)) || [];
             this.version = (uri && uri.version && S.apply({}, uri.version)) || { major: 1, minor: 0 };
+        },
+        clone: function() {
+            return new Sage.SData.Client.SDataUri(this);
         },
         getVersion: function() {
             return this.version;
@@ -869,6 +923,9 @@
             this.pathSegments.push(segment);
 
             return this;
+        },
+        toString: function(excludeQuery) {
+            return this.build(excludeQuery);
         },
         build: function(excludeQuery) {
             var url = [];
@@ -1502,15 +1559,16 @@
         commitBatch: function(request, options) {
             options = options || {};
 
-            var item,
+            var items = request.getItems(),
+                item,
                 entry,
                 feed = {
                     '$resources': []
                 };
 
-            for (var i = 0; i < request.items.length; i++)
+            for (var i = 0; i < items.length; i++)
             {
-                item = request.items[i];
+                item = items[i];
                 entry = S.apply({}, item.entry); /* only need a shallow copy as only top-level properties will be modified */
 
                 if (item.url) entry['$url'] = item.url;
