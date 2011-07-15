@@ -29,7 +29,7 @@
             );
         },
         clone: function() {
-            return new Sage.SData.Client.SDataApplicationRequest(this.service)
+            return new Sage.SData.Client.SDataBatchRequest(this.service)
                 .setUri(new Sage.SData.Client.SDataUri(this.uri))
                 .setItems(this.items.slice(0));
         },
