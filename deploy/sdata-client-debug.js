@@ -1628,7 +1628,7 @@
 
             for (var fqPropertyName in value)
             {
-                if (fqPropertyName[0] === '@') continue;
+                if (fqPropertyName.charAt(0) === '@') continue;
                 
                 firstChild = value[fqPropertyName];
                 break; // will always ever be one property, either an entity, or an array of
@@ -1656,7 +1656,7 @@
 
             for (var fqPropertyName in entity)
             {
-                if (fqPropertyName[0] === '@') continue;
+                if (fqPropertyName.charAt(0) === '@') continue;
 
                 var hasNS = nsRE.exec(fqPropertyName),
                     propertyNS = hasNS ? hasNS[1] : false,
@@ -1693,7 +1693,7 @@
         convertEntityCollection: function(ns, name, collection) {
             for (var fqPropertyName in collection)
             {
-                if (fqPropertyName[0] === '@') continue;
+                if (fqPropertyName.charAt(0) === '@') continue;
 
                 var hasNS = nsRE.exec(fqPropertyName),
                     propertyNS = hasNS ? hasNS[1] : false,
@@ -1741,7 +1741,7 @@
 
             for (var propertyName in entity)
             {
-                if (propertyName[0] === '$') continue;
+                if (propertyName.charAt(0) === '$') continue;
 
                 var value = entity[propertyName];
 
