@@ -54,6 +54,34 @@ describe('SDataResourceCollectionRequest', function() {
 
         (function(feed) {
             expect(feed).toExist();
+            expect(feed).toHaveProperty('$totalResults', 2);
+            expect(feed).toHaveProperty('$resources');
+            expect(feed).toHaveProperty('$resources.length', 2);
+            expect(feed).toHaveProperty('$resources.0.ContactId', '1209');
+        })(success.mostRecentCall.args[0]);
+    });
+    
+    it('can read explicitly namespaced atom feed', function() {
+
+        withResponseContent('TestFeedExplicit.xml');
+
+        var success = jasmine.createSpy(),
+            failure = jasmine.createSpy();
+
+        var request = new Sage.SData.Client.SDataResourceCollectionRequest(service)
+            .setResourceKind('employees');
+
+        request.read({
+            success: success,
+            failure: failure
+        });
+
+        expect(success).toHaveBeenCalled();
+        expect(failure).not.toHaveBeenCalled();
+
+        (function(feed) {
+            expect(feed).toExist();
+            expect(feed).toHaveProperty('$totalResults', 2);
             expect(feed).toHaveProperty('$resources');
             expect(feed).toHaveProperty('$resources.length', 2);
             expect(feed).toHaveProperty('$resources.0.ContactId', '1209');

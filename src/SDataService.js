@@ -17,6 +17,11 @@
     var S = Sage,
         C = Sage.namespace('Sage.SData.Client'),
         isDefined = function(value) { return typeof value !== 'undefined' },
+        unwrap = function(value) {
+            return value && value['#text']
+                ? value['#text']
+                : value;
+        },
         nsRE = /^(.+?):(.*)$/;
 
     Sage.SData.Client.SDataService = Sage.Evented.extend({
@@ -727,6 +732,7 @@
 
             for (var key in payload)
             {
+                if (key.charAt(0) === '@') continue;
                 if (payload.hasOwnProperty(key) == false) continue;
 
                 var parts = key.split(':'),
@@ -783,13 +789,13 @@
             var result = {};
 
             if (feed['opensearch:totalResults'])
-                result['$totalResults'] = parseInt(feed['opensearch:totalResults']);
+                result['$totalResults'] = parseInt(unwrap(feed['opensearch:totalResults']));
 
             if (feed['opensearch:startIndex'])
-                result['$startIndex'] = parseInt(feed['opensearch:startIndex']);
+                result['$startIndex'] = parseInt(unwrap(feed['opensearch:startIndex']));
 
             if (feed['opensearch:itemsPerPage'])
-                result['$itemsPerPage'] = parseInt(feed['opensearch:itemsPerPage']);
+                result['$itemsPerPage'] = parseInt(unwrap(feed['opensearch:itemsPerPage']));
 
             if (feed['link'])
             {
