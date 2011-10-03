@@ -90,7 +90,7 @@
             o.params = S.apply({}, o.params);
             o.headers = S.apply({}, o.headers);
 
-            if (o.cache !== false)
+            if (o.cache !== true)
                 o.params[o.cacheParam || '_t'] = (new Date()).getTime();
 
             o.method = o.method || 'GET';
