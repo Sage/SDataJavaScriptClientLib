@@ -13,10 +13,40 @@
  * limitations under the License.
  */
 
-(function(){
+(function() {
     var S = Sage,
         C = Sage.namespace('Sage.SData.Client'),
         isDefined = function(value) { return typeof value !== 'undefined' },
+        expand = function(options, userName, password) {
+            var result = {},
+                url = typeof options === 'object'
+                    ? options['url']
+                    : options;
+
+            var parsed = (typeof parseUri === 'function') && parseUri(url);
+            if (parsed)
+            {
+                if (parsed.host) result.serverName = parsed.host;
+
+                var path = parsed.path.split('/').slice(1);
+
+                // ["sdata", "slx", "dynamic", "-", "accounts"]
+                if (path[0]) result.virtualDirectory = path[0];
+                if (path[1]) result.applicationName = path[1];
+                if (path[2]) result.contractName = path[2];
+                if (path[3]) result.dataSet = path[3];
+
+                if (parsed.port) result.port = parseInt(parsed.port);
+                if (parsed.protocol) result.protocol = parsed.protocol;
+            }
+
+            if (typeof options === 'object') S.apply(result, options);
+
+            if (isDefined(userName)) result.userName = userName;
+            if (isDefined(password)) result.password = password;
+
+            return result;
+        },
         unwrap = function(value) {
             return value && value['#text']
                 ? value['#text']
@@ -31,30 +61,32 @@
         userName: false,
         password: '',
         batchScope: null,
-        constructor: function(options) {
-            /// <field name="uri" type="Sage.SData.Client.SDataUri" />
-            this.base.apply(this, arguments);   
-            
+        constructor: function(options, userName, password) {
+            // pass the first argument to the base class; will only have an effect if the argument
+            // is an object and has a `listeners` property.
+            this.base.call(this, options);
+
             this.uri = new Sage.SData.Client.SDataUri();
 
-            if (options)
-            {
-                if (isDefined(options.uri)) this.uri = new Sage.SData.Client.SDataUri(options.uri);
-                if (isDefined(options.version)) this.uri.setVersion(options.version);
-                if (isDefined(options.serverName)) this.uri.setHost(options.serverName);
-                if (isDefined(options.virtualDirectory)) this.uri.setServer(options.virtualDirectory);
-                if (isDefined(options.applicationName)) this.uri.setProduct(options.applicationName);
-                if (isDefined(options.contractName)) this.uri.setContract(options.contractName);
-                if (isDefined(options.dataSet)) this.uri.setCompanyDataset(options.dataSet);
-                if (isDefined(options.port)) this.uri.setPort(options.port);
-                if (isDefined(options.protocol)) this.uri.setScheme(options.protocol);
-                if (isDefined(options.includeContent)) this.uri.setIncludeContent(options.includeContent);
+            var expanded = expand(options, userName, password);
 
-                if (isDefined(options.json)) this.json = options.json;
-                if (isDefined(options.userName)) this.userName = options.userName;
-                if (isDefined(options.password)) this.password = options.password;
-                if (isDefined(options.useCredentialedRequest)) this.useCredentialedRequest = options.useCredentialedRequest;
-            }
+            if (isDefined(expanded.uri)) this.uri = new Sage.SData.Client.SDataUri(expanded.uri);
+
+            if (isDefined(expanded.serverName)) this.uri.setHost(expanded.serverName);
+            if (isDefined(expanded.virtualDirectory)) this.uri.setServer(expanded.virtualDirectory);
+            if (isDefined(expanded.applicationName)) this.uri.setProduct(expanded.applicationName);
+            if (isDefined(expanded.contractName)) this.uri.setContract(expanded.contractName);
+            if (isDefined(expanded.dataSet)) this.uri.setCompanyDataset(expanded.dataSet);
+            if (isDefined(expanded.port)) this.uri.setPort(expanded.port);
+            if (isDefined(expanded.protocol)) this.uri.setScheme(expanded.protocol);
+
+            if (isDefined(expanded.includeContent)) this.uri.setIncludeContent(expanded.includeContent);
+            if (isDefined(expanded.version)) this.uri.setVersion(expanded.version);
+            if (isDefined(expanded.json)) this.json = expanded.json;
+
+            if (isDefined(expanded.userName)) this.userName = expanded.userName;
+            if (isDefined(expanded.password)) this.password = expanded.password;
+            if (isDefined(expanded.useCredentialedRequest)) this.useCredentialedRequest = expanded.useCredentialedRequest;
 
             this.addEvents(
                 'beforerequest',

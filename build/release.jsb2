@@ -57,6 +57,9 @@
 			text: 'ObjTree.js',
 			path: '../libraries/'
 		},{
+		    text: 'parseuri.js',
+		    path: '../libraries/'
+		},{
 			text: 'sage.js',
 			path: '../libraries/sage/'
 		},{

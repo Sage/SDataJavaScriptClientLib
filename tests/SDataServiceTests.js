@@ -14,6 +14,34 @@ describe('SDataService', function() {
         expect(service.uri.build()).toEqual("https://localhost:8080/sdata/aw/dynamic/alpha?_includeContent=true");
     });
 
+    it('can set available url properties via url passed to constructor', function() {
+        var service = new Sage.SData.Client.SDataService("https://localhost:8080/sdata/aw/dynamic/alpha");
+        
+        expect(service.uri.build()).toEqual("https://localhost:8080/sdata/aw/dynamic/alpha");
+    });
+
+    it('can set credentials via arguments passed to constructor', function() {
+        var service = new Sage.SData.Client.SDataService("https://localhost:8080/sdata/aw/dynamic/alpha", "admin", "password");
+
+        expect(service.uri.build()).toEqual("https://localhost:8080/sdata/aw/dynamic/alpha");
+        expect(service.getUserName()).toEqual("admin");
+        expect(service.getPassword()).toEqual("password");
+    });
+
+    it('can mix and match url properties via object passed to constructor', function() {
+        var service = new Sage.SData.Client.SDataService({
+            url: "https://localhost:8080/sdata/aw/dynamic/alpha",
+            applicationName: "sample",
+            dataSet: "omega",
+            userName: "user",
+            password: "password"
+        }, "admin");
+
+        expect(service.uri.build()).toEqual("https://localhost:8080/sdata/sample/dynamic/omega");
+        expect(service.getUserName()).toEqual("admin");
+        expect(service.getPassword()).toEqual("password");
+    });
+
     it('does provide data set segment to requests', function() {
         var service = new Sage.SData.Client.SDataService({
             serverName: 'localhost',
