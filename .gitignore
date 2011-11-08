@@ -29,3 +29,5 @@ deploy/src/
 _ReSharper*/
 [Tt]est[Rr]esult*
 .idea/
+
+web.config

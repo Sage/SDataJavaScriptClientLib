@@ -840,8 +840,8 @@
             if (!response.responseText) return null;
 
             var contentType = response.getResponseHeader && response.getResponseHeader('Content-Type');
-            
-            if ((contentType === 'application/json') || (!contentType && this.isJsonEnabled()))
+
+            if (/application\/json/i.test(contentType) || (!contentType && this.isJsonEnabled()))
             {
                 var doc = JSON.parse(response.responseText);
 
