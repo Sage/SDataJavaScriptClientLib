@@ -102,12 +102,11 @@
             var xhr = new XMLHttpRequest();
 
             if (o.user)
-            {
                 xhr.open(o.method, o.url, o.async !== false, o.user, o.password);
-                xhr.withCredentials = true;
-            }
             else
                 xhr.open(o.method, o.url, o.async !== false);
+
+            if (o.withCredentials) xhr.withCredentials = true;
 
             try
             {

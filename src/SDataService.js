@@ -57,6 +57,7 @@
     Sage.SData.Client.SDataService = Sage.Evented.extend({
         uri: null,
         useCredentialedRequest: false,
+        useCrossDomainCookies: false,
         userAgent: 'Sage',
         userName: false,
         password: '',
@@ -86,7 +87,9 @@
 
             if (isDefined(expanded.userName)) this.userName = expanded.userName;
             if (isDefined(expanded.password)) this.password = expanded.password;
+
             if (isDefined(expanded.useCredentialedRequest)) this.useCredentialedRequest = expanded.useCredentialedRequest;
+            if (isDefined(expanded.useCrossDomainCookies)) this.useCrossDomainCookies = expanded.useCrossDomainCookies;
 
             this.addEvents(
                 'beforerequest',
@@ -259,8 +262,13 @@
             /* we only handle `Accept` for now */
             if (request.extendedHeaders['Accept'])
                 o.headers['Accept'] = this.extendAcceptRequestHeader(o.headers['Accept'], request.extendedHeaders['Accept']);
-            
-            if (this.userName && this.useCredentialedRequest)
+
+            if (this.useCredentialedRequest || this.useCrossDomainCookies)
+            {
+                o.withCredentials = true;
+            }
+
+            if (this.useCredentialedRequest && this.userName)
             {
                 o.user = this.userName;
                 o.password = this.password;
