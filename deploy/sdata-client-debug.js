@@ -1337,12 +1337,10 @@
 
             this.fireEvent('beforerequest', request, o);
 
-            /* if the event provided its own result, do not execute the ajax call */
-            if (typeof o.result !== 'undefined')
+            /* if the event provides its own bypass caller, do not execute the ajax call */
+            if (typeof o.bypass === 'function')
             {
-                if (options.success)
-                    options.success.call(options.scope || this, o.result);
-
+                o.bypass.apply(o.bypassScope || this, [request, options, o]);
                 return;
             }
 
