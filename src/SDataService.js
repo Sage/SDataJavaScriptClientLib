@@ -52,7 +52,9 @@
                 ? value['#text']
                 : value;
         },
-        nsRE = /^(.+?):(.*)$/;
+        nsRE = /^(.+?):(.*)$/,
+        applicationJsonRE = /application\/json/i,
+        applicationXmlRE = /application\/xml/i;
 
     Sage.SData.Client.SDataService = Sage.Evented.extend({
         uri: null,
@@ -244,10 +246,12 @@
                         options.success.call(options.scope || this, feed);
                 },
                 failure: function(response, opt) {
-                    this.fireEvent('requestexception', request, opt, response);
+                    var error = this.processError(response);
+
+                    this.fireEvent('requestexception', request, opt, error, response);
 
                     if (options.failure)
-                        options.failure.call(options.scope || this, response, opt);
+                        options.failure.call(options.scope || this, error, response, opt);
                 },
                 aborted: function(response, opt) {
                     this.fireEvent('requestaborted', request, opt, response);
@@ -876,12 +880,58 @@
 
             return {'feed': result};
         },
+        processError: function(response) {
+            if (!response.responseText) return null;
+
+            var contentType = response.getResponseHeader && response.getResponseHeader('Content-Type');
+
+            // There *must* be a Content-Type in order to process errors.  Since there is currently no way to detect if the error was raised
+            // by the SData layer, or by the web server itself, in order to process error content, the Content-Type must be used.
+            if (applicationJsonRE.test(contentType))
+            {
+                return JSON.parse(response.responseText);
+            }
+            else if (applicationXmlRE.test(contentType))
+            {
+                var xml = new XML.ObjTree();
+                xml.attr_prefix = '@';
+
+                var doc = xml.parseXML(response.responseText);
+                if (doc.hasOwnProperty('sdata:diagnoses'))
+                {
+                    var raw = S.isArray(doc['sdata:diagnoses']) ? doc['sdata:diagnoses'] : [doc['sdata:diagnoses']],
+                        diagnoses = [];
+
+                    for (var i = 0; i < raw.length; i++)
+                    {
+                        diagnoses.push({
+                            'severity': raw[i]['sdata:severity'],
+                            'sdataCode': raw[i]['sdata:severity'],
+                            'applicationCode': raw[i]['sdata:severity'],
+                            'message': raw[i]['sdata:severity'],
+                            'stackTrace': raw[i]['sdata:severity'],
+                            'payloadPath': raw[i]['sdata:severity']
+                        });
+                    }
+
+                    return diagnoses;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                return null;
+            }
+        },
         processFeed: function(response) {
             if (!response.responseText) return null;
 
             var contentType = response.getResponseHeader && response.getResponseHeader('Content-Type');
 
-            if (/application\/json/i.test(contentType) || (!contentType && this.isJsonEnabled()))
+            if (applicationJsonRE.test(contentType) || (!contentType && this.isJsonEnabled()))
             {
                 var doc = JSON.parse(response.responseText);
 

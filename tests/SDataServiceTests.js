@@ -78,4 +78,12 @@ describe('SDataService', function() {
             expect(options).toHaveProperty('headers.Accept', 'application/atom+xml;type=feed;view=other,*/*;view=other');
         })(Sage.SData.Client.Ajax.request.mostRecentCall.args[0]);
     });
+
+    it('can process error diagnoses from XML', function() {
+
+    });
+
+    it('can process error diagnoses from XML', function() {
+
+    });
 });

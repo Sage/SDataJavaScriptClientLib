@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sdata:diagnoses xmlns="http://schemas.sage.com/sdata/2008/1" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:sme="http://schemas.sage.com/sdata/sme/2007" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sdata="http://schemas.sage.com/sdata/2008/1" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:http="http://schemas.sage.com/sdata/http/2008/1" xmlns:sync="http://schemas.sage.com/sdata/sync/2008/1">
+  <sdata:diagnosis>
+    <sdata:severity>error</sdata:severity>
+    <sdata:sdataCode>ApplicationDiagnosis</sdata:sdataCode>
+    <sdata:applicationCode xsi:nil="true" />
+    <sdata:message>could not resolve property: dddd of: Sage.SalesLogix.Entities.Account</sdata:message>
+    <sdata:stackTrace>NHibernate.QueryException: could not resolve property: dddd of: Sage.SalesLogix.Entities.Account
+   at NHibernate.Persister.Entity.AbstractPropertyMapping.ToType(String propertyName)
+   at NHibernate.Persister.Entity.AbstractEntityPersister.GetSubclassPropertyTableNumber(String propertyPath)
+   at NHibernate.Persister.Entity.BasicEntityPropertyMapping.ToColumns(String alias, String propertyName)
+   at NHibernate.Persister.Entity.AbstractEntityPersister.ToColumns(String alias, String propertyName)
+   at NHibernate.Loader.Criteria.CriteriaQueryTranslator.GetColumns(ICriteria subcriteria, String propertyName)
+   at NHibernate.Loader.Criteria.CriteriaQueryTranslator.GetColumnsUsingProjection(ICriteria subcriteria, String propertyName)
+   at NHibernate.Criterion.PropertyProjection.ToSqlString(ICriteria criteria, Int32 loc, ICriteriaQuery criteriaQuery, IDictionary`2 enabledFilters)
+   at NHibernate.Criterion.CriterionUtil.GetColumnNamesUsingProjection(IProjection projection, ICriteriaQuery criteriaQuery, ICriteria criteria, IDictionary`2 enabledFilters)
+   at NHibernate.Criterion.SimpleExpression.ToSqlString(ICriteria criteria, ICriteriaQuery criteriaQuery, IDictionary`2 enabledFilters)
+   at NHibernate.Loader.Criteria.CriteriaQueryTranslator.GetWhereCondition(IDictionary`2 enabledFilters)
+   at NHibernate.Loader.Criteria.CriteriaJoinWalker..ctor(IOuterJoinLoadable persister, CriteriaQueryTranslator translator, ISessionFactoryImplementor factory, ICriteria criteria, String rootEntityName, IDictionary`2 enabledFilters)
+   at NHibernate.Loader.Criteria.CriteriaLoader..ctor(IOuterJoinLoadable persister, ISessionFactoryImplementor factory, CriteriaImpl rootCriteria, String rootEntityName, IDictionary`2 enabledFilters)
+   at NHibernate.Impl.SessionImpl.List(CriteriaImpl criteria, IList results)
+   at NHibernate.Impl.CriteriaImpl.List(IList results)
+   at NHibernate.Impl.CriteriaImpl.UniqueResult[T]()
+   at Sage.Platform.SData.RequestHandlerBase`3.GetEntities(SDataUri uri, Int64&amp; totalResults, Int32&amp; startIndex, Int32&amp; itemsPerPage)
+   at Sage.Platform.SData.RequestHandlerBase`3.InternalGet()
+   at Invoke731b667614574bd79affc71c8d960371.Invoke(Object , IRequest )
+   at Sage.Integration.Messaging.RequestTargetRegistration.RequestTargetInvoker.Invoke(IRequest request)
+   at Sage.Integration.Messaging.Request.Process(RequestTargetInvoker invoker)
+   at Sage.Integration.Adapter.AdapterController.RealAdapterController.Process(IRequest request)
+   at Sage.Integration.Adapter.AdapterController.RealAdapterController.ProcessWorker(IProtocolRequest protocolRequest)
+   at Sage.Integration.Adapter.AdapterController.Process(IProtocolRequest request)
+   at Sage.Integration.Messaging.MessagingService.Process(IProtocolRequest protocolRequest)</sdata:stackTrace>
+    <sdata:payloadPath />
+  </sdata:diagnosis>
+  <sdata:diagnosis>
+    <sdata:severity>error</sdata:severity>
+    <sdata:sdataCode>ApplicationDiagnosis</sdata:sdataCode>
+    <sdata:applicationCode xsi:nil="true" />
+    <sdata:message>could not resolve property: dddd of: Sage.SalesLogix.Entities.Account</sdata:message>
+    <sdata:stackTrace>NHibernate.QueryException: could not resolve property: dddd of: Sage.SalesLogix.Entities.Account
+   at NHibernate.Persister.Entity.AbstractPropertyMapping.ToType(String propertyName)
+   at NHibernate.Persister.Entity.AbstractEntityPersister.GetSubclassPropertyTableNumber(String propertyPath)
+   at NHibernate.Persister.Entity.BasicEntityPropertyMapping.ToColumns(String alias, String propertyName)
+   at NHibernate.Persister.Entity.AbstractEntityPersister.ToColumns(String alias, String propertyName)
+   at NHibernate.Loader.Criteria.CriteriaQueryTranslator.GetColumns(ICriteria subcriteria, String propertyName)
+   at NHibernate.Loader.Criteria.CriteriaQueryTranslator.GetColumnsUsingProjection(ICriteria subcriteria, String propertyName)
+   at NHibernate.Criterion.PropertyProjection.ToSqlString(ICriteria criteria, Int32 loc, ICriteriaQuery criteriaQuery, IDictionary`2 enabledFilters)
+   at NHibernate.Criterion.CriterionUtil.GetColumnNamesUsingProjection(IProjection projection, ICriteriaQuery criteriaQuery, ICriteria criteria, IDictionary`2 enabledFilters)
+   at NHibernate.Criterion.SimpleExpression.ToSqlString(ICriteria criteria, ICriteriaQuery criteriaQuery, IDictionary`2 enabledFilters)
+   at NHibernate.Loader.Criteria.CriteriaQueryTranslator.GetWhereCondition(IDictionary`2 enabledFilters)
+   at NHibernate.Loader.Criteria.CriteriaJoinWalker..ctor(IOuterJoinLoadable persister, CriteriaQueryTranslator translator, ISessionFactoryImplementor factory, ICriteria criteria, String rootEntityName, IDictionary`2 enabledFilters)
+   at NHibernate.Loader.Criteria.CriteriaLoader..ctor(IOuterJoinLoadable persister, ISessionFactoryImplementor factory, CriteriaImpl rootCriteria, String rootEntityName, IDictionary`2 enabledFilters)
+   at NHibernate.Impl.SessionImpl.List(CriteriaImpl criteria, IList results)
+   at NHibernate.Impl.CriteriaImpl.List(IList results)
+   at NHibernate.Impl.CriteriaImpl.UniqueResult[T]()
+   at Sage.Platform.SData.RequestHandlerBase`3.GetEntities(SDataUri uri, Int64&amp; totalResults, Int32&amp; startIndex, Int32&amp; itemsPerPage)
+   at Sage.Platform.SData.RequestHandlerBase`3.InternalGet()
+   at Invoke731b667614574bd79affc71c8d960371.Invoke(Object , IRequest )
+   at Sage.Integration.Messaging.RequestTargetRegistration.RequestTargetInvoker.Invoke(IRequest request)
+   at Sage.Integration.Messaging.Request.Process(RequestTargetInvoker invoker)
+   at Sage.Integration.Adapter.AdapterController.RealAdapterController.Process(IRequest request)
+   at Sage.Integration.Adapter.AdapterController.RealAdapterController.ProcessWorker(IProtocolRequest protocolRequest)
+   at Sage.Integration.Adapter.AdapterController.Process(IProtocolRequest request)
+   at Sage.Integration.Messaging.MessagingService.Process(IProtocolRequest protocolRequest)</sdata:stackTrace>
+    <sdata:payloadPath />
+  </sdata:diagnosis>
+</sdata:diagnoses>
